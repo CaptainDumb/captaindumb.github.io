@@ -913,7 +913,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "33";
+	app.meta.h["build"] = "34";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "ld47";
 	app.meta.h["name"] = "fnf 0.2 (2/98)";
@@ -7709,6 +7709,8 @@ var IncrementalState = function() {
 	this.upgradeButtons = [];
 	this.upgrades = [];
 	this.passiveRate = 0;
+	this.FormulaLevel = 0;
+	this.FormulaBoost = 1;
 	this.clickMulti = 1;
 	this.baseMulti = 0.0000001;
 	this.points = 0;
@@ -7719,7 +7721,7 @@ IncrementalState.__name__ = "IncrementalState";
 IncrementalState.__super__ = flixel_FlxState;
 IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	initUpgrades: function() {
-		this.upgrades = [{ id : "clickboost1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100}];
+		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 1, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e7, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e10, costMult : 1.5, multiplier : 1.05, maxLevel : 10}];
 	}
 	,buyUpgrade: function(id) {
 		var _g = 0;
@@ -7820,6 +7822,13 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	,scientific: function(value) {
 		var exp = Math.floor(Math.log(value) / Math.log(10));
 		var mantissa = value / Math.pow(10,exp);
+		if(exp >= 9) {
+			return Std.string(this.floorTo(mantissa,6)) + "e" + exp;
+		} else if(exp <= 99) {
+			return Std.string(this.floorTo(mantissa,5)) + "e" + exp;
+		} else if(exp <= 999) {
+			return Std.string(this.floorTo(mantissa,4)) + "e" + exp;
+		}
 		return Std.string(this.floorTo(mantissa,2)) + "e" + exp;
 	}
 	,create: function() {
@@ -7827,7 +7836,7 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		flixel_FlxState.prototype.create.call(this);
 		this.initUpgrades();
 		this.createUpgradeUI();
-		flixel_FlxG.sound.playMusic("assets/music/HaxeFlixel_Tutorial_Game.ogg",0,false);
+		flixel_FlxG.sound.playMusic("assets/music/HaxeFlixel_Tutorial_Game.mp3",0,false);
 		this.pointsText = new flixel_text_FlxText(10,10,0,"points: 0");
 		this.pointsText.set_size(16);
 		this.add(this.pointsText);
@@ -7839,7 +7848,7 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		this.saveWarningText = new flixel_text_FlxText(4,flixel_FlxG.height - 36,0,"WARNING: SAVING NOT YET IMPLEMENTED");
 		this.saveWarningText.set_size(8);
 		this.add(this.saveWarningText);
-		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"PROTOTYPE 1 - endgame = 1m points");
+		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"PROTOTYPE 2 - endgame = 1e10 points");
 		this.versionText.set_size(8);
 		this.add(this.versionText);
 		new flixel_util_FlxTimer().start(1,function(_) {
@@ -7853,8 +7862,39 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
 		this.clickMulti = 1;
-		if(this.points > 1e6) {
-			this.points = 1e6;
+		switch(this.FormulaLevel) {
+		case 0:
+			this.FormulaBoost = 1.0;
+			break;
+		case 1:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 5000) + 1) + 1) + 1),1);
+			break;
+		case 2:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 4000) + 1) + 1) + 1),1);
+			break;
+		case 3:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 3000) + 1) + 1) + 1),1);
+			break;
+		case 4:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 2500) + 1) + 1) + 1),1);
+			break;
+		case 5:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 2000) + 1) + 1) + 1),1);
+			break;
+		case 6:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 1750) + 1) + 1) + 1),1);
+			break;
+		}
+		var f = this.FormulaBoost;
+		if(isNaN(f)) {
+			this.FormulaBoost = 1;
+		}
+		var f = this.points;
+		if(isNaN(f)) {
+			this.points = 0;
+		}
+		if(this.points > 1e10) {
+			this.points = 1e10;
 		}
 		var _g = 0;
 		var _g1 = this.upgrades;
@@ -7863,31 +7903,29 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 			++_g;
 			if(u.level > 0) {
 				switch(u.id) {
-				case "clickboost1":
-					this.clickMulti *= u.multiplier * u.level;
+				case "formula":
+					this.FormulaLevel = u.level;
 					break;
-				case "clickboost2":
-					this.clickMulti *= u.multiplier * u.level;
+				case "powers1":
+					this.clickMulti *= Math.pow(u.multiplier,u.level);
 					break;
-				case "clickboost3":
+				default:
 					this.clickMulti *= u.multiplier * u.level;
-					break;
-				case "clickboost4":
-					this.clickMulti *= u.multiplier * u.level;
-					break;
-				case "clickboost5":
-					this.clickMulti *= u.multiplier * u.level;
-					break;
 				}
 			}
 		}
+		this.clickMulti *= this.FormulaBoost;
 		var _g = 0;
 		var _g1 = this.upgrades.length;
 		while(_g < _g1) {
 			var i = _g++;
 			var u = this.upgrades[i];
 			var cost = this.getCost(u);
-			this.upgradeTexts[i].set_text(u.id + "\nCost: " + this.checkRounding(cost) + " | Level: " + u.level + "/" + u.maxLevel);
+			if(u.level == u.maxLevel) {
+				this.upgradeTexts[i].set_text(u.name + "\nMAX LEVEL REACHED");
+				continue;
+			}
+			this.upgradeTexts[i].set_text(u.name + "\nCost: " + this.checkRounding(cost) + " | Level: " + u.level + "/" + u.maxLevel);
 		}
 	}
 	,__class__: IncrementalState
@@ -79471,7 +79509,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 41028;
+	this.version = 68920;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
