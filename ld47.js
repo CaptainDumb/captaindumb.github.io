@@ -913,13 +913,13 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "5";
+	app.meta.h["build"] = "33";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "ld47";
-	app.meta.h["name"] = "fnf ld47 1.0 (3/25)";
+	app.meta.h["name"] = "fnf 0.2 (2/98)";
 	app.meta.h["packageName"] = "com.example.myapp";
-	app.meta.h["version"] = "0.0.1.3";
-	var attributes = { allowHighDPI : true, alwaysOnTop : false, borderless : false, element : null, frameRate : 240, height : 720, hidden : false, maximized : false, minimized : false, parameters : { }, resizable : true, title : "fnf ld47 1.0 (3/25)", width : 1280, x : null, y : null};
+	app.meta.h["version"] = "0.0.2.2";
+	var attributes = { allowHighDPI : true, alwaysOnTop : false, borderless : false, element : null, frameRate : 240, height : 720, hidden : false, maximized : false, minimized : false, parameters : { }, resizable : true, title : "fnf 0.2 (2/98)", width : 1280, x : null, y : null};
 	attributes.context = { antialiasing : 0, background : 0, colorDepth : 32, depth : true, hardware : true, stencil : true, type : null, vsync : false};
 	if(app.__window == null) {
 		if(config != null) {
@@ -2635,7 +2635,7 @@ openfl_display_DisplayObject.prototype = $extend(openfl_events_EventDispatcher.p
 			this.__scrollRect = null;
 		}
 		this.__setTransformDirty();
-		if(openfl_display_DisplayObject.__supportDOM) {
+		if(openfl_display_DisplayObject.__supportDOM || this.get_cacheAsBitmap()) {
 			if(!this.__renderDirty) {
 				this.__renderDirty = true;
 				this.__setParentRenderDirty();
@@ -3489,7 +3489,7 @@ openfl_display_Sprite.prototype = $extend(openfl_display_DisplayObjectContainer.
 });
 var Main = function() {
 	openfl_display_Sprite.call(this);
-	this.addChild(new flixel_FlxGame(0,0,flixel_util_typeLimit_InitialState.fromType(PlayState)));
+	this.addChild(new flixel_FlxGame(0,0,flixel_util_typeLimit_InitialState.fromType(EngineStartState)));
 	this.addChild(new openfl_display_FPS(10,3,16777215));
 };
 $hxClasses["Main"] = Main;
@@ -3512,72 +3512,6 @@ DocumentClass.prototype = $extend(Main.prototype,{
 var AssetPaths = function() { };
 $hxClasses["AssetPaths"] = AssetPaths;
 AssetPaths.__name__ = "AssetPaths";
-var ChartParser = function() { };
-$hxClasses["ChartParser"] = ChartParser;
-ChartParser.__name__ = "ChartParser";
-ChartParser.parse = function(songName,section) {
-	var IMG_WIDTH = 8;
-	var regex = new EReg("[ \t]*((\r\n)|\r|\n)[ \t]*","g");
-	var csvData = flixel_util_FlxStringUtil.imageToCSV("assets/data/" + songName + "/section" + section + ".png");
-	var lines = regex.split(csvData);
-	var _g = [];
-	var _g1 = 0;
-	var _g2 = lines;
-	while(_g1 < _g2.length) {
-		var v = _g2[_g1];
-		++_g1;
-		if(v != "") {
-			_g.push(v);
-		}
-	}
-	var rows = _g;
-	StringTools.replace(csvData,"\n",",");
-	var heightInTiles = rows.length;
-	var widthInTiles = 0;
-	var row = 0;
-	var dopeArray = [];
-	while(row < heightInTiles) {
-		var rowString = rows[row];
-		if(StringTools.endsWith(rowString,",")) {
-			rowString = HxOverrides.substr(rowString,0,rowString.length - 1);
-		}
-		var columns = rowString.split(",");
-		if(columns.length == 0) {
-			--heightInTiles;
-			continue;
-		}
-		if(widthInTiles == 0) {
-			widthInTiles = columns.length;
-		}
-		var column = 0;
-		var pushedInColumn = false;
-		while(column < widthInTiles) {
-			var columnString = columns[column];
-			var curTile = Std.parseInt(columnString);
-			if(curTile == null) {
-				throw haxe_Exception.thrown("String in row " + row + ", column " + column + " is not a valid integer: \"" + columnString + "\"");
-			}
-			if(curTile == 1) {
-				if(column < 4) {
-					dopeArray.push(column + 1);
-				} else {
-					var tempCol = (column + 1) * -1;
-					tempCol += 4;
-					dopeArray.push(tempCol);
-				}
-				pushedInColumn = true;
-			}
-			++column;
-		}
-		if(!pushedInColumn) {
-			dopeArray.push(0);
-		}
-		++row;
-	}
-	haxe_Log.trace(dopeArray.length,{ fileName : "source/ChartParser.hx", lineNumber : 79, className : "ChartParser", methodName : "parse"});
-	haxe_Log.trace(dopeArray,{ fileName : "source/ChartParser.hx", lineNumber : 80, className : "ChartParser", methodName : "parse"});
-	return dopeArray;
-};
 var flixel_util_IFlxDestroyable = function() { };
 $hxClasses["flixel.util.IFlxDestroyable"] = flixel_util_IFlxDestroyable;
 flixel_util_IFlxDestroyable.__name__ = "flixel.util.IFlxDestroyable";
@@ -3691,1282 +3625,6 @@ flixel_FlxBasic.prototype = {
 	,__class__: flixel_FlxBasic
 	,__properties__: {get_container:"get_container",set_cameras:"set_cameras",get_cameras:"get_cameras",set_camera:"set_camera",get_camera:"get_camera",set_exists:"set_exists",set_alive:"set_alive",set_visible:"set_visible",set_active:"set_active"}
 };
-var flixel_group_FlxTypedGroup = function(MaxSize) {
-	if(MaxSize == null) {
-		MaxSize = 0;
-	}
-	this._marker = 0;
-	this.length = 0;
-	flixel_FlxBasic.call(this);
-	this.members = [];
-	this.set_maxSize(Math.abs(MaxSize) | 0);
-	this.flixelType = 2;
-};
-$hxClasses["flixel.group.FlxTypedGroup"] = flixel_group_FlxTypedGroup;
-flixel_group_FlxTypedGroup.__name__ = "flixel.group.FlxTypedGroup";
-flixel_group_FlxTypedGroup.resolveGroup = function(basic) {
-	if(basic != null) {
-		if(basic.flixelType == 2) {
-			return basic;
-		} else if(basic.flixelType == 4) {
-			return basic.group;
-		}
-	}
-	return null;
-};
-flixel_group_FlxTypedGroup.resolveSelectionGroup = function(basic) {
-	return flixel_group_FlxTypedGroup.resolveGroup(basic);
-};
-flixel_group_FlxTypedGroup.__super__ = flixel_FlxBasic;
-flixel_group_FlxTypedGroup.prototype = $extend(flixel_FlxBasic.prototype,{
-	destroy: function() {
-		flixel_FlxBasic.prototype.destroy.call(this);
-		flixel_util_FlxDestroyUtil.destroy(this._memberAdded);
-		flixel_util_FlxDestroyUtil.destroy(this._memberRemoved);
-		if(this.members != null) {
-			var count = this.length;
-			while(count-- > 0) {
-				var basic = this.members.shift();
-				if(basic != null) {
-					basic.destroy();
-				}
-			}
-			this.members = null;
-		}
-	}
-	,update: function(elapsed) {
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && basic.exists && basic.active) {
-				basic.update(elapsed);
-			}
-		}
-	}
-	,draw: function() {
-		var oldDefaultCameras = flixel_FlxCamera._defaultCameras;
-		if(this._cameras != null) {
-			flixel_FlxCamera._defaultCameras = this._cameras;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && basic.exists && basic.visible) {
-				basic.draw();
-			}
-		}
-		flixel_FlxCamera._defaultCameras = oldDefaultCameras;
-	}
-	,add: function(basic) {
-		if(basic == null) {
-			flixel_FlxG.log.advanced("Cannot add a `null` object to a FlxGroup.",flixel_system_debug_log_LogStyle.WARNING,true);
-			return null;
-		}
-		if(this.members.indexOf(basic) >= 0) {
-			return basic;
-		}
-		var index = this.getFirstNull();
-		if(index != -1) {
-			this.members[index] = basic;
-			if(index >= this.length) {
-				this.length = index + 1;
-			}
-			this.onMemberAdd(basic);
-			return basic;
-		}
-		if(this.maxSize > 0 && this.length >= this.maxSize) {
-			return basic;
-		}
-		this.members.push(basic);
-		this.length++;
-		this.onMemberAdd(basic);
-		return basic;
-	}
-	,insert: function(position,object) {
-		if(object == null) {
-			flixel_FlxG.log.advanced("Cannot insert a `null` object into a FlxGroup.",flixel_system_debug_log_LogStyle.WARNING,true);
-			return null;
-		}
-		if(this.members.indexOf(object) >= 0) {
-			return object;
-		}
-		if(position < this.length && this.members[position] == null) {
-			this.members[position] = object;
-			this.onMemberAdd(object);
-			return object;
-		}
-		if(this.maxSize > 0 && this.length >= this.maxSize) {
-			return object;
-		}
-		this.members.splice(position,0,object);
-		this.length++;
-		this.onMemberAdd(object);
-		return object;
-	}
-	,recycle: function(objectClass,objectFactory,force,revive) {
-		if(revive == null) {
-			revive = true;
-		}
-		if(force == null) {
-			force = false;
-		}
-		var _gthis = this;
-		if(this.maxSize > 0) {
-			if(this.length < this.maxSize) {
-				return objectFactory != null ? _gthis.add(objectFactory()) : objectClass != null ? _gthis.add(Type.createInstance(objectClass,[])) : null;
-			}
-			var basic = this.members[this._marker++];
-			if(this._marker >= this.maxSize) {
-				this._marker = 0;
-			}
-			if(revive) {
-				basic.revive();
-			}
-			return basic;
-		}
-		var basic = this.getFirstAvailable(objectClass,force);
-		if(basic != null) {
-			if(revive) {
-				basic.revive();
-			}
-			return basic;
-		}
-		return objectFactory != null ? _gthis.add(objectFactory()) : objectClass != null ? _gthis.add(Type.createInstance(objectClass,[])) : null;
-	}
-	,remove: function(basic,splice) {
-		if(splice == null) {
-			splice = false;
-		}
-		if(this.members == null) {
-			return null;
-		}
-		var index = this.members.indexOf(basic);
-		if(index < 0) {
-			return null;
-		}
-		if(splice) {
-			this.members.splice(index,1);
-			this.length--;
-		} else {
-			this.members[index] = null;
-		}
-		this.onMemberRemove(basic);
-		return basic;
-	}
-	,replace: function(oldObject,newObject) {
-		var index = this.members.indexOf(oldObject);
-		if(index < 0) {
-			return null;
-		}
-		this.members[index] = newObject;
-		this.onMemberRemove(oldObject);
-		this.onMemberAdd(newObject);
-		return newObject;
-	}
-	,sort: function(func,order) {
-		if(order == null) {
-			order = -1;
-		}
-		var _g = func;
-		var a1 = order;
-		var tmp = function(a2,a3) {
-			return _g(a1,a2,a3);
-		};
-		this.members.sort(tmp);
-	}
-	,getFirst: function(func) {
-		var result = null;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && func(basic)) {
-				result = basic;
-				break;
-			}
-		}
-		return result;
-	}
-	,getFirstHelper: function(func) {
-		var result = null;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && func(basic)) {
-				result = basic;
-				break;
-			}
-		}
-		return result;
-	}
-	,getLast: function(func) {
-		var result = null;
-		var i = this.members.length;
-		while(i-- > 0) {
-			var basic = this.members[i];
-			if(basic != null && func(basic)) {
-				result = basic;
-				break;
-			}
-		}
-		return result;
-	}
-	,getFirstIndex: function(func) {
-		var result = -1;
-		var _g_current = 0;
-		var _g_array = this.members;
-		while(_g_current < _g_array.length) {
-			var _g_value = _g_array[_g_current];
-			var _g_key = _g_current++;
-			var i = _g_key;
-			var basic = _g_value;
-			if(basic != null && func(basic)) {
-				result = i;
-				break;
-			}
-		}
-		return result;
-	}
-	,getLastIndex: function(func) {
-		var result = -1;
-		var i = this.members.length;
-		while(i-- > 0) {
-			var basic = this.members[i];
-			if(basic != null && func(basic)) {
-				result = i;
-				break;
-			}
-		}
-		return result;
-	}
-	,any: function(func) {
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && func(basic)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	,every: function(func) {
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && !func(basic)) {
-				return false;
-			}
-		}
-		return true;
-	}
-	,getFirstAvailable: function(objectClass,force) {
-		if(force == null) {
-			force = false;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && !basic.exists && (objectClass == null || js_Boot.__instanceof(basic,objectClass))) {
-				var tmp;
-				if(force) {
-					var c = js_Boot.getClass(basic);
-					tmp = c.__name__ != objectClass.__name__;
-				} else {
-					tmp = false;
-				}
-				if(tmp) {
-					continue;
-				}
-				return basic;
-			}
-		}
-		return null;
-	}
-	,getFirstNull: function() {
-		return this.members.indexOf(null);
-	}
-	,getFirstExisting: function() {
-		var result = null;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && basic.exists) {
-				result = basic;
-				break;
-			}
-		}
-		return result;
-	}
-	,getFirstAlive: function() {
-		var result = null;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && (basic.exists && basic.alive)) {
-				result = basic;
-				break;
-			}
-		}
-		return result;
-	}
-	,getFirstDead: function() {
-		var result = null;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && !basic.alive) {
-				result = basic;
-				break;
-			}
-		}
-		return result;
-	}
-	,countLiving: function() {
-		var count = -1;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null) {
-				if(count < 0) {
-					count = 0;
-				}
-				if(basic.exists && basic.alive) {
-					++count;
-				}
-			}
-		}
-		return count;
-	}
-	,countDead: function() {
-		var count = -1;
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null) {
-				if(count < 0) {
-					count = 0;
-				}
-				if(!basic.alive) {
-					++count;
-				}
-			}
-		}
-		return count;
-	}
-	,getRandom: function(startIndex,length) {
-		if(length == null) {
-			length = 0;
-		}
-		if(startIndex == null) {
-			startIndex = 0;
-		}
-		if(startIndex < 0) {
-			startIndex = 0;
-		}
-		if(length <= 0) {
-			length = this.length;
-		}
-		return flixel_FlxG.random.getObject_flixel_group_FlxTypedGroup_T(this.members,null,startIndex,length);
-	}
-	,clear: function() {
-		this.length = 0;
-		if(this._memberRemoved != null) {
-			var _g = 0;
-			var _g1 = this.members;
-			while(_g < _g1.length) {
-				var member = _g1[_g];
-				++_g;
-				this.onMemberRemove(member);
-			}
-		}
-		flixel_util_FlxArrayUtil.clearArray(this.members);
-	}
-	,killMembers: function() {
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && basic.exists) {
-				basic.kill();
-			}
-		}
-	}
-	,kill: function() {
-		this.killMembers();
-		flixel_FlxBasic.prototype.kill.call(this);
-	}
-	,reviveMembers: function() {
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && !basic.exists) {
-				basic.revive();
-			}
-		}
-	}
-	,revive: function() {
-		this.reviveMembers();
-		flixel_FlxBasic.prototype.revive.call(this);
-	}
-	,iterator: function(filter) {
-		return new flixel_group_FlxTypedGroupIterator(this.members,filter);
-	}
-	,keyValueIterator: function() {
-		return new haxe_iterators_ArrayKeyValueIterator(this.members);
-	}
-	,forEach: function(func,recurse) {
-		if(recurse == null) {
-			recurse = false;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null) {
-				if(recurse) {
-					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
-					if(group != null) {
-						group.forEach(func,recurse);
-					}
-				}
-				func(basic);
-			}
-		}
-	}
-	,forEachAlive: function(func,recurse) {
-		if(recurse == null) {
-			recurse = false;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && basic.exists && basic.alive) {
-				if(recurse) {
-					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
-					if(group != null) {
-						group.forEachAlive(func,recurse);
-					}
-				}
-				func(basic);
-			}
-		}
-	}
-	,forEachDead: function(func,recurse) {
-		if(recurse == null) {
-			recurse = false;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && !basic.alive) {
-				if(recurse) {
-					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
-					if(group != null) {
-						group.forEachDead(func,recurse);
-					}
-				}
-				func(basic);
-			}
-		}
-	}
-	,forEachExists: function(func,recurse) {
-		if(recurse == null) {
-			recurse = false;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null && basic.exists) {
-				if(recurse) {
-					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
-					if(group != null) {
-						group.forEachExists(func,recurse);
-					}
-				}
-				func(basic);
-			}
-		}
-	}
-	,forEachOfType: function(objectClass,func,recurse) {
-		if(recurse == null) {
-			recurse = false;
-		}
-		var _g = 0;
-		var _g1 = this.members;
-		while(_g < _g1.length) {
-			var basic = _g1[_g];
-			++_g;
-			if(basic != null) {
-				if(recurse) {
-					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
-					if(group != null) {
-						group.forEachOfType(objectClass,func,recurse);
-					}
-				}
-				if(js_Boot.__instanceof(basic,objectClass)) {
-					func(basic);
-				}
-			}
-		}
-	}
-	,set_maxSize: function(size) {
-		this.maxSize = Math.abs(size) | 0;
-		if(this._marker >= this.maxSize) {
-			this._marker = 0;
-		}
-		if(this.maxSize == 0 || this.members == null || this.maxSize >= this.length) {
-			return this.maxSize;
-		}
-		while(this.length > this.maxSize) {
-			var basic = this.members.splice(this.maxSize - 1,1)[0];
-			if(basic != null) {
-				this.onMemberRemove(basic);
-				basic.destroy();
-			}
-			this.length--;
-		}
-		return this.maxSize;
-	}
-	,onMemberAdd: function(member) {
-		if(this._memberAdded != null) {
-			this._memberAdded.dispatch(member);
-		}
-	}
-	,onMemberRemove: function(member) {
-		if(this._memberRemoved != null) {
-			this._memberRemoved.dispatch(member);
-		}
-	}
-	,get_memberAdded: function() {
-		if(this._memberAdded == null) {
-			this._memberAdded = new flixel_util__$FlxSignal_FlxSignal1();
-		}
-		return this._memberAdded;
-	}
-	,get_memberRemoved: function() {
-		if(this._memberRemoved == null) {
-			this._memberRemoved = new flixel_util__$FlxSignal_FlxSignal1();
-		}
-		return this._memberRemoved;
-	}
-	,__class__: flixel_group_FlxTypedGroup
-	,__properties__: $extend(flixel_FlxBasic.prototype.__properties__,{get_memberRemoved:"get_memberRemoved",get_memberAdded:"get_memberAdded",set_maxSize:"set_maxSize"})
-});
-var flixel_group_FlxTypedContainer = function(maxSize) {
-	if(maxSize == null) {
-		maxSize = 0;
-	}
-	flixel_group_FlxTypedGroup.call(this,maxSize);
-};
-$hxClasses["flixel.group.FlxTypedContainer"] = flixel_group_FlxTypedContainer;
-flixel_group_FlxTypedContainer.__name__ = "flixel.group.FlxTypedContainer";
-flixel_group_FlxTypedContainer.__super__ = flixel_group_FlxTypedGroup;
-flixel_group_FlxTypedContainer.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
-	onMemberAdd: function(member) {
-		if(member.get_container() != null) {
-			member.get_container().remove(member);
-		}
-		member.container = this;
-		flixel_group_FlxTypedGroup.prototype.onMemberAdd.call(this,member);
-	}
-	,onMemberRemove: function(member) {
-		member.container = null;
-		flixel_group_FlxTypedGroup.prototype.onMemberRemove.call(this,member);
-	}
-	,__class__: flixel_group_FlxTypedContainer
-});
-var flixel_FlxState = function() {
-	this._requestSubStateReset = false;
-	this.destroySubStates = true;
-	this.persistentDraw = true;
-	this.persistentUpdate = false;
-	flixel_group_FlxTypedContainer.call(this,0);
-};
-$hxClasses["flixel.FlxState"] = flixel_FlxState;
-flixel_FlxState.__name__ = "flixel.FlxState";
-flixel_FlxState.__super__ = flixel_group_FlxTypedContainer;
-flixel_FlxState.prototype = $extend(flixel_group_FlxTypedContainer.prototype,{
-	create: function() {
-	}
-	,draw: function() {
-		if(this.persistentDraw || this.subState == null) {
-			flixel_group_FlxTypedContainer.prototype.draw.call(this);
-		}
-		if(this.subState != null) {
-			this.subState.draw();
-		}
-	}
-	,openSubState: function(SubState) {
-		this._requestSubStateReset = true;
-		this._requestedSubState = SubState;
-	}
-	,closeSubState: function() {
-		this._requestSubStateReset = true;
-	}
-	,resetSubState: function() {
-		if(this.subState != null) {
-			if(this.subState.closeCallback != null) {
-				this.subState.closeCallback();
-			}
-			if(this._subStateClosed != null) {
-				this._subStateClosed.dispatch(this.subState);
-			}
-			if(this.destroySubStates) {
-				this.subState.destroy();
-			}
-		}
-		this.subState = this._requestedSubState;
-		this._requestedSubState = null;
-		if(this.subState != null) {
-			if(!this.persistentUpdate) {
-				flixel_FlxG.inputs.onStateSwitch();
-			}
-			this.subState._parentState = this;
-			if(!this.subState._created) {
-				this.subState._created = true;
-				this.subState.create();
-			}
-			if(this.subState.openCallback != null) {
-				this.subState.openCallback();
-			}
-			if(this._subStateOpened != null) {
-				this._subStateOpened.dispatch(this.subState);
-			}
-		}
-	}
-	,destroy: function() {
-		this._constructor = flixel_util_typeLimit_NextState.fromMaker(function() {
-			throw haxe_Exception.thrown("Attempting to resetState while the current state is destroyed");
-		});
-		flixel_util_FlxDestroyUtil.destroy(this._subStateOpened);
-		flixel_util_FlxDestroyUtil.destroy(this._subStateClosed);
-		if(this.subState != null) {
-			this.subState.destroy();
-			this.subState = null;
-		}
-		flixel_group_FlxTypedContainer.prototype.destroy.call(this);
-	}
-	,switchTo: function(nextState) {
-		return true;
-	}
-	,startOutro: function(onOutroComplete) {
-		onOutroComplete();
-	}
-	,onFocusLost: function() {
-	}
-	,onFocus: function() {
-	}
-	,onResize: function(Width,Height) {
-	}
-	,tryUpdate: function(elapsed) {
-		if(this.persistentUpdate || this.subState == null) {
-			this.update(elapsed);
-		}
-		if(this._requestSubStateReset) {
-			this._requestSubStateReset = false;
-			this.resetSubState();
-		}
-		if(this.subState != null) {
-			this.subState.tryUpdate(elapsed);
-		}
-	}
-	,get_bgColor: function() {
-		return flixel_FlxG.cameras.get_bgColor();
-	}
-	,set_bgColor: function(Value) {
-		return flixel_FlxG.cameras.set_bgColor(Value);
-	}
-	,get_subStateOpened: function() {
-		if(this._subStateOpened == null) {
-			this._subStateOpened = new flixel_util__$FlxSignal_FlxSignal1();
-		}
-		return this._subStateOpened;
-	}
-	,get_subStateClosed: function() {
-		if(this._subStateClosed == null) {
-			this._subStateClosed = new flixel_util__$FlxSignal_FlxSignal1();
-		}
-		return this._subStateClosed;
-	}
-	,__class__: flixel_FlxState
-	,__properties__: $extend(flixel_group_FlxTypedContainer.prototype.__properties__,{get_subStateClosed:"get_subStateClosed",get_subStateOpened:"get_subStateOpened",set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
-});
-var Charting = function() {
-	flixel_FlxState.call(this);
-};
-$hxClasses["Charting"] = Charting;
-Charting.__name__ = "Charting";
-Charting.__super__ = flixel_FlxState;
-Charting.prototype = $extend(flixel_FlxState.prototype,{
-	create: function() {
-		var _this = flixel_FlxG.sound.music;
-		_this.cleanup(_this.autoDestroy,true);
-		flixel_FlxState.prototype.create.call(this);
-	}
-	,__class__: Charting
-});
-var Conductor = function() {
-};
-$hxClasses["Conductor"] = Conductor;
-Conductor.__name__ = "Conductor";
-Conductor.prototype = {
-	__class__: Conductor
-};
-var EReg = function(r,opt) {
-	this.r = new RegExp(r,opt.split("u").join(""));
-};
-$hxClasses["EReg"] = EReg;
-EReg.__name__ = "EReg";
-EReg.prototype = {
-	match: function(s) {
-		if(this.r.global) {
-			this.r.lastIndex = 0;
-		}
-		this.r.m = this.r.exec(s);
-		this.r.s = s;
-		return this.r.m != null;
-	}
-	,matched: function(n) {
-		if(this.r.m != null && n >= 0 && n < this.r.m.length) {
-			return this.r.m[n];
-		} else {
-			throw haxe_Exception.thrown("EReg::matched");
-		}
-	}
-	,matchedRight: function() {
-		if(this.r.m == null) {
-			throw haxe_Exception.thrown("No string matched");
-		}
-		var sz = this.r.m.index + this.r.m[0].length;
-		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
-	}
-	,matchedPos: function() {
-		if(this.r.m == null) {
-			throw haxe_Exception.thrown("No string matched");
-		}
-		return { pos : this.r.m.index, len : this.r.m[0].length};
-	}
-	,matchSub: function(s,pos,len) {
-		if(len == null) {
-			len = -1;
-		}
-		if(this.r.global) {
-			this.r.lastIndex = pos;
-			this.r.m = this.r.exec(len < 0 ? s : HxOverrides.substr(s,0,pos + len));
-			var b = this.r.m != null;
-			if(b) {
-				this.r.s = s;
-			}
-			return b;
-		} else {
-			var b = this.match(len < 0 ? HxOverrides.substr(s,pos,null) : HxOverrides.substr(s,pos,len));
-			if(b) {
-				this.r.s = s;
-				this.r.m.index += pos;
-			}
-			return b;
-		}
-	}
-	,split: function(s) {
-		var d = "#__delim__#";
-		return s.replace(this.r,d).split(d);
-	}
-	,map: function(s,f) {
-		var offset = 0;
-		var buf_b = "";
-		do {
-			if(offset >= s.length) {
-				break;
-			} else if(!this.matchSub(s,offset)) {
-				buf_b += Std.string(HxOverrides.substr(s,offset,null));
-				break;
-			}
-			var p = this.matchedPos();
-			buf_b += Std.string(HxOverrides.substr(s,offset,p.pos - offset));
-			buf_b += Std.string(f(this));
-			if(p.len == 0) {
-				buf_b += Std.string(HxOverrides.substr(s,p.pos,1));
-				offset = p.pos + 1;
-			} else {
-				offset = p.pos + p.len;
-			}
-		} while(this.r.global);
-		if(!this.r.global && offset > 0 && offset < s.length) {
-			buf_b += Std.string(HxOverrides.substr(s,offset,null));
-		}
-		return buf_b;
-	}
-	,__class__: EReg
-};
-var HxOverrides = function() { };
-$hxClasses["HxOverrides"] = HxOverrides;
-HxOverrides.__name__ = "HxOverrides";
-HxOverrides.strDate = function(s) {
-	switch(s.length) {
-	case 8:
-		var k = s.split(":");
-		var d = new Date();
-		d["setTime"](0);
-		d["setUTCHours"](k[0]);
-		d["setUTCMinutes"](k[1]);
-		d["setUTCSeconds"](k[2]);
-		return d;
-	case 10:
-		var k = s.split("-");
-		return new Date(k[0],k[1] - 1,k[2],0,0,0);
-	case 19:
-		var k = s.split(" ");
-		var y = k[0].split("-");
-		var t = k[1].split(":");
-		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
-	default:
-		throw haxe_Exception.thrown("Invalid date format : " + s);
-	}
-};
-HxOverrides.cca = function(s,index) {
-	var x = s.charCodeAt(index);
-	if(x != x) {
-		return undefined;
-	}
-	return x;
-};
-HxOverrides.substr = function(s,pos,len) {
-	if(len == null) {
-		len = s.length;
-	} else if(len < 0) {
-		if(pos == 0) {
-			len = s.length + len;
-		} else {
-			return "";
-		}
-	}
-	return s.substr(pos,len);
-};
-HxOverrides.remove = function(a,obj) {
-	var i = a.indexOf(obj);
-	if(i == -1) {
-		return false;
-	}
-	a.splice(i,1);
-	return true;
-};
-HxOverrides.now = function() {
-	return Date.now();
-};
-var Lambda = function() { };
-$hxClasses["Lambda"] = Lambda;
-Lambda.__name__ = "Lambda";
-Lambda.array = function(it) {
-	var a = [];
-	var i = $getIterator(it);
-	while(i.hasNext()) {
-		var i1 = i.next();
-		a.push(i1);
-	}
-	return a;
-};
-Lambda.count = function(it,pred) {
-	var n = 0;
-	if(pred == null) {
-		var _ = $getIterator(it);
-		while(_.hasNext()) {
-			var _1 = _.next();
-			++n;
-		}
-	} else {
-		var x = $getIterator(it);
-		while(x.hasNext()) {
-			var x1 = x.next();
-			if(pred(x1)) {
-				++n;
-			}
-		}
-	}
-	return n;
-};
-var ManifestResources = function() { };
-$hxClasses["ManifestResources"] = ManifestResources;
-ManifestResources.__name__ = "ManifestResources";
-ManifestResources.init = function(config) {
-	ManifestResources.preloadLibraries = [];
-	ManifestResources.preloadLibraryNames = [];
-	ManifestResources.rootPath = null;
-	if(config != null && Object.prototype.hasOwnProperty.call(config,"rootPath")) {
-		ManifestResources.rootPath = Reflect.field(config,"rootPath");
-		if(!StringTools.endsWith(ManifestResources.rootPath,"/")) {
-			ManifestResources.rootPath += "/";
-		}
-	}
-	if(ManifestResources.rootPath == null) {
-		ManifestResources.rootPath = "./";
-	}
-	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
-	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
-	var bundle;
-	var data = "{\"name\":null,\"assets\":\"aoy4:pathy38:assets%2Fdata%2Fbopeebo%2Fbopeebo.jsony4:sizei61y4:typey4:TEXTy2:idR1y7:preloadtgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection1.pngR2i116R3y5:IMAGER5R7R6tgoR0y39:assets%2Fdata%2Fbopeebo%2Fsection10.pngR2i122R3R8R5R9R6tgoR0y39:assets%2Fdata%2Fbopeebo%2Fsection11.pngR2i127R3R8R5R10R6tgoR0y39:assets%2Fdata%2Fbopeebo%2Fsection12.pngR2i100R3R8R5R11R6tgoR0y39:assets%2Fdata%2Fbopeebo%2Fsection13.pngR2i117R3R8R5R12R6tgoR0y39:assets%2Fdata%2Fbopeebo%2Fsection14.pngR2i127R3R8R5R13R6tgoR0y39:assets%2Fdata%2Fbopeebo%2Fsection15.pngR2i125R3R8R5R14R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection2.pngR2i127R3R8R5R15R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection3.pngR2i128R3R8R5R16R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection4.pngR2i123R3R8R5R17R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection5.pngR2i126R3R8R5R18R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection6.pngR2i123R3R8R5R19R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection7.pngR2i117R3R8R5R20R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection8.pngR2i127R3R8R5R21R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fsection9.pngR2i127R3R8R5R22R6tgoR0y28:assets%2Fdata%2Fbopeebo.jsonR2i189R3R4R5R23R6tgoR0y34:assets%2Fdata%2Fdata-goes-here.txtR2zR3R4R5R24R6tgoR0y33:assets%2Fdata%2Fsection1.asepriteR2i566R3y6:BINARYR5R25R6tgoR0y33:assets%2Fdata%2FspecialThanks.txtR2i21R3R4R5R27R6tgoR0y31:assets%2Fimages%2FBOYFRIEND.pngR2i831983R3R8R5R28R6tgoR0y31:assets%2Fimages%2FBOYFRIEND.xmlR2i21614R3R4R5R29R6tgoR0y35:assets%2Fimages%2FDADDY_DEAREST.pngR2i1250586R3R8R5R30R6tgoR0y35:assets%2Fimages%2FDADDY_DEAREST.xmlR2i16982R3R4R5R31R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R4R5R32R6tgoR0y33:assets%2Fimages%2FNOTE_assets.pngR2i58171R3R8R5R33R6tgoR0y33:assets%2Fimages%2FNOTE_assets.xmlR2i1630R3R4R5R34R6tgoR2i3071999R3y5:MUSICR5y28:assets%2Fmusic%2FBopeebo.mp3y9:pathGroupaR36hR6tgoR2i3071999R3R35R5y33:assets%2Fmusic%2FBopeebo_Inst.mp3R37aR38hR6tgoR2i3071999R3R35R5y35:assets%2Fmusic%2FBopeebo_Voices.mp3R37aR39hR6tgoR2i3071999R3R35R5y28:assets%2Fmusic%2FJammer2.mp3R37aR40hR6tgoR0y36:assets%2Fmusic%2Fmusic-goes-here.txtR2zR3R4R5R41R6tgoR0y36:assets%2Fsounds%2Fsounds-go-here.txtR2zR3R4R5R42R6tgoR2i8220R3R35R5y26:flixel%2Fsounds%2Fbeep.mp3R37aR43y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R35R5y28:flixel%2Fsounds%2Fflixel.mp3R37aR45y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i6840R3y5:SOUNDR5R44R37aR43R44hgoR2i33629R3R47R5R46R37aR45R46hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R48R49y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i222R3R8R5R54R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i484R3R8R5R55R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
-	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
-	var library = lime_utils_AssetLibrary.fromManifest(manifest);
-	lime_utils_Assets.registerLibrary("default",library);
-	library = lime_utils_Assets.getLibrary("default");
-	if(library != null) {
-		ManifestResources.preloadLibraries.push(library);
-	} else {
-		ManifestResources.preloadLibraryNames.push("default");
-	}
-};
-var lime_text_Font = function(name) {
-	if(name != null) {
-		this.name = name;
-	}
-	if(!this.__init) {
-		if(this.ascender == undefined) {
-			this.ascender = 0;
-		}
-		if(this.descender == undefined) {
-			this.descender = 0;
-		}
-		if(this.height == undefined) {
-			this.height = 0;
-		}
-		if(this.numGlyphs == undefined) {
-			this.numGlyphs = 0;
-		}
-		if(this.underlinePosition == undefined) {
-			this.underlinePosition = 0;
-		}
-		if(this.underlineThickness == undefined) {
-			this.underlineThickness = 0;
-		}
-		if(this.unitsPerEM == undefined) {
-			this.unitsPerEM = 0;
-		}
-		if(this.__fontID != null) {
-			if(lime_utils_Assets.isLocal(this.__fontID)) {
-				this.__fromBytes(lime_utils_Assets.getBytes(this.__fontID));
-			}
-		} else if(this.__fontPath != null) {
-			this.__fromFile(this.__fontPath);
-		}
-	}
-};
-$hxClasses["lime.text.Font"] = lime_text_Font;
-lime_text_Font.__name__ = "lime.text.Font";
-lime_text_Font.fromBytes = function(bytes) {
-	if(bytes == null) {
-		return null;
-	}
-	var font = new lime_text_Font();
-	font.__fromBytes(bytes);
-	return font;
-};
-lime_text_Font.fromFile = function(path) {
-	if(path == null) {
-		return null;
-	}
-	var font = new lime_text_Font();
-	font.__fromFile(path);
-	return font;
-};
-lime_text_Font.loadFromBytes = function(bytes) {
-	return lime_app_Future.withValue(lime_text_Font.fromBytes(bytes));
-};
-lime_text_Font.loadFromFile = function(path) {
-	var request = new lime_net__$HTTPRequest_$lime_$text_$Font();
-	return request.load(path).then(function(font) {
-		if(font != null) {
-			return lime_app_Future.withValue(font);
-		} else {
-			return lime_app_Future.withError("");
-		}
-	});
-};
-lime_text_Font.loadFromName = function(path) {
-	var font = new lime_text_Font();
-	return font.__loadFromName(path);
-};
-lime_text_Font.__measureFontNode = function(fontFamily) {
-	var node = window.document.createElement("span");
-	node.setAttribute("aria-hidden","true");
-	var text = window.document.createTextNode("BESbswy");
-	node.appendChild(text);
-	var style = node.style;
-	style.display = "block";
-	style.position = "absolute";
-	style.top = "-9999px";
-	style.left = "-9999px";
-	style.fontSize = "300px";
-	style.width = "auto";
-	style.height = "auto";
-	style.lineHeight = "normal";
-	style.margin = "0";
-	style.padding = "0";
-	style.fontVariant = "normal";
-	style.whiteSpace = "nowrap";
-	style.fontFamily = fontFamily;
-	window.document.body.appendChild(node);
-	return node;
-};
-lime_text_Font.prototype = {
-	decompose: function() {
-		return null;
-	}
-	,getGlyph: function(character) {
-		return -1;
-	}
-	,getGlyphs: function(characters) {
-		if(characters == null) {
-			characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^`'\"/\\&*()[]{}<>|:;_-+=?,. ";
-		}
-		return null;
-	}
-	,getGlyphMetrics: function(glyph) {
-		return null;
-	}
-	,renderGlyph: function(glyph,fontSize) {
-		return null;
-	}
-	,renderGlyphs: function(glyphs,fontSize) {
-		return null;
-	}
-	,__copyFrom: function(other) {
-		if(other != null) {
-			this.ascender = other.ascender;
-			this.descender = other.descender;
-			this.height = other.height;
-			this.name = other.name;
-			this.numGlyphs = other.numGlyphs;
-			this.src = other.src;
-			this.underlinePosition = other.underlinePosition;
-			this.underlineThickness = other.underlineThickness;
-			this.unitsPerEM = other.unitsPerEM;
-			this.__fontID = other.__fontID;
-			this.__fontPath = other.__fontPath;
-			this.__init = true;
-		}
-	}
-	,__fromBytes: function(bytes) {
-		this.__fontPath = null;
-	}
-	,__fromFile: function(path) {
-		this.__fontPath = path;
-	}
-	,__initializeSource: function() {
-		this.__init = true;
-	}
-	,__loadFromName: function(name) {
-		var _gthis = this;
-		var promise = new lime_app_Promise();
-		this.name = name;
-		var userAgent = $global.navigator.userAgent.toLowerCase();
-		var isSafari = userAgent.indexOf(" safari/") >= 0 && userAgent.indexOf(" chrome/") < 0;
-		var isUIWebView = new EReg("(iPhone|iPod|iPad).*AppleWebKit(?!.*Version)","i").match(userAgent);
-		if(!isSafari && !isUIWebView && (window.document.fonts && ($_=window.document.fonts,$bind($_,$_.load)))) {
-			window.document.fonts.load("1em '" + name + "'").then(function(_) {
-				promise.complete(_gthis);
-			},function(_) {
-				lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 656, className : "lime.text.Font", methodName : "__loadFromName"});
-				promise.complete(_gthis);
-			});
-		} else {
-			var node1 = lime_text_Font.__measureFontNode("'" + name + "', sans-serif");
-			var node2 = lime_text_Font.__measureFontNode("'" + name + "', serif");
-			var width1 = node1.offsetWidth;
-			var width2 = node2.offsetWidth;
-			var interval = -1;
-			var timeout = 3000;
-			var intervalLength = 50;
-			var intervalCount = 0;
-			var loaded;
-			var timeExpired;
-			var checkFont = function() {
-				intervalCount += 1;
-				loaded = node1.offsetWidth != width1 || node2.offsetWidth != width2;
-				timeExpired = intervalCount * intervalLength >= timeout;
-				if(loaded || timeExpired) {
-					window.clearInterval(interval);
-					node1.parentNode.removeChild(node1);
-					node2.parentNode.removeChild(node2);
-					node1 = null;
-					node2 = null;
-					if(timeExpired) {
-						lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 692, className : "lime.text.Font", methodName : "__loadFromName"});
-					}
-					promise.complete(_gthis);
-				}
-			};
-			interval = window.setInterval(checkFont,intervalLength);
-		}
-		return promise.future;
-	}
-	,__setSize: function(size,dpi) {
-		if(dpi == null) {
-			dpi = 72;
-		}
-	}
-	,__class__: lime_text_Font
-};
-var _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__flixel_fonts_nokiafc22_ttf"] = function() {
-	this.ascender = 2048;
-	this.descender = -512;
-	this.height = 2816;
-	this.numGlyphs = 172;
-	this.underlinePosition = -640;
-	this.underlineThickness = 256;
-	this.unitsPerEM = 2048;
-	this.name = "Nokia Cellphone FC Small";
-	lime_text_Font.call(this);
-};
-$hxClasses["__ASSET__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf;
-_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__flixel_fonts_nokiafc22_ttf";
-_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = lime_text_Font;
-_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(lime_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf
-});
-var _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__flixel_fonts_monsterrat_ttf"] = function() {
-	this.ascender = 968;
-	this.descender = -251;
-	this.height = 1219;
-	this.numGlyphs = 263;
-	this.underlinePosition = -150;
-	this.underlineThickness = 50;
-	this.unitsPerEM = 1000;
-	this.name = "Monsterrat";
-	lime_text_Font.call(this);
-};
-$hxClasses["__ASSET__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf;
-_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__flixel_fonts_monsterrat_ttf";
-_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = lime_text_Font;
-_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(lime_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf
-});
-var openfl_text_Font = function(name) {
-	lime_text_Font.call(this,name);
-};
-$hxClasses["openfl.text.Font"] = openfl_text_Font;
-openfl_text_Font.__name__ = "openfl.text.Font";
-openfl_text_Font.enumerateFonts = function(enumerateDeviceFonts) {
-	if(enumerateDeviceFonts == null) {
-		enumerateDeviceFonts = false;
-	}
-	return openfl_text_Font.__registeredFonts;
-};
-openfl_text_Font.fromBytes = function(bytes) {
-	var font = new openfl_text_Font();
-	font.__fromBytes(openfl_utils_ByteArray.toBytes(bytes));
-	return font;
-};
-openfl_text_Font.fromFile = function(path) {
-	if(path == null) {
-		return null;
-	}
-	var font = new openfl_text_Font();
-	font.__fromFile(path);
-	return font;
-};
-openfl_text_Font.loadFromBytes = function(bytes) {
-	return lime_text_Font.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(limeFont) {
-		var font = new openfl_text_Font();
-		font.__fromLimeFont(limeFont);
-		return lime_app_Future.withValue(font);
-	});
-};
-openfl_text_Font.loadFromFile = function(path) {
-	return lime_text_Font.loadFromFile(path).then(function(limeFont) {
-		var font = new openfl_text_Font();
-		font.__fromLimeFont(limeFont);
-		return lime_app_Future.withValue(font);
-	});
-};
-openfl_text_Font.loadFromName = function(path) {
-	return lime_text_Font.loadFromName(path).then(function(limeFont) {
-		var font = new openfl_text_Font();
-		font.__fromLimeFont(limeFont);
-		return lime_app_Future.withValue(font);
-	});
-};
-openfl_text_Font.registerFont = function(font) {
-	var instance = null;
-	if(js_Boot.getClass(font) == null) {
-		instance = js_Boot.__cast(Type.createInstance(font,[]) , openfl_text_Font);
-	} else {
-		instance = js_Boot.__cast(font , openfl_text_Font);
-	}
-	if(instance != null) {
-		openfl_text_Font.__registeredFonts.push(instance);
-		openfl_text_Font.__fontByName.h[instance.name] = instance;
-	}
-};
-openfl_text_Font.__super__ = lime_text_Font;
-openfl_text_Font.prototype = $extend(lime_text_Font.prototype,{
-	__fromLimeFont: function(font) {
-		this.__copyFrom(font);
-	}
-	,__initialize: function() {
-		return this.__initialized;
-	}
-	,get_fontName: function() {
-		return this.name;
-	}
-	,set_fontName: function(value) {
-		return this.name = value;
-	}
-	,__class__: openfl_text_Font
-	,__properties__: {set_fontName:"set_fontName",get_fontName:"get_fontName"}
-});
-var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = function() {
-	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf());
-	openfl_text_Font.call(this);
-};
-$hxClasses["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf";
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = openfl_text_Font;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(openfl_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf
-});
-var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = function() {
-	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf());
-	openfl_text_Font.call(this);
-};
-$hxClasses["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_monsterrat_ttf";
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = openfl_text_Font;
-_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(openfl_text_Font.prototype,{
-	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf
-});
-Math.__name__ = "Math";
 var flixel_FlxObject = function(x,y,width,height) {
 	if(height == null) {
 		height = 0;
@@ -7718,7 +6376,1904 @@ flixel_FlxSprite.prototype = $extend(flixel_FlxObject.prototype,{
 	,__class__: flixel_FlxSprite
 	,__properties__: $extend(flixel_FlxObject.prototype.__properties__,{set_clipRect:"set_clipRect",set_color:"set_color",set_blend:"set_blend",set_flipY:"set_flipY",set_flipX:"set_flipX",set_facing:"set_facing",set_alpha:"set_alpha",set_graphic:"set_graphic",set_frames:"set_frames",get_numFrames:"get_numFrames",set_frame:"set_frame",set_pixels:"set_pixels",get_pixels:"get_pixels",set_antialiasing:"set_antialiasing",set_useFramePixels:"set_useFramePixels"})
 });
-var Note = function(strumTime,noteData) {
+var Character = function(x,y) {
+	this.debugMode = false;
+	this.animOffsets = new haxe_ds_StringMap();
+	flixel_FlxSprite.call(this,x,y);
+};
+$hxClasses["Character"] = Character;
+Character.__name__ = "Character";
+Character.__super__ = flixel_FlxSprite;
+Character.prototype = $extend(flixel_FlxSprite.prototype,{
+	playAnim: function(AnimName,Force,Reversed,Frame) {
+		if(Frame == null) {
+			Frame = 0;
+		}
+		if(Reversed == null) {
+			Reversed = false;
+		}
+		if(Force == null) {
+			Force = false;
+		}
+		this.animation.play(AnimName,Force,Reversed,Frame);
+		var daOffset = this.animOffsets.h[this.animation._curAnim.name];
+		if(Object.prototype.hasOwnProperty.call(this.animOffsets.h,this.animation._curAnim.name)) {
+			var this1 = this.offset;
+			var x = daOffset[0];
+			var y = daOffset[1];
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
+		}
+	}
+	,addOffset: function(name,x,y) {
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var v = [x,y];
+		this.animOffsets.h[name] = v;
+	}
+	,__class__: Character
+});
+var Boyfriend = function(x,y) {
+	this.stunned = false;
+	Character.call(this,x,y);
+	var tex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/BOYFRIEND.png","assets/images/BOYFRIEND.xml");
+	this.set_frames(tex);
+	this.animation.addByPrefix("idle","BF idle dance",24,false);
+	this.animation.addByPrefix("singUP","BF NOTE UP0",24,false);
+	this.animation.addByPrefix("singLEFT","BF NOTE LEFT0",24,false);
+	this.animation.addByPrefix("singRIGHT","BF NOTE RIGHT0",24,false);
+	this.animation.addByPrefix("singDOWN","BF NOTE DOWN0",24,false);
+	this.animation.addByPrefix("singUPmiss","BF NOTE UP MISS",24,false);
+	this.animation.addByPrefix("singLEFTmiss","BF NOTE LEFT MISS",24,false);
+	this.animation.addByPrefix("singRIGHTmiss","BF NOTE RIGHT MISS",24,false);
+	this.animation.addByPrefix("singDOWNmiss","BF NOTE DOWN MISS",24,false);
+	this.animation.addByPrefix("hey","BF HEY",24,false);
+	this.playAnim("idle");
+	this.set_antialiasing(true);
+	this.addOffset("idle",-5);
+	this.addOffset("singUP",-29,27);
+	this.addOffset("singRIGHT",-38,-7);
+	this.addOffset("singLEFT",12,-6);
+	this.addOffset("singDOWN",-10,-50);
+	this.addOffset("singUPmiss",-29,27);
+	this.addOffset("singRIGHTmiss",-30,21);
+	this.addOffset("singLEFTmiss",12,24);
+	this.addOffset("singDOWNmiss",-11,-19);
+	this.addOffset("hey",7,4);
+};
+$hxClasses["Boyfriend"] = Boyfriend;
+Boyfriend.__name__ = "Boyfriend";
+Boyfriend.__super__ = Character;
+Boyfriend.prototype = $extend(Character.prototype,{
+	update: function(elapsed) {
+		if(StringTools.endsWith(this.animation._curAnim.name,"miss") && this.animation._curAnim.finished && !this.debugMode) {
+			this.playAnim("idle",true,false,10);
+		}
+		Character.prototype.update.call(this,elapsed);
+	}
+	,__class__: Boyfriend
+});
+var ChartParser = function() { };
+$hxClasses["ChartParser"] = ChartParser;
+ChartParser.__name__ = "ChartParser";
+ChartParser.parse = function(songName,section) {
+	var IMG_WIDTH = 8;
+	var regex = new EReg("[ \t]*((\r\n)|\r|\n)[ \t]*","g");
+	var csvData = flixel_util_FlxStringUtil.imageToCSV("assets/data/" + songName + "/" + songName + "_section" + section + ".png");
+	var lines = regex.split(csvData);
+	var _g = [];
+	var _g1 = 0;
+	var _g2 = lines;
+	while(_g1 < _g2.length) {
+		var v = _g2[_g1];
+		++_g1;
+		if(v != "") {
+			_g.push(v);
+		}
+	}
+	var rows = _g;
+	StringTools.replace(csvData,"\n",",");
+	var heightInTiles = rows.length;
+	var widthInTiles = 0;
+	var row = 0;
+	var dopeArray = [];
+	while(row < heightInTiles) {
+		var rowString = rows[row];
+		if(StringTools.endsWith(rowString,",")) {
+			rowString = HxOverrides.substr(rowString,0,rowString.length - 1);
+		}
+		var columns = rowString.split(",");
+		if(columns.length == 0) {
+			--heightInTiles;
+			continue;
+		}
+		if(widthInTiles == 0) {
+			widthInTiles = columns.length;
+		}
+		var column = 0;
+		var pushedInColumn = false;
+		while(column < widthInTiles) {
+			var columnString = columns[column];
+			var curTile = Std.parseInt(columnString);
+			if(curTile == null) {
+				throw haxe_Exception.thrown("String in row " + row + ", column " + column + " is not a valid integer: \"" + columnString + "\"");
+			}
+			if(curTile == 1) {
+				if(column < 4) {
+					dopeArray.push(column + 1);
+				} else {
+					var tempCol = (column + 1) * -1;
+					tempCol += 4;
+					dopeArray.push(tempCol);
+				}
+				pushedInColumn = true;
+			}
+			++column;
+		}
+		if(!pushedInColumn) {
+			dopeArray.push(0);
+		}
+		++row;
+	}
+	return dopeArray;
+};
+var Conductor = function() {
+};
+$hxClasses["Conductor"] = Conductor;
+Conductor.__name__ = "Conductor";
+Conductor.changeBPM = function(newBpm) {
+	Conductor.bpm = newBpm;
+	Conductor.crochet = 60 / Conductor.bpm * 1000;
+	Conductor.stepCrochet = Conductor.crochet / 4;
+};
+Conductor.prototype = {
+	__class__: Conductor
+};
+var Dad = function(x,y) {
+	Character.call(this,x,y);
+	var dadTex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/DADDY_DEAREST.png","assets/images/DADDY_DEAREST.xml");
+	this.set_frames(dadTex);
+	this.animation.addByPrefix("idle","Dad idle dance",24);
+	this.animation.addByPrefix("singUP","Dad Sing Note UP",24);
+	this.animation.addByPrefix("singRIGHT","Dad Sing Note RIGHT",24);
+	this.animation.addByPrefix("singDOWN","Dad Sing Note DOWN",24);
+	this.animation.addByPrefix("singLEFT","Dad Sing Note LEFT",24);
+	this.playAnim("idle");
+	this.addOffset("idle");
+	this.addOffset("singUP",-6,50);
+	this.addOffset("singRIGHT",0,27);
+	this.addOffset("singLEFT",-10,10);
+	this.addOffset("singDOWN",0,-30);
+};
+$hxClasses["Dad"] = Dad;
+Dad.__name__ = "Dad";
+Dad.__super__ = Character;
+Dad.prototype = $extend(Character.prototype,{
+	__class__: Dad
+});
+var EReg = function(r,opt) {
+	this.r = new RegExp(r,opt.split("u").join(""));
+};
+$hxClasses["EReg"] = EReg;
+EReg.__name__ = "EReg";
+EReg.prototype = {
+	match: function(s) {
+		if(this.r.global) {
+			this.r.lastIndex = 0;
+		}
+		this.r.m = this.r.exec(s);
+		this.r.s = s;
+		return this.r.m != null;
+	}
+	,matched: function(n) {
+		if(this.r.m != null && n >= 0 && n < this.r.m.length) {
+			return this.r.m[n];
+		} else {
+			throw haxe_Exception.thrown("EReg::matched");
+		}
+	}
+	,matchedRight: function() {
+		if(this.r.m == null) {
+			throw haxe_Exception.thrown("No string matched");
+		}
+		var sz = this.r.m.index + this.r.m[0].length;
+		return HxOverrides.substr(this.r.s,sz,this.r.s.length - sz);
+	}
+	,matchedPos: function() {
+		if(this.r.m == null) {
+			throw haxe_Exception.thrown("No string matched");
+		}
+		return { pos : this.r.m.index, len : this.r.m[0].length};
+	}
+	,matchSub: function(s,pos,len) {
+		if(len == null) {
+			len = -1;
+		}
+		if(this.r.global) {
+			this.r.lastIndex = pos;
+			this.r.m = this.r.exec(len < 0 ? s : HxOverrides.substr(s,0,pos + len));
+			var b = this.r.m != null;
+			if(b) {
+				this.r.s = s;
+			}
+			return b;
+		} else {
+			var b = this.match(len < 0 ? HxOverrides.substr(s,pos,null) : HxOverrides.substr(s,pos,len));
+			if(b) {
+				this.r.s = s;
+				this.r.m.index += pos;
+			}
+			return b;
+		}
+	}
+	,split: function(s) {
+		var d = "#__delim__#";
+		return s.replace(this.r,d).split(d);
+	}
+	,map: function(s,f) {
+		var offset = 0;
+		var buf_b = "";
+		do {
+			if(offset >= s.length) {
+				break;
+			} else if(!this.matchSub(s,offset)) {
+				buf_b += Std.string(HxOverrides.substr(s,offset,null));
+				break;
+			}
+			var p = this.matchedPos();
+			buf_b += Std.string(HxOverrides.substr(s,offset,p.pos - offset));
+			buf_b += Std.string(f(this));
+			if(p.len == 0) {
+				buf_b += Std.string(HxOverrides.substr(s,p.pos,1));
+				offset = p.pos + 1;
+			} else {
+				offset = p.pos + p.len;
+			}
+		} while(this.r.global);
+		if(!this.r.global && offset > 0 && offset < s.length) {
+			buf_b += Std.string(HxOverrides.substr(s,offset,null));
+		}
+		return buf_b;
+	}
+	,__class__: EReg
+};
+var flixel_group_FlxTypedGroup = function(MaxSize) {
+	if(MaxSize == null) {
+		MaxSize = 0;
+	}
+	this._marker = 0;
+	this.length = 0;
+	flixel_FlxBasic.call(this);
+	this.members = [];
+	this.set_maxSize(Math.abs(MaxSize) | 0);
+	this.flixelType = 2;
+};
+$hxClasses["flixel.group.FlxTypedGroup"] = flixel_group_FlxTypedGroup;
+flixel_group_FlxTypedGroup.__name__ = "flixel.group.FlxTypedGroup";
+flixel_group_FlxTypedGroup.resolveGroup = function(basic) {
+	if(basic != null) {
+		if(basic.flixelType == 2) {
+			return basic;
+		} else if(basic.flixelType == 4) {
+			return basic.group;
+		}
+	}
+	return null;
+};
+flixel_group_FlxTypedGroup.resolveSelectionGroup = function(basic) {
+	return flixel_group_FlxTypedGroup.resolveGroup(basic);
+};
+flixel_group_FlxTypedGroup.__super__ = flixel_FlxBasic;
+flixel_group_FlxTypedGroup.prototype = $extend(flixel_FlxBasic.prototype,{
+	destroy: function() {
+		flixel_FlxBasic.prototype.destroy.call(this);
+		flixel_util_FlxDestroyUtil.destroy(this._memberAdded);
+		flixel_util_FlxDestroyUtil.destroy(this._memberRemoved);
+		if(this.members != null) {
+			var count = this.length;
+			while(count-- > 0) {
+				var basic = this.members.shift();
+				if(basic != null) {
+					basic.destroy();
+				}
+			}
+			this.members = null;
+		}
+	}
+	,update: function(elapsed) {
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && basic.exists && basic.active) {
+				basic.update(elapsed);
+			}
+		}
+	}
+	,draw: function() {
+		var oldDefaultCameras = flixel_FlxCamera._defaultCameras;
+		if(this._cameras != null) {
+			flixel_FlxCamera._defaultCameras = this._cameras;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && basic.exists && basic.visible) {
+				basic.draw();
+			}
+		}
+		flixel_FlxCamera._defaultCameras = oldDefaultCameras;
+	}
+	,add: function(basic) {
+		if(basic == null) {
+			flixel_FlxG.log.advanced("Cannot add a `null` object to a FlxGroup.",flixel_system_debug_log_LogStyle.WARNING,true);
+			return null;
+		}
+		if(this.members.indexOf(basic) >= 0) {
+			return basic;
+		}
+		var index = this.getFirstNull();
+		if(index != -1) {
+			this.members[index] = basic;
+			if(index >= this.length) {
+				this.length = index + 1;
+			}
+			this.onMemberAdd(basic);
+			return basic;
+		}
+		if(this.maxSize > 0 && this.length >= this.maxSize) {
+			return basic;
+		}
+		this.members.push(basic);
+		this.length++;
+		this.onMemberAdd(basic);
+		return basic;
+	}
+	,insert: function(position,object) {
+		if(object == null) {
+			flixel_FlxG.log.advanced("Cannot insert a `null` object into a FlxGroup.",flixel_system_debug_log_LogStyle.WARNING,true);
+			return null;
+		}
+		if(this.members.indexOf(object) >= 0) {
+			return object;
+		}
+		if(position < this.length && this.members[position] == null) {
+			this.members[position] = object;
+			this.onMemberAdd(object);
+			return object;
+		}
+		if(this.maxSize > 0 && this.length >= this.maxSize) {
+			return object;
+		}
+		this.members.splice(position,0,object);
+		this.length++;
+		this.onMemberAdd(object);
+		return object;
+	}
+	,recycle: function(objectClass,objectFactory,force,revive) {
+		if(revive == null) {
+			revive = true;
+		}
+		if(force == null) {
+			force = false;
+		}
+		var _gthis = this;
+		if(this.maxSize > 0) {
+			if(this.length < this.maxSize) {
+				return objectFactory != null ? _gthis.add(objectFactory()) : objectClass != null ? _gthis.add(Type.createInstance(objectClass,[])) : null;
+			}
+			var basic = this.members[this._marker++];
+			if(this._marker >= this.maxSize) {
+				this._marker = 0;
+			}
+			if(revive) {
+				basic.revive();
+			}
+			return basic;
+		}
+		var basic = this.getFirstAvailable(objectClass,force);
+		if(basic != null) {
+			if(revive) {
+				basic.revive();
+			}
+			return basic;
+		}
+		return objectFactory != null ? _gthis.add(objectFactory()) : objectClass != null ? _gthis.add(Type.createInstance(objectClass,[])) : null;
+	}
+	,remove: function(basic,splice) {
+		if(splice == null) {
+			splice = false;
+		}
+		if(this.members == null) {
+			return null;
+		}
+		var index = this.members.indexOf(basic);
+		if(index < 0) {
+			return null;
+		}
+		if(splice) {
+			this.members.splice(index,1);
+			this.length--;
+		} else {
+			this.members[index] = null;
+		}
+		this.onMemberRemove(basic);
+		return basic;
+	}
+	,replace: function(oldObject,newObject) {
+		var index = this.members.indexOf(oldObject);
+		if(index < 0) {
+			return null;
+		}
+		this.members[index] = newObject;
+		this.onMemberRemove(oldObject);
+		this.onMemberAdd(newObject);
+		return newObject;
+	}
+	,sort: function(func,order) {
+		if(order == null) {
+			order = -1;
+		}
+		var _g = func;
+		var a1 = order;
+		var tmp = function(a2,a3) {
+			return _g(a1,a2,a3);
+		};
+		this.members.sort(tmp);
+	}
+	,getFirst: function(func) {
+		var result = null;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && func(basic)) {
+				result = basic;
+				break;
+			}
+		}
+		return result;
+	}
+	,getFirstHelper: function(func) {
+		var result = null;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && func(basic)) {
+				result = basic;
+				break;
+			}
+		}
+		return result;
+	}
+	,getLast: function(func) {
+		var result = null;
+		var i = this.members.length;
+		while(i-- > 0) {
+			var basic = this.members[i];
+			if(basic != null && func(basic)) {
+				result = basic;
+				break;
+			}
+		}
+		return result;
+	}
+	,getFirstIndex: function(func) {
+		var result = -1;
+		var _g_current = 0;
+		var _g_array = this.members;
+		while(_g_current < _g_array.length) {
+			var _g_value = _g_array[_g_current];
+			var _g_key = _g_current++;
+			var i = _g_key;
+			var basic = _g_value;
+			if(basic != null && func(basic)) {
+				result = i;
+				break;
+			}
+		}
+		return result;
+	}
+	,getLastIndex: function(func) {
+		var result = -1;
+		var i = this.members.length;
+		while(i-- > 0) {
+			var basic = this.members[i];
+			if(basic != null && func(basic)) {
+				result = i;
+				break;
+			}
+		}
+		return result;
+	}
+	,any: function(func) {
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && func(basic)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	,every: function(func) {
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && !func(basic)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	,getFirstAvailable: function(objectClass,force) {
+		if(force == null) {
+			force = false;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && !basic.exists && (objectClass == null || js_Boot.__instanceof(basic,objectClass))) {
+				var tmp;
+				if(force) {
+					var c = js_Boot.getClass(basic);
+					tmp = c.__name__ != objectClass.__name__;
+				} else {
+					tmp = false;
+				}
+				if(tmp) {
+					continue;
+				}
+				return basic;
+			}
+		}
+		return null;
+	}
+	,getFirstNull: function() {
+		return this.members.indexOf(null);
+	}
+	,getFirstExisting: function() {
+		var result = null;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && basic.exists) {
+				result = basic;
+				break;
+			}
+		}
+		return result;
+	}
+	,getFirstAlive: function() {
+		var result = null;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && (basic.exists && basic.alive)) {
+				result = basic;
+				break;
+			}
+		}
+		return result;
+	}
+	,getFirstDead: function() {
+		var result = null;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && !basic.alive) {
+				result = basic;
+				break;
+			}
+		}
+		return result;
+	}
+	,countLiving: function() {
+		var count = -1;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null) {
+				if(count < 0) {
+					count = 0;
+				}
+				if(basic.exists && basic.alive) {
+					++count;
+				}
+			}
+		}
+		return count;
+	}
+	,countDead: function() {
+		var count = -1;
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null) {
+				if(count < 0) {
+					count = 0;
+				}
+				if(!basic.alive) {
+					++count;
+				}
+			}
+		}
+		return count;
+	}
+	,getRandom: function(startIndex,length) {
+		if(length == null) {
+			length = 0;
+		}
+		if(startIndex == null) {
+			startIndex = 0;
+		}
+		if(startIndex < 0) {
+			startIndex = 0;
+		}
+		if(length <= 0) {
+			length = this.length;
+		}
+		return flixel_FlxG.random.getObject_flixel_group_FlxTypedGroup_T(this.members,null,startIndex,length);
+	}
+	,clear: function() {
+		this.length = 0;
+		if(this._memberRemoved != null) {
+			var _g = 0;
+			var _g1 = this.members;
+			while(_g < _g1.length) {
+				var member = _g1[_g];
+				++_g;
+				this.onMemberRemove(member);
+			}
+		}
+		flixel_util_FlxArrayUtil.clearArray(this.members);
+	}
+	,killMembers: function() {
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && basic.exists) {
+				basic.kill();
+			}
+		}
+	}
+	,kill: function() {
+		this.killMembers();
+		flixel_FlxBasic.prototype.kill.call(this);
+	}
+	,reviveMembers: function() {
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && !basic.exists) {
+				basic.revive();
+			}
+		}
+	}
+	,revive: function() {
+		this.reviveMembers();
+		flixel_FlxBasic.prototype.revive.call(this);
+	}
+	,iterator: function(filter) {
+		return new flixel_group_FlxTypedGroupIterator(this.members,filter);
+	}
+	,keyValueIterator: function() {
+		return new haxe_iterators_ArrayKeyValueIterator(this.members);
+	}
+	,forEach: function(func,recurse) {
+		if(recurse == null) {
+			recurse = false;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null) {
+				if(recurse) {
+					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
+					if(group != null) {
+						group.forEach(func,recurse);
+					}
+				}
+				func(basic);
+			}
+		}
+	}
+	,forEachAlive: function(func,recurse) {
+		if(recurse == null) {
+			recurse = false;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && basic.exists && basic.alive) {
+				if(recurse) {
+					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
+					if(group != null) {
+						group.forEachAlive(func,recurse);
+					}
+				}
+				func(basic);
+			}
+		}
+	}
+	,forEachDead: function(func,recurse) {
+		if(recurse == null) {
+			recurse = false;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && !basic.alive) {
+				if(recurse) {
+					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
+					if(group != null) {
+						group.forEachDead(func,recurse);
+					}
+				}
+				func(basic);
+			}
+		}
+	}
+	,forEachExists: function(func,recurse) {
+		if(recurse == null) {
+			recurse = false;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null && basic.exists) {
+				if(recurse) {
+					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
+					if(group != null) {
+						group.forEachExists(func,recurse);
+					}
+				}
+				func(basic);
+			}
+		}
+	}
+	,forEachOfType: function(objectClass,func,recurse) {
+		if(recurse == null) {
+			recurse = false;
+		}
+		var _g = 0;
+		var _g1 = this.members;
+		while(_g < _g1.length) {
+			var basic = _g1[_g];
+			++_g;
+			if(basic != null) {
+				if(recurse) {
+					var group = flixel_group_FlxTypedGroup.resolveGroup(basic);
+					if(group != null) {
+						group.forEachOfType(objectClass,func,recurse);
+					}
+				}
+				if(js_Boot.__instanceof(basic,objectClass)) {
+					func(basic);
+				}
+			}
+		}
+	}
+	,set_maxSize: function(size) {
+		this.maxSize = Math.abs(size) | 0;
+		if(this._marker >= this.maxSize) {
+			this._marker = 0;
+		}
+		if(this.maxSize == 0 || this.members == null || this.maxSize >= this.length) {
+			return this.maxSize;
+		}
+		while(this.length > this.maxSize) {
+			var basic = this.members.splice(this.maxSize - 1,1)[0];
+			if(basic != null) {
+				this.onMemberRemove(basic);
+				basic.destroy();
+			}
+			this.length--;
+		}
+		return this.maxSize;
+	}
+	,onMemberAdd: function(member) {
+		if(this._memberAdded != null) {
+			this._memberAdded.dispatch(member);
+		}
+	}
+	,onMemberRemove: function(member) {
+		if(this._memberRemoved != null) {
+			this._memberRemoved.dispatch(member);
+		}
+	}
+	,get_memberAdded: function() {
+		if(this._memberAdded == null) {
+			this._memberAdded = new flixel_util__$FlxSignal_FlxSignal1();
+		}
+		return this._memberAdded;
+	}
+	,get_memberRemoved: function() {
+		if(this._memberRemoved == null) {
+			this._memberRemoved = new flixel_util__$FlxSignal_FlxSignal1();
+		}
+		return this._memberRemoved;
+	}
+	,__class__: flixel_group_FlxTypedGroup
+	,__properties__: $extend(flixel_FlxBasic.prototype.__properties__,{get_memberRemoved:"get_memberRemoved",get_memberAdded:"get_memberAdded",set_maxSize:"set_maxSize"})
+});
+var flixel_group_FlxTypedContainer = function(maxSize) {
+	if(maxSize == null) {
+		maxSize = 0;
+	}
+	flixel_group_FlxTypedGroup.call(this,maxSize);
+};
+$hxClasses["flixel.group.FlxTypedContainer"] = flixel_group_FlxTypedContainer;
+flixel_group_FlxTypedContainer.__name__ = "flixel.group.FlxTypedContainer";
+flixel_group_FlxTypedContainer.__super__ = flixel_group_FlxTypedGroup;
+flixel_group_FlxTypedContainer.prototype = $extend(flixel_group_FlxTypedGroup.prototype,{
+	onMemberAdd: function(member) {
+		if(member.get_container() != null) {
+			member.get_container().remove(member);
+		}
+		member.container = this;
+		flixel_group_FlxTypedGroup.prototype.onMemberAdd.call(this,member);
+	}
+	,onMemberRemove: function(member) {
+		member.container = null;
+		flixel_group_FlxTypedGroup.prototype.onMemberRemove.call(this,member);
+	}
+	,__class__: flixel_group_FlxTypedContainer
+});
+var flixel_FlxState = function() {
+	this._requestSubStateReset = false;
+	this.destroySubStates = true;
+	this.persistentDraw = true;
+	this.persistentUpdate = false;
+	flixel_group_FlxTypedContainer.call(this,0);
+};
+$hxClasses["flixel.FlxState"] = flixel_FlxState;
+flixel_FlxState.__name__ = "flixel.FlxState";
+flixel_FlxState.__super__ = flixel_group_FlxTypedContainer;
+flixel_FlxState.prototype = $extend(flixel_group_FlxTypedContainer.prototype,{
+	create: function() {
+	}
+	,draw: function() {
+		if(this.persistentDraw || this.subState == null) {
+			flixel_group_FlxTypedContainer.prototype.draw.call(this);
+		}
+		if(this.subState != null) {
+			this.subState.draw();
+		}
+	}
+	,openSubState: function(SubState) {
+		this._requestSubStateReset = true;
+		this._requestedSubState = SubState;
+	}
+	,closeSubState: function() {
+		this._requestSubStateReset = true;
+	}
+	,resetSubState: function() {
+		if(this.subState != null) {
+			if(this.subState.closeCallback != null) {
+				this.subState.closeCallback();
+			}
+			if(this._subStateClosed != null) {
+				this._subStateClosed.dispatch(this.subState);
+			}
+			if(this.destroySubStates) {
+				this.subState.destroy();
+			}
+		}
+		this.subState = this._requestedSubState;
+		this._requestedSubState = null;
+		if(this.subState != null) {
+			if(!this.persistentUpdate) {
+				flixel_FlxG.inputs.onStateSwitch();
+			}
+			this.subState._parentState = this;
+			if(!this.subState._created) {
+				this.subState._created = true;
+				this.subState.create();
+			}
+			if(this.subState.openCallback != null) {
+				this.subState.openCallback();
+			}
+			if(this._subStateOpened != null) {
+				this._subStateOpened.dispatch(this.subState);
+			}
+		}
+	}
+	,destroy: function() {
+		this._constructor = flixel_util_typeLimit_NextState.fromMaker(function() {
+			throw haxe_Exception.thrown("Attempting to resetState while the current state is destroyed");
+		});
+		flixel_util_FlxDestroyUtil.destroy(this._subStateOpened);
+		flixel_util_FlxDestroyUtil.destroy(this._subStateClosed);
+		if(this.subState != null) {
+			this.subState.destroy();
+			this.subState = null;
+		}
+		flixel_group_FlxTypedContainer.prototype.destroy.call(this);
+	}
+	,switchTo: function(nextState) {
+		return true;
+	}
+	,startOutro: function(onOutroComplete) {
+		onOutroComplete();
+	}
+	,onFocusLost: function() {
+	}
+	,onFocus: function() {
+	}
+	,onResize: function(Width,Height) {
+	}
+	,tryUpdate: function(elapsed) {
+		if(this.persistentUpdate || this.subState == null) {
+			this.update(elapsed);
+		}
+		if(this._requestSubStateReset) {
+			this._requestSubStateReset = false;
+			this.resetSubState();
+		}
+		if(this.subState != null) {
+			this.subState.tryUpdate(elapsed);
+		}
+	}
+	,get_bgColor: function() {
+		return flixel_FlxG.cameras.get_bgColor();
+	}
+	,set_bgColor: function(Value) {
+		return flixel_FlxG.cameras.set_bgColor(Value);
+	}
+	,get_subStateOpened: function() {
+		if(this._subStateOpened == null) {
+			this._subStateOpened = new flixel_util__$FlxSignal_FlxSignal1();
+		}
+		return this._subStateOpened;
+	}
+	,get_subStateClosed: function() {
+		if(this._subStateClosed == null) {
+			this._subStateClosed = new flixel_util__$FlxSignal_FlxSignal1();
+		}
+		return this._subStateClosed;
+	}
+	,__class__: flixel_FlxState
+	,__properties__: $extend(flixel_group_FlxTypedContainer.prototype.__properties__,{get_subStateClosed:"get_subStateClosed",get_subStateOpened:"get_subStateOpened",set_bgColor:"set_bgColor",get_bgColor:"get_bgColor"})
+});
+var EngineStartState = function() {
+	flixel_FlxState.call(this);
+};
+$hxClasses["EngineStartState"] = EngineStartState;
+EngineStartState.__name__ = "EngineStartState";
+EngineStartState.__super__ = flixel_FlxState;
+EngineStartState.prototype = $extend(flixel_FlxState.prototype,{
+	create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		var game = "0";
+		var urlParams = new URLSearchParams(window.location.search);
+		var urlGame = urlParams.get("game");
+		if(urlGame != null) {
+			game = urlGame;
+		}
+		switch(game) {
+		case "0":
+			var nextState = flixel_util_typeLimit_NextState.fromState(new TitleState());
+			var stateOnCall = flixel_FlxG.game._state;
+			if(!((nextState) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState)) {
+				flixel_FlxG.game._state.startOutro(function() {
+					if(flixel_FlxG.game._state == stateOnCall) {
+						flixel_FlxG.game._nextState = nextState;
+					} else {
+						flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+					}
+				});
+			}
+			break;
+		case "1":
+			var nextState1 = flixel_util_typeLimit_NextState.fromState(new TitleState());
+			var stateOnCall1 = flixel_FlxG.game._state;
+			if(!((nextState1) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState1)) {
+				flixel_FlxG.game._state.startOutro(function() {
+					if(flixel_FlxG.game._state == stateOnCall1) {
+						flixel_FlxG.game._nextState = nextState1;
+					} else {
+						flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+					}
+				});
+			}
+			break;
+		case "2":
+			var nextState2 = flixel_util_typeLimit_NextState.fromState(new IncrementalState());
+			var stateOnCall2 = flixel_FlxG.game._state;
+			if(!((nextState2) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState2)) {
+				flixel_FlxG.game._state.startOutro(function() {
+					if(flixel_FlxG.game._state == stateOnCall2) {
+						flixel_FlxG.game._nextState = nextState2;
+					} else {
+						flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+					}
+				});
+			}
+			break;
+		default:
+			window.location.href = "https://www.bit.ly/rarabfunny";
+		}
+	}
+	,__class__: EngineStartState
+});
+var flixel_addons_transition_FlxTransitionableState = function(TransIn,TransOut) {
+	this._exiting = false;
+	this.transOutFinished = false;
+	this.transIn = TransIn;
+	this.transOut = TransOut;
+	if(this.transIn == null && flixel_addons_transition_FlxTransitionableState.defaultTransIn != null) {
+		this.transIn = flixel_addons_transition_FlxTransitionableState.defaultTransIn;
+	}
+	if(this.transOut == null && flixel_addons_transition_FlxTransitionableState.defaultTransOut != null) {
+		this.transOut = flixel_addons_transition_FlxTransitionableState.defaultTransOut;
+	}
+	flixel_FlxState.call(this);
+};
+$hxClasses["flixel.addons.transition.FlxTransitionableState"] = flixel_addons_transition_FlxTransitionableState;
+flixel_addons_transition_FlxTransitionableState.__name__ = "flixel.addons.transition.FlxTransitionableState";
+flixel_addons_transition_FlxTransitionableState.__super__ = flixel_FlxState;
+flixel_addons_transition_FlxTransitionableState.prototype = $extend(flixel_FlxState.prototype,{
+	destroy: function() {
+		flixel_FlxState.prototype.destroy.call(this);
+		this.transIn = null;
+		this.transOut = null;
+		this._onExit = null;
+	}
+	,create: function() {
+		flixel_FlxState.prototype.create.call(this);
+		this.transitionIn();
+	}
+	,startOutro: function(onOutroComplete) {
+		if(!this.get_hasTransOut()) {
+			onOutroComplete();
+		} else if(!this._exiting) {
+			this._exiting = true;
+			this.transitionOut(onOutroComplete);
+			if(flixel_addons_transition_FlxTransitionableState.skipNextTransOut) {
+				flixel_addons_transition_FlxTransitionableState.skipNextTransOut = false;
+				this.finishTransOut();
+			}
+		}
+	}
+	,transitionIn: function() {
+		if(this.transIn != null && this.transIn.type != "none") {
+			if(flixel_addons_transition_FlxTransitionableState.skipNextTransIn) {
+				flixel_addons_transition_FlxTransitionableState.skipNextTransIn = false;
+				if(this.finishTransIn != null) {
+					this.finishTransIn();
+				}
+				return;
+			}
+			var _trans = this.createTransition(this.transIn);
+			_trans.setStatus(3);
+			this.openSubState(_trans);
+			_trans.set_finishCallback($bind(this,this.finishTransIn));
+			_trans.start(1);
+		}
+	}
+	,transitionOut: function(OnExit) {
+		this._onExit = OnExit;
+		if(this.get_hasTransOut()) {
+			var _trans = this.createTransition(this.transOut);
+			_trans.setStatus(2);
+			this.openSubState(_trans);
+			_trans.set_finishCallback($bind(this,this.finishTransOut));
+			_trans.start(0);
+		} else {
+			this._onExit();
+		}
+	}
+	,get_hasTransIn: function() {
+		if(this.transIn != null) {
+			return this.transIn.type != "none";
+		} else {
+			return false;
+		}
+	}
+	,get_hasTransOut: function() {
+		if(this.transOut != null) {
+			return this.transOut.type != "none";
+		} else {
+			return false;
+		}
+	}
+	,createTransition: function(data) {
+		switch(data.type) {
+		case "fade":
+			return new flixel_addons_transition_Transition(data);
+		case "tiles":
+			return new flixel_addons_transition_Transition(data);
+		default:
+			return null;
+		}
+	}
+	,finishTransIn: function() {
+		this.closeSubState();
+	}
+	,finishTransOut: function() {
+		this.transOutFinished = true;
+		if(!this._exiting) {
+			this.closeSubState();
+		}
+		if(this._onExit != null) {
+			this._onExit();
+		}
+	}
+	,__class__: flixel_addons_transition_FlxTransitionableState
+	,__properties__: $extend(flixel_FlxState.prototype.__properties__,{get_hasTransOut:"get_hasTransOut",get_hasTransIn:"get_hasTransIn"})
+});
+var GameOverState = function(TransIn,TransOut) {
+	this.fading = false;
+	flixel_addons_transition_FlxTransitionableState.call(this,TransIn,TransOut);
+};
+$hxClasses["GameOverState"] = GameOverState;
+GameOverState.__name__ = "GameOverState";
+GameOverState.__super__ = flixel_addons_transition_FlxTransitionableState;
+GameOverState.prototype = $extend(flixel_addons_transition_FlxTransitionableState.prototype,{
+	create: function() {
+		var loser = new flixel_FlxSprite(100,100);
+		var loseTex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/lose.png","assets/images/lose.xml");
+		loser.set_frames(loseTex);
+		loser.animation.addByPrefix("lose","lose",24,false);
+		loser.animation.play("lose");
+		this.add(loser);
+		var restart = new flixel_FlxSprite(500,50).loadGraphic("assets/images/restart.png");
+		restart.setGraphicSize(restart.get_width() * 0.6 | 0);
+		restart.updateHitbox();
+		restart.set_alpha(0);
+		restart.set_antialiasing(true);
+		this.add(restart);
+		var _this = flixel_FlxG.sound.music;
+		var Duration = 2;
+		var To = flixel_FlxG.sound.music._volume * 0.6;
+		if(To == null) {
+			To = 0;
+		}
+		if(Duration == null) {
+			Duration = 1;
+		}
+		if(_this.fadeTween != null) {
+			_this.fadeTween.cancel();
+		}
+		_this.fadeTween = flixel_tweens_FlxTween.num(_this._volume,To,Duration,{ onComplete : null},$bind(_this,_this.volumeTween));
+		flixel_tweens_FlxTween.tween(restart,{ alpha : 1},1,{ ease : flixel_tweens_FlxEase.quartInOut});
+		flixel_tweens_FlxTween.tween(restart,{ y : restart.y + 40},7,{ ease : flixel_tweens_FlxEase.quartInOut, type : 4});
+		flixel_addons_transition_FlxTransitionableState.prototype.create.call(this);
+	}
+	,update: function(elapsed) {
+		if(flixel_FlxG.keys.justPressed.get_ANY() && !this.fading) {
+			this.fading = true;
+			var _this = flixel_FlxG.sound.music;
+			var Duration = 0.5;
+			var To = 0;
+			if(To == null) {
+				To = 0;
+			}
+			if(Duration == null) {
+				Duration = 1;
+			}
+			if(_this.fadeTween != null) {
+				_this.fadeTween.cancel();
+			}
+			_this.fadeTween = flixel_tweens_FlxTween.num(_this._volume,To,Duration,{ onComplete : function(twn) {
+				var _this = flixel_FlxG.sound.music;
+				_this.cleanup(_this.autoDestroy,true);
+				var nextState = flixel_util_typeLimit_NextState.fromState(new PlayState());
+				var stateOnCall = flixel_FlxG.game._state;
+				if(!((nextState) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState)) {
+					flixel_FlxG.game._state.startOutro(function() {
+						if(flixel_FlxG.game._state == stateOnCall) {
+							flixel_FlxG.game._nextState = nextState;
+						} else {
+							flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+						}
+					});
+				}
+			}},$bind(_this,_this.volumeTween));
+		}
+		flixel_addons_transition_FlxTransitionableState.prototype.update.call(this,elapsed);
+	}
+	,__class__: GameOverState
+});
+var Girlfriend = function(x,y) {
+	this.danced = false;
+	Character.call(this,x,y);
+	var tex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/GF_assets.png","assets/images/GF_assets.xml");
+	this.set_frames(tex);
+	this.animation.addByPrefix("cheer","GF Cheer");
+	this.animation.addByIndices("sad","gf sad",[0,1,2,3,4,5,6,7,8,9,10,11,12],"",24,false);
+	this.animation.addByIndices("danceLeft","GF Dancing Beat",[30,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],"",24,false);
+	this.animation.addByIndices("danceRight","GF Dancing Beat",[15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],"",24,false);
+	this.addOffset("cheer");
+	this.addOffset("sad");
+	this.addOffset("danceLeft");
+	this.addOffset("danceRight");
+	this.playAnim("danceRight");
+};
+$hxClasses["Girlfriend"] = Girlfriend;
+Girlfriend.__name__ = "Girlfriend";
+Girlfriend.__super__ = Character;
+Girlfriend.prototype = $extend(Character.prototype,{
+	dance: function() {
+		this.danced = !this.danced;
+		if(this.danced) {
+			this.playAnim("danceRight");
+		} else {
+			this.playAnim("danceLeft");
+		}
+	}
+	,__class__: Girlfriend
+});
+var HxOverrides = function() { };
+$hxClasses["HxOverrides"] = HxOverrides;
+HxOverrides.__name__ = "HxOverrides";
+HxOverrides.strDate = function(s) {
+	switch(s.length) {
+	case 8:
+		var k = s.split(":");
+		var d = new Date();
+		d["setTime"](0);
+		d["setUTCHours"](k[0]);
+		d["setUTCMinutes"](k[1]);
+		d["setUTCSeconds"](k[2]);
+		return d;
+	case 10:
+		var k = s.split("-");
+		return new Date(k[0],k[1] - 1,k[2],0,0,0);
+	case 19:
+		var k = s.split(" ");
+		var y = k[0].split("-");
+		var t = k[1].split(":");
+		return new Date(y[0],y[1] - 1,y[2],t[0],t[1],t[2]);
+	default:
+		throw haxe_Exception.thrown("Invalid date format : " + s);
+	}
+};
+HxOverrides.cca = function(s,index) {
+	var x = s.charCodeAt(index);
+	if(x != x) {
+		return undefined;
+	}
+	return x;
+};
+HxOverrides.substr = function(s,pos,len) {
+	if(len == null) {
+		len = s.length;
+	} else if(len < 0) {
+		if(pos == 0) {
+			len = s.length + len;
+		} else {
+			return "";
+		}
+	}
+	return s.substr(pos,len);
+};
+HxOverrides.remove = function(a,obj) {
+	var i = a.indexOf(obj);
+	if(i == -1) {
+		return false;
+	}
+	a.splice(i,1);
+	return true;
+};
+HxOverrides.now = function() {
+	return Date.now();
+};
+var IncrementalState = function() {
+	this.upgradeTexts = [];
+	this.upgradeButtons = [];
+	this.upgrades = [];
+	this.passiveRate = 0;
+	this.clickMulti = 1;
+	this.baseMulti = 0.0000001;
+	this.points = 0;
+	flixel_FlxState.call(this);
+};
+$hxClasses["IncrementalState"] = IncrementalState;
+IncrementalState.__name__ = "IncrementalState";
+IncrementalState.__super__ = flixel_FlxState;
+IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
+	initUpgrades: function() {
+		this.upgrades = [{ id : "clickboost1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100}];
+	}
+	,buyUpgrade: function(id) {
+		var _g = 0;
+		var _g1 = this.upgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			if(u.id == id) {
+				if(u.level >= u.maxLevel) {
+					return;
+				}
+				var cost = this.getCost(u);
+				if(this.points >= cost) {
+					this.points -= cost;
+					u.level++;
+					if(u.level > u.maxLevel) {
+						u.level = u.maxLevel;
+					}
+				}
+			}
+		}
+	}
+	,getCost: function(u) {
+		return u.baseCost * Math.pow(u.costMult,u.level);
+	}
+	,canBuy: function(u) {
+		if(u.level >= u.maxLevel) {
+			return false;
+		}
+		return this.points >= this.getCost(u);
+	}
+	,createUpgradeUI: function() {
+		var _gthis = this;
+		var startY = 100;
+		var _g = 0;
+		var _g1 = this.upgrades.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var u = [this.upgrades[i]];
+			var label = new flixel_text_FlxText(10,startY + i * 40,200,"");
+			label.set_size(12);
+			this.add(label);
+			var btn = new flixel_ui_FlxButton(220,startY + i * 40,"BUY",(function(u) {
+				return function() {
+					_gthis.buyUpgrade(u[0].id);
+				};
+			})(u));
+			this.add(btn);
+			this.upgradeTexts.push(label);
+			this.upgradeButtons.push(btn);
+		}
+	}
+	,floorTo: function(value,decimals) {
+		var m = Math.pow(10,decimals);
+		return Math.floor((value + 1e-12) * m) / m;
+	}
+	,checkRounding: function(value) {
+		if(value <= 0) {
+			return "0";
+		}
+		if(value < 1e-6) {
+			if(value >= 9e-7) {
+				return "0.0000009";
+			}
+			if(value >= 8e-7) {
+				return "0.0000008";
+			}
+			if(value >= 7e-7) {
+				return "0.0000007";
+			}
+			if(value >= 6e-7) {
+				return "0.0000006";
+			}
+			if(value >= 5e-7) {
+				return "0.0000005";
+			}
+			if(value >= 4e-7) {
+				return "0.0000004";
+			}
+			if(value >= 3e-7) {
+				return "0.0000003";
+			}
+			if(value >= 2e-7) {
+				return "0.0000002";
+			}
+			if(value >= 1e-7) {
+				return "0.0000001";
+			}
+			return "0";
+		}
+		var exp = Math.floor(Math.log(value) / Math.log(10));
+		var decimals = 7 - exp;
+		if(decimals < 0) {
+			return this.scientific(value);
+		}
+		return Std.string(this.floorTo(value,decimals));
+	}
+	,scientific: function(value) {
+		var exp = Math.floor(Math.log(value) / Math.log(10));
+		var mantissa = value / Math.pow(10,exp);
+		return Std.string(this.floorTo(mantissa,2)) + "e" + exp;
+	}
+	,create: function() {
+		var _gthis = this;
+		flixel_FlxState.prototype.create.call(this);
+		this.initUpgrades();
+		this.createUpgradeUI();
+		flixel_FlxG.sound.playMusic("assets/music/HaxeFlixel_Tutorial_Game.ogg",0,false);
+		this.pointsText = new flixel_text_FlxText(10,10,0,"points: 0");
+		this.pointsText.set_size(16);
+		this.add(this.pointsText);
+		this.clickButton = new flixel_ui_FlxButton(10,50,"get points ",function() {
+			_gthis.points += _gthis.baseMulti * _gthis.clickMulti;
+			_gthis.updateUI();
+		});
+		this.add(this.clickButton);
+		this.saveWarningText = new flixel_text_FlxText(4,flixel_FlxG.height - 36,0,"WARNING: SAVING NOT YET IMPLEMENTED");
+		this.saveWarningText.set_size(8);
+		this.add(this.saveWarningText);
+		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"PROTOTYPE 1 - endgame = 1m points");
+		this.versionText.set_size(8);
+		this.add(this.versionText);
+		new flixel_util_FlxTimer().start(1,function(_) {
+			_gthis.points += _gthis.passiveRate;
+			_gthis.updateUI();
+		},0);
+	}
+	,updateUI: function() {
+		this.pointsText.set_text("points: " + this.checkRounding(this.points));
+	}
+	,update: function(elapsed) {
+		flixel_FlxState.prototype.update.call(this,elapsed);
+		this.clickMulti = 1;
+		if(this.points > 1e6) {
+			this.points = 1e6;
+		}
+		var _g = 0;
+		var _g1 = this.upgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			if(u.level > 0) {
+				switch(u.id) {
+				case "clickboost1":
+					this.clickMulti *= u.multiplier * u.level;
+					break;
+				case "clickboost2":
+					this.clickMulti *= u.multiplier * u.level;
+					break;
+				case "clickboost3":
+					this.clickMulti *= u.multiplier * u.level;
+					break;
+				case "clickboost4":
+					this.clickMulti *= u.multiplier * u.level;
+					break;
+				case "clickboost5":
+					this.clickMulti *= u.multiplier * u.level;
+					break;
+				}
+			}
+		}
+		var _g = 0;
+		var _g1 = this.upgrades.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var u = this.upgrades[i];
+			var cost = this.getCost(u);
+			this.upgradeTexts[i].set_text(u.id + "\nCost: " + this.checkRounding(cost) + " | Level: " + u.level + "/" + u.maxLevel);
+		}
+	}
+	,__class__: IncrementalState
+});
+var Lambda = function() { };
+$hxClasses["Lambda"] = Lambda;
+Lambda.__name__ = "Lambda";
+Lambda.array = function(it) {
+	var a = [];
+	var i = $getIterator(it);
+	while(i.hasNext()) {
+		var i1 = i.next();
+		a.push(i1);
+	}
+	return a;
+};
+Lambda.count = function(it,pred) {
+	var n = 0;
+	if(pred == null) {
+		var _ = $getIterator(it);
+		while(_.hasNext()) {
+			var _1 = _.next();
+			++n;
+		}
+	} else {
+		var x = $getIterator(it);
+		while(x.hasNext()) {
+			var x1 = x.next();
+			if(pred(x1)) {
+				++n;
+			}
+		}
+	}
+	return n;
+};
+var ManifestResources = function() { };
+$hxClasses["ManifestResources"] = ManifestResources;
+ManifestResources.__name__ = "ManifestResources";
+ManifestResources.init = function(config) {
+	ManifestResources.preloadLibraries = [];
+	ManifestResources.preloadLibraryNames = [];
+	ManifestResources.rootPath = null;
+	if(config != null && Object.prototype.hasOwnProperty.call(config,"rootPath")) {
+		ManifestResources.rootPath = Reflect.field(config,"rootPath");
+		if(!StringTools.endsWith(ManifestResources.rootPath,"/")) {
+			ManifestResources.rootPath += "/";
+		}
+	}
+	if(ManifestResources.rootPath == null) {
+		ManifestResources.rootPath = "./";
+	}
+	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf);
+	openfl_text_Font.registerFont(_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf);
+	var bundle;
+	var data = "{\"name\":null,\"assets\":\"aoy4:pathy25:assets%2Fimages%2Fbad.pngy4:sizei11727y4:typey5:IMAGEy2:idR1y7:preloadtgoR0y24:assets%2Fimages%2Fbg.pngR2i155574R3R4R5R7R6tgoR0y31:assets%2Fimages%2FBOYFRIEND.pngR2i1351101R3R4R5R8R6tgoR0y31:assets%2Fimages%2FBOYFRIEND.xmlR2i41362R3y4:TEXTR5R9R6tgoR0y27:assets%2Fimages%2Fcombo.pngR2i14255R3R4R5R11R6tgoR0y35:assets%2Fimages%2FDADDY_DEAREST.pngR2i1106359R3R4R5R12R6tgoR0y35:assets%2Fimages%2FDADDY_DEAREST.xmlR2i6531R3R10R5R13R6tgoR0y31:assets%2Fimages%2FGF_assets.pngR2i888273R3R4R5R14R6tgoR0y31:assets%2Fimages%2FGF_assets.xmlR2i12842R3R10R5R15R6tgoR0y24:assets%2Fimages%2Fgo.pngR2i12296R3R4R5R16R6tgoR0y26:assets%2Fimages%2Fgood.pngR2i11923R3R4R5R17R6tgoR0y28:assets%2Fimages%2Fgrafix.pngR2i139101R3R4R5R18R6tgoR0y31:assets%2Fimages%2FhealthBar.pngR2i307R3R4R5R19R6tgoR0y33:assets%2Fimages%2FhealthHeads.pngR2i22300R3R4R5R20R6tgoR0y33:assets%2Fimages%2FhealthHeads.xmlR2i429R3R10R5R21R6tgoR0y36:assets%2Fimages%2Fimages-go-here.txtR2zR3R10R5R22R6tgoR0y26:assets%2Fimages%2Flogo.pngR2i86924R3R4R5R23R6tgoR0y26:assets%2Fimages%2Flose.pngR2i236363R3R4R5R24R6tgoR0y26:assets%2Fimages%2Flose.xmlR2i4131R3R10R5R25R6tgoR0y33:assets%2Fimages%2FNOTE_assets.pngR2i716622R3R4R5R26R6tgoR0y33:assets%2Fimages%2FNOTE_assets.xmlR2i4973R3R10R5R27R6tgoR0y26:assets%2Fimages%2Fnum0.pngR2i3738R3R4R5R28R6tgoR0y26:assets%2Fimages%2Fnum1.pngR2i3390R3R4R5R29R6tgoR0y26:assets%2Fimages%2Fnum2.pngR2i3990R3R4R5R30R6tgoR0y26:assets%2Fimages%2Fnum3.pngR2i4022R3R4R5R31R6tgoR0y26:assets%2Fimages%2Fnum4.pngR2i3989R3R4R5R32R6tgoR0y26:assets%2Fimages%2Fnum5.pngR2i4113R3R4R5R33R6tgoR0y26:assets%2Fimages%2Fnum6.pngR2i4181R3R4R5R34R6tgoR0y26:assets%2Fimages%2Fnum7.pngR2i3692R3R4R5R35R6tgoR0y26:assets%2Fimages%2Fnum8.pngR2i3914R3R4R5R36R6tgoR0y26:assets%2Fimages%2Fnum9.pngR2i3687R3R4R5R37R6tgoR0y27:assets%2Fimages%2Fready.pngR2i28966R3R4R5R38R6tgoR0y29:assets%2Fimages%2Frestart.pngR2i41117R3R4R5R39R6tgoR0y25:assets%2Fimages%2Fset.pngR2i25471R3R4R5R40R6tgoR0y26:assets%2Fimages%2Fshit.pngR2i15319R3R4R5R41R6tgoR0y26:assets%2Fimages%2Fsick.pngR2i19249R3R4R5R42R6tgoR0y31:assets%2Fimages%2Fstageback.pngR2i36925R3R4R5R43R6tgoR0y35:assets%2Fimages%2Fstagecurtains.pngR2i154716R3R4R5R44R6tgoR0y32:assets%2Fimages%2Fstagefront.pngR2i143142R3R4R5R45R6tgoR0y33:assets%2Fimages%2Fstage_light.pngR2i12177R3R4R5R46R6tgoR0y38:assets%2Fdata%2Fbopeebo%2Fbopeebo.jsonR2i61R3R10R5R47R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section1.pngR2i116R3R4R5R48R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeebo_section10.pngR2i122R3R4R5R49R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeebo_section11.pngR2i127R3R4R5R50R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeebo_section12.pngR2i100R3R4R5R51R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeebo_section13.pngR2i117R3R4R5R52R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeebo_section14.pngR2i127R3R4R5R53R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeebo_section15.pngR2i125R3R4R5R54R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section2.pngR2i127R3R4R5R55R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section3.pngR2i128R3R4R5R56R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section4.pngR2i123R3R4R5R57R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section5.pngR2i126R3R4R5R58R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section6.pngR2i123R3R4R5R59R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section7.pngR2i117R3R4R5R60R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section8.pngR2i127R3R4R5R61R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeebo_section9.pngR2i127R3R4R5R62R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section1.pngR2i116R3R4R5R63R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeepo_section10.pngR2i122R3R4R5R64R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeepo_section11.pngR2i127R3R4R5R65R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeepo_section12.pngR2i100R3R4R5R66R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeepo_section13.pngR2i117R3R4R5R67R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeepo_section14.pngR2i127R3R4R5R68R6tgoR0y47:assets%2Fdata%2Fbopeebo%2Fbopeepo_section15.pngR2i125R3R4R5R69R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section2.pngR2i127R3R4R5R70R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section3.pngR2i128R3R4R5R71R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section4.pngR2i123R3R4R5R72R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section5.pngR2i126R3R4R5R73R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section6.pngR2i123R3R4R5R74R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section7.pngR2i117R3R4R5R75R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section8.pngR2i127R3R4R5R76R6tgoR0y46:assets%2Fdata%2Fbopeebo%2Fbopeepo_section9.pngR2i127R3R4R5R77R6tgoR0y28:assets%2Fdata%2Fbopeebo.jsonR2i189R3R10R5R78R6tgoR0y34:assets%2Fdata%2Fdata-goes-here.txtR2zR3R10R5R79R6tgoR0y34:assets%2Fdata%2Ffresh%2Ffresh.jsonR2i59R3R10R5R80R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section1.pngR2i129R3R4R5R81R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section10.pngR2i123R3R4R5R82R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section11.pngR2i121R3R4R5R83R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section12.pngR2i125R3R4R5R84R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section13.pngR2i139R3R4R5R85R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section14.pngR2i149R3R4R5R86R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section15.pngR2i129R3R4R5R87R6tgoR0y43:assets%2Fdata%2Ffresh%2Ffresh_section16.pngR2i133R3R4R5R88R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section2.pngR2i133R3R4R5R89R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section3.pngR2i116R3R4R5R90R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section4.pngR2i120R3R4R5R91R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section5.pngR2i121R3R4R5R92R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section6.pngR2i127R3R4R5R93R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section7.pngR2i139R3R4R5R94R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section8.pngR2i149R3R4R5R95R6tgoR0y42:assets%2Fdata%2Ffresh%2Ffresh_section9.pngR2i117R3R4R5R96R6tgoR0y33:assets%2Fdata%2Fsection1.asepriteR2i566R3y6:BINARYR5R97R6tgoR0y33:assets%2Fdata%2FspecialThanks.txtR2i31R3R10R5R99R6tgoR2i3071999R3y5:MUSICR5y28:assets%2Fmusic%2FBopeebo.mp3y9:pathGroupaR101hR6tgoR2i3071999R3R100R5y33:assets%2Fmusic%2FBopeebo_Inst.mp3R102aR103hR6tgoR2i3071999R3R100R5y35:assets%2Fmusic%2FBopeebo_Voices.mp3R102aR104hR6tgoR2i2880782R3R100R5y26:assets%2Fmusic%2FFresh.mp3R102aR105hR6tgoR2i3279933R3R100R5y31:assets%2Fmusic%2FFresh_Inst.mp3R102aR106hR6tgoR2i3279933R3R100R5y33:assets%2Fmusic%2FFresh_Voices.mp3R102aR107hR6tgoR2i1282133R3R100R5y45:assets%2Fmusic%2FHaxeFlixel_Tutorial_Game.mp3R102aR108hR6tgoR2i3071999R3R100R5y28:assets%2Fmusic%2FJammer2.mp3R102aR109hR6tgoR2i1508831R3R100R5y26:assets%2Fmusic%2Ftitle.mp3R102aR110hR6tgoR2i210573R3R100R5y31:assets%2Fmusic%2FtitleShoot.mp3R102aR111hR6tgoR2i34480R3R100R5y31:assets%2Fsounds%2Fbadnoise1.mp3R102aR112hR6tgoR2i34480R3R100R5y31:assets%2Fsounds%2Fbadnoise2.mp3R102aR113hR6tgoR2i34480R3R100R5y31:assets%2Fsounds%2Fbadnoise3.mp3R102aR114hR6tgoR2i6339R3R100R5y32:assets%2Fsounds%2FfreshIntro.mp3R102aR115hR6tgoR2i11426R3R100R5y28:assets%2Fsounds%2Fintro1.mp3R102aR116hR6tgoR2i12051R3R100R5y28:assets%2Fsounds%2Fintro2.mp3R102aR117hR6tgoR2i11582R3R100R5y28:assets%2Fsounds%2Fintro3.mp3R102aR118hR6tgoR2i13254R3R100R5y29:assets%2Fsounds%2FintroGo.mp3R102aR119hR6tgoR2i68962R3R100R5y31:assets%2Fsounds%2Fmissnote1.mp3R102aR120hR6tgoR2i68962R3R100R5y31:assets%2Fsounds%2Fmissnote2.mp3R102aR121hR6tgoR2i68962R3R100R5y31:assets%2Fsounds%2Fmissnote3.mp3R102aR122hR6tgoR2i8220R3R100R5y26:flixel%2Fsounds%2Fbeep.mp3R102aR123y26:flixel%2Fsounds%2Fbeep.ogghR6tgoR2i39706R3R100R5y28:flixel%2Fsounds%2Fflixel.mp3R102aR125y28:flixel%2Fsounds%2Fflixel.ogghR6tgoR2i6840R3y5:SOUNDR5R124R102aR123R124hgoR2i33629R3R127R5R126R102aR125R126hgoR2i15744R3y4:FONTy9:classNamey35:__ASSET__flixel_fonts_nokiafc22_ttfR5y30:flixel%2Ffonts%2Fnokiafc22.ttfR6tgoR2i29724R3R128R129y36:__ASSET__flixel_fonts_monsterrat_ttfR5y31:flixel%2Ffonts%2Fmonsterrat.ttfR6tgoR0y33:flixel%2Fimages%2Fui%2Fbutton.pngR2i222R3R4R5R134R6tgoR0y36:flixel%2Fimages%2Flogo%2Fdefault.pngR2i484R3R4R5R135R6tgoR0y42:flixel%2Fimages%2Ftransitions%2Fcircle.pngR2i299R3R4R5R136R6tgoR0y53:flixel%2Fimages%2Ftransitions%2Fdiagonal_gradient.pngR2i730R3R4R5R137R6tgoR0y43:flixel%2Fimages%2Ftransitions%2Fdiamond.pngR2i236R3R4R5R138R6tgoR0y42:flixel%2Fimages%2Ftransitions%2Fsquare.pngR2i209R3R4R5R139R6tgh\",\"rootPath\":null,\"version\":2,\"libraryArgs\":[],\"libraryType\":null}";
+	var manifest = lime_utils_AssetManifest.parse(data,ManifestResources.rootPath);
+	var library = lime_utils_AssetLibrary.fromManifest(manifest);
+	lime_utils_Assets.registerLibrary("default",library);
+	library = lime_utils_Assets.getLibrary("default");
+	if(library != null) {
+		ManifestResources.preloadLibraries.push(library);
+	} else {
+		ManifestResources.preloadLibraryNames.push("default");
+	}
+};
+var lime_text_Font = function(name) {
+	if(name != null) {
+		this.name = name;
+	}
+	if(!this.__init) {
+		if(this.ascender == undefined) {
+			this.ascender = 0;
+		}
+		if(this.descender == undefined) {
+			this.descender = 0;
+		}
+		if(this.height == undefined) {
+			this.height = 0;
+		}
+		if(this.numGlyphs == undefined) {
+			this.numGlyphs = 0;
+		}
+		if(this.underlinePosition == undefined) {
+			this.underlinePosition = 0;
+		}
+		if(this.underlineThickness == undefined) {
+			this.underlineThickness = 0;
+		}
+		if(this.unitsPerEM == undefined) {
+			this.unitsPerEM = 0;
+		}
+		if(this.__fontID != null) {
+			if(lime_utils_Assets.isLocal(this.__fontID)) {
+				this.__fromBytes(lime_utils_Assets.getBytes(this.__fontID));
+			}
+		} else if(this.__fontPath != null) {
+			this.__fromFile(this.__fontPath);
+		}
+	}
+};
+$hxClasses["lime.text.Font"] = lime_text_Font;
+lime_text_Font.__name__ = "lime.text.Font";
+lime_text_Font.fromBytes = function(bytes) {
+	if(bytes == null) {
+		return null;
+	}
+	var font = new lime_text_Font();
+	font.__fromBytes(bytes);
+	return font;
+};
+lime_text_Font.fromFile = function(path) {
+	if(path == null) {
+		return null;
+	}
+	var font = new lime_text_Font();
+	font.__fromFile(path);
+	return font;
+};
+lime_text_Font.loadFromBytes = function(bytes) {
+	return lime_app_Future.withValue(lime_text_Font.fromBytes(bytes));
+};
+lime_text_Font.loadFromFile = function(path) {
+	var request = new lime_net__$HTTPRequest_$lime_$text_$Font();
+	return request.load(path).then(function(font) {
+		if(font != null) {
+			return lime_app_Future.withValue(font);
+		} else {
+			return lime_app_Future.withError("");
+		}
+	});
+};
+lime_text_Font.loadFromName = function(path) {
+	var font = new lime_text_Font();
+	return font.__loadFromName(path);
+};
+lime_text_Font.__measureFontNode = function(fontFamily) {
+	var node = window.document.createElement("span");
+	node.setAttribute("aria-hidden","true");
+	var text = window.document.createTextNode("BESbswy");
+	node.appendChild(text);
+	var style = node.style;
+	style.display = "block";
+	style.position = "absolute";
+	style.top = "-9999px";
+	style.left = "-9999px";
+	style.fontSize = "300px";
+	style.width = "auto";
+	style.height = "auto";
+	style.lineHeight = "normal";
+	style.margin = "0";
+	style.padding = "0";
+	style.fontVariant = "normal";
+	style.whiteSpace = "nowrap";
+	style.fontFamily = fontFamily;
+	window.document.body.appendChild(node);
+	return node;
+};
+lime_text_Font.prototype = {
+	decompose: function() {
+		return null;
+	}
+	,getGlyph: function(character) {
+		return -1;
+	}
+	,getGlyphs: function(characters) {
+		if(characters == null) {
+			characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^`'\"/\\&*()[]{}<>|:;_-+=?,. ";
+		}
+		return null;
+	}
+	,getGlyphMetrics: function(glyph) {
+		return null;
+	}
+	,renderGlyph: function(glyph,fontSize) {
+		return null;
+	}
+	,renderGlyphs: function(glyphs,fontSize) {
+		return null;
+	}
+	,__copyFrom: function(other) {
+		if(other != null) {
+			this.ascender = other.ascender;
+			this.descender = other.descender;
+			this.height = other.height;
+			this.name = other.name;
+			this.numGlyphs = other.numGlyphs;
+			this.src = other.src;
+			this.underlinePosition = other.underlinePosition;
+			this.underlineThickness = other.underlineThickness;
+			this.unitsPerEM = other.unitsPerEM;
+			this.__fontID = other.__fontID;
+			this.__fontPath = other.__fontPath;
+			this.__init = true;
+		}
+	}
+	,__fromBytes: function(bytes) {
+		this.__fontPath = null;
+	}
+	,__fromFile: function(path) {
+		this.__fontPath = path;
+	}
+	,__initializeSource: function() {
+		this.__init = true;
+	}
+	,__loadFromName: function(name) {
+		var _gthis = this;
+		var promise = new lime_app_Promise();
+		this.name = name;
+		var userAgent = $global.navigator.userAgent.toLowerCase();
+		var isSafari = userAgent.indexOf(" safari/") >= 0 && userAgent.indexOf(" chrome/") < 0;
+		var isUIWebView = new EReg("(iPhone|iPod|iPad).*AppleWebKit(?!.*Version)","i").match(userAgent);
+		if(!isSafari && !isUIWebView && (window.document.fonts && ($_=window.document.fonts,$bind($_,$_.load)))) {
+			window.document.fonts.load("1em '" + name + "'").then(function(_) {
+				promise.complete(_gthis);
+			},function(_) {
+				lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 656, className : "lime.text.Font", methodName : "__loadFromName"});
+				promise.complete(_gthis);
+			});
+		} else {
+			var node1 = lime_text_Font.__measureFontNode("'" + name + "', sans-serif");
+			var node2 = lime_text_Font.__measureFontNode("'" + name + "', serif");
+			var width1 = node1.offsetWidth;
+			var width2 = node2.offsetWidth;
+			var interval = -1;
+			var timeout = 3000;
+			var intervalLength = 50;
+			var intervalCount = 0;
+			var loaded;
+			var timeExpired;
+			var checkFont = function() {
+				intervalCount += 1;
+				loaded = node1.offsetWidth != width1 || node2.offsetWidth != width2;
+				timeExpired = intervalCount * intervalLength >= timeout;
+				if(loaded || timeExpired) {
+					window.clearInterval(interval);
+					node1.parentNode.removeChild(node1);
+					node2.parentNode.removeChild(node2);
+					node1 = null;
+					node2 = null;
+					if(timeExpired) {
+						lime_utils_Log.warn("Could not load web font \"" + name + "\"",{ fileName : "lime/text/Font.hx", lineNumber : 692, className : "lime.text.Font", methodName : "__loadFromName"});
+					}
+					promise.complete(_gthis);
+				}
+			};
+			interval = window.setInterval(checkFont,intervalLength);
+		}
+		return promise.future;
+	}
+	,__setSize: function(size,dpi) {
+		if(dpi == null) {
+			dpi = 72;
+		}
+	}
+	,__class__: lime_text_Font
+};
+var _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__flixel_fonts_nokiafc22_ttf"] = function() {
+	this.ascender = 2048;
+	this.descender = -512;
+	this.height = 2816;
+	this.numGlyphs = 172;
+	this.underlinePosition = -640;
+	this.underlineThickness = 256;
+	this.unitsPerEM = 2048;
+	this.name = "Nokia Cellphone FC Small";
+	lime_text_Font.call(this);
+};
+$hxClasses["__ASSET__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf;
+_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__flixel_fonts_nokiafc22_ttf";
+_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = lime_text_Font;
+_$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(lime_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf
+});
+var _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__flixel_fonts_monsterrat_ttf"] = function() {
+	this.ascender = 968;
+	this.descender = -251;
+	this.height = 1219;
+	this.numGlyphs = 263;
+	this.underlinePosition = -150;
+	this.underlineThickness = 50;
+	this.unitsPerEM = 1000;
+	this.name = "Monsterrat";
+	lime_text_Font.call(this);
+};
+$hxClasses["__ASSET__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf;
+_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__flixel_fonts_monsterrat_ttf";
+_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = lime_text_Font;
+_$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(lime_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf
+});
+var openfl_text_Font = function(name) {
+	lime_text_Font.call(this,name);
+};
+$hxClasses["openfl.text.Font"] = openfl_text_Font;
+openfl_text_Font.__name__ = "openfl.text.Font";
+openfl_text_Font.enumerateFonts = function(enumerateDeviceFonts) {
+	if(enumerateDeviceFonts == null) {
+		enumerateDeviceFonts = false;
+	}
+	return openfl_text_Font.__registeredFonts;
+};
+openfl_text_Font.fromBytes = function(bytes) {
+	var font = new openfl_text_Font();
+	font.__fromBytes(openfl_utils_ByteArray.toBytes(bytes));
+	return font;
+};
+openfl_text_Font.fromFile = function(path) {
+	if(path == null) {
+		return null;
+	}
+	var font = new openfl_text_Font();
+	font.__fromFile(path);
+	return font;
+};
+openfl_text_Font.loadFromBytes = function(bytes) {
+	return lime_text_Font.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(limeFont) {
+		var font = new openfl_text_Font();
+		font.__fromLimeFont(limeFont);
+		return lime_app_Future.withValue(font);
+	});
+};
+openfl_text_Font.loadFromFile = function(path) {
+	return lime_text_Font.loadFromFile(path).then(function(limeFont) {
+		var font = new openfl_text_Font();
+		font.__fromLimeFont(limeFont);
+		return lime_app_Future.withValue(font);
+	});
+};
+openfl_text_Font.loadFromName = function(path) {
+	return lime_text_Font.loadFromName(path).then(function(limeFont) {
+		var font = new openfl_text_Font();
+		font.__fromLimeFont(limeFont);
+		return lime_app_Future.withValue(font);
+	});
+};
+openfl_text_Font.registerFont = function(font) {
+	var instance = null;
+	if(js_Boot.getClass(font) == null) {
+		instance = js_Boot.__cast(Type.createInstance(font,[]) , openfl_text_Font);
+	} else {
+		instance = js_Boot.__cast(font , openfl_text_Font);
+	}
+	if(instance != null) {
+		openfl_text_Font.__registeredFonts.push(instance);
+		openfl_text_Font.__fontByName.h[instance.name] = instance;
+	}
+};
+openfl_text_Font.__super__ = lime_text_Font;
+openfl_text_Font.prototype = $extend(lime_text_Font.prototype,{
+	__fromLimeFont: function(font) {
+		this.__copyFrom(font);
+	}
+	,__initialize: function() {
+		return this.__initialized;
+	}
+	,get_fontName: function() {
+		return this.name;
+	}
+	,set_fontName: function(value) {
+		return this.name = value;
+	}
+	,__class__: openfl_text_Font
+	,__properties__: {set_fontName:"set_fontName",get_fontName:"get_fontName"}
+});
+var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = function() {
+	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$nokiafc22_$ttf());
+	openfl_text_Font.call(this);
+};
+$hxClasses["__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_nokiafc22_ttf";
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.__super__ = openfl_text_Font;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf.prototype = $extend(openfl_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$nokiafc22_$ttf
+});
+var _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf = $hx_exports["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = function() {
+	this.__fromLimeFont(new _$_$ASSET_$_$flixel_$fonts_$monsterrat_$ttf());
+	openfl_text_Font.call(this);
+};
+$hxClasses["__ASSET__OPENFL__flixel_fonts_monsterrat_ttf"] = _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__name__ = "__ASSET__OPENFL__flixel_fonts_monsterrat_ttf";
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.__super__ = openfl_text_Font;
+_$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf.prototype = $extend(openfl_text_Font.prototype,{
+	__class__: _$_$ASSET_$_$OPENFL_$_$flixel_$fonts_$monsterrat_$ttf
+});
+Math.__name__ = "Math";
+var Note = function(strumTime,noteData,prevNote) {
 	this.noteScore = 1;
 	this.wasGoodHit = false;
 	this.tooLate = false;
@@ -7727,32 +8282,86 @@ var Note = function(strumTime,noteData) {
 	this.mustPress = false;
 	this.strumTime = 0;
 	flixel_FlxSprite.call(this);
-	this.set_x(this.x + 100);
+	if(prevNote == null) {
+		prevNote = this;
+	}
+	this.prevNote = prevNote;
+	this.set_x(this.x + 50);
 	this.strumTime = strumTime;
 	this.noteData = noteData;
 	var tex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/NOTE_assets.png","assets/images/NOTE_assets.xml");
 	this.set_frames(tex);
-	var swagWidth = 55;
+	this.animation.addByPrefix("greenScroll","green0");
+	this.animation.addByPrefix("redScroll","red0");
+	this.animation.addByPrefix("blueScroll","blue0");
+	this.animation.addByPrefix("purpleScroll","purple0");
+	this.animation.addByPrefix("purpleholdend","pruple end hold");
+	this.animation.addByPrefix("greenholdend","green hold end");
+	this.animation.addByPrefix("redholdend","red hold end");
+	this.animation.addByPrefix("blueholdend","blue hold end");
+	this.animation.addByPrefix("purplehold","purple hold piece");
+	this.animation.addByPrefix("greenhold","green hold piece");
+	this.animation.addByPrefix("redhold","red hold piece");
+	this.animation.addByPrefix("bluehold","blue hold piece");
+	this.setGraphicSize(this.get_width() * 0.7 | 0);
+	this.updateHitbox();
+	this.set_antialiasing(true);
 	switch(Math.abs(noteData)) {
 	case 1:
-		this.set_x(this.x + swagWidth * 2);
-		this.set_color(-16744448);
+		this.set_x(this.x + Note.swagWidth * 2);
+		this.animation.play("greenScroll");
 		break;
 	case 2:
-		this.set_x(this.x + swagWidth * 3);
-		this.set_color(-65536);
+		this.set_x(this.x + Note.swagWidth * 3);
+		this.animation.play("redScroll");
 		break;
 	case 3:
-		this.set_x(this.x + swagWidth);
-		this.set_color(-16776961);
+		this.set_x(this.x + Note.swagWidth);
+		this.animation.play("blueScroll");
 		break;
 	case 4:
-		this.set_x(this.x + swagWidth * 0);
-		this.set_color(-8388480);
+		this.set_x(this.x + Note.swagWidth * 0);
+		this.animation.play("purpleScroll");
 		break;
 	}
-	if(noteData < 0) {
+	haxe_Log.trace(prevNote,{ fileName : "source/Note.hx", lineNumber : 73, className : "Note", methodName : "new"});
+	if(noteData < 0 && prevNote != null) {
 		this.set_alpha(0.6);
+		this.set_x(this.x + this.get_width() / 2);
+		switch(noteData) {
+		case -4:
+			this.animation.play("purpleholdend");
+			break;
+		case -3:
+			this.animation.play("blueholdend");
+			break;
+		case -2:
+			this.animation.play("redholdend");
+			break;
+		case -1:
+			this.animation.play("greenholdend");
+			break;
+		}
+		this.updateHitbox();
+		this.set_x(this.x - this.get_width() / 2);
+		if(prevNote.noteData < 0) {
+			switch(prevNote.noteData) {
+			case -4:
+				prevNote.animation.play("purplehold");
+				break;
+			case -3:
+				prevNote.animation.play("bluehold");
+				break;
+			case -2:
+				prevNote.animation.play("redhold");
+				break;
+			case -1:
+				prevNote.animation.play("greenhold");
+				break;
+			}
+			prevNote.offset.set_y(-19);
+			prevNote.scale.set_y(prevNote.scale.y * 2.25);
+		}
 	}
 };
 $hxClasses["Note"] = Note;
@@ -7784,52 +8393,177 @@ Note.prototype = $extend(flixel_FlxSprite.prototype,{
 	}
 	,__class__: Note
 });
-var PlayState = function() {
+var PlayState = function(TransIn,TransOut) {
 	this.sectionScored = false;
+	this.sortedNotes = false;
 	this.debugNum = 0;
+	this.countingDown = false;
+	this.generatedMusic = false;
+	this.combo = 0;
+	this.health = 1;
+	this.gfSpeed = 1;
+	this.curSong = "";
+	this.camZooming = false;
+	this.sectionLengths = [];
 	this.sectionScores = [[],[]];
 	this.curSection = 0;
+	this.unspawnNotes = [];
 	this.totalSteps = 0;
 	this.totalBeats = 0;
-	this.canHit = false;
 	this.lastStep = 0;
 	this.lastBeat = 0;
-	flixel_FlxState.call(this);
+	flixel_addons_transition_FlxTransitionableState.call(this,TransIn,TransOut);
 };
 $hxClasses["PlayState"] = PlayState;
 PlayState.__name__ = "PlayState";
-PlayState.__super__ = flixel_FlxState;
-PlayState.prototype = $extend(flixel_FlxState.prototype,{
+PlayState.__super__ = flixel_addons_transition_FlxTransitionableState;
+PlayState.prototype = $extend(flixel_addons_transition_FlxTransitionableState.prototype,{
 	create: function() {
-		this.dad = new flixel_FlxSprite(100,100).loadGraphic("assets/images/DADDY_DEAREST.png");
-		var dadTex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/DADDY_DEAREST.png","assets/images/DADDY_DEAREST.xml");
-		this.dad.set_frames(dadTex);
-		this.dad.animation.addByPrefix("idle","Dad idle dance",24);
-		this.dad.animation.addByPrefix("singUP","Dad Sing note UP",24);
-		this.dad.animation.addByPrefix("singRIGHT","Dad Sing note UP",24);
-		this.dad.animation.addByPrefix("singDOWN","Dad Sing Note DOWN",24);
-		this.dad.animation.addByPrefix("singLEFT","dad sing note right",24);
-		this.dad.animation.play("idle");
+		var _gthis = this;
+		this.persistentUpdate = true;
+		this.persistentDraw = true;
+		var bg = new flixel_FlxSprite(-600,-200).loadGraphic("assets/images/stageback.png");
+		bg.set_antialiasing(true);
+		var this1 = bg.scrollFactor;
+		var x = 0.9;
+		var y = 0.9;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		bg.set_active(false);
+		this.add(bg);
+		var stageFront = new flixel_FlxSprite(-650,600).loadGraphic("assets/images/stagefront.png");
+		stageFront.setGraphicSize(stageFront.get_width() * 1.1 | 0);
+		stageFront.updateHitbox();
+		stageFront.set_antialiasing(true);
+		var this1 = stageFront.scrollFactor;
+		var x = 0.9;
+		var y = 0.9;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		stageFront.set_active(false);
+		this.add(stageFront);
+		var stageCurtains = new flixel_FlxSprite(-500,-300).loadGraphic("assets/images/stagecurtains.png");
+		stageCurtains.setGraphicSize(stageCurtains.get_width() * 0.9 | 0);
+		stageCurtains.updateHitbox();
+		stageCurtains.set_antialiasing(true);
+		var this1 = stageCurtains.scrollFactor;
+		var x = 1.3;
+		var y = 1.3;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		stageCurtains.set_active(false);
+		this.gf = new Girlfriend(400,130);
+		var this1 = this.gf.scrollFactor;
+		var x = 0.95;
+		var y = 0.95;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		this.gf.set_antialiasing(true);
+		this.add(this.gf);
+		this.dad = new Dad(100,100);
 		this.add(this.dad);
-		this.boyfriend = new flixel_FlxSprite(770,450);
-		var tex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/BOYFRIEND.png","assets/images/BOYFRIEND.xml");
-		this.boyfriend.set_frames(tex);
-		this.boyfriend.animation.addByPrefix("idle","BF idle dance",24,false);
-		this.boyfriend.animation.addByPrefix("singUP","BF NOTE UP",24,false);
-		this.boyfriend.animation.addByPrefix("singLEFT","BF NOTE LEFT",24,false);
-		this.boyfriend.animation.addByPrefix("singRIGHT","BF NOTE RIGHT",24,false);
-		this.boyfriend.animation.addByPrefix("singDOWN","BF NOTE DOWN",24,false);
-		this.boyfriend.animation.addByPrefix("hey","BF HEY",24,false);
-		this.boyfriend.animation.play("idle");
+		this.boyfriend = new Boyfriend(770,450);
 		this.add(this.boyfriend);
-		this.generateSong("assets/data/bopeebo/bopeebo.json");
-		this.canHitText = new flixel_text_FlxText(10,10,0,"weed");
+		this.add(stageCurtains);
 		this.strumLine = new flixel_FlxSprite(0,50).makeGraphic(flixel_FlxG.width,10);
 		var this1 = this.strumLine.scrollFactor;
 		this1.set_x(0);
 		this1.set_y(0);
-		this.add(this.strumLine);
+		this.strumLineNotes = new flixel_group_FlxTypedGroup();
+		this.add(this.strumLineNotes);
+		this.playerStrums = new flixel_group_FlxTypedGroup();
+		var swagCounter = 0;
+		this.generateSong(PlayState.curLevel.toLowerCase());
+		this.countingDown = true;
+		Conductor.songPosition = 0;
+		Conductor.songPosition -= Conductor.crochet * 5;
+		new flixel_util_FlxTimer().start(Conductor.crochet / 1000,function(tmr) {
+			switch(swagCounter) {
+			case 0:
+				flixel_FlxG.sound.play("assets/sounds/intro3.mp3",0.6);
+				break;
+			case 1:
+				var ready = new flixel_FlxSprite().loadGraphic("assets/images/ready.png");
+				var this1 = ready.scrollFactor;
+				this1.set_x(0);
+				this1.set_y(0);
+				if(17 == 1 || 17 == 17) {
+					ready.set_x((flixel_FlxG.width - ready.get_width()) / 2);
+				}
+				if(17 == 16 || 17 == 17) {
+					ready.set_y((flixel_FlxG.height - ready.get_height()) / 2);
+				}
+				_gthis.add(ready);
+				flixel_tweens_FlxTween.tween(ready,{ y : ready.set_y(ready.y + 100), alpha : 0},Conductor.crochet / 1000,{ ease : flixel_tweens_FlxEase.cubeInOut, onComplete : function(twn) {
+					ready.destroy();
+				}});
+				flixel_FlxG.sound.play("assets/sounds/intro2.mp3",0.6);
+				break;
+			case 2:
+				var set = new flixel_FlxSprite().loadGraphic("assets/images/set.png");
+				var this1 = set.scrollFactor;
+				this1.set_x(0);
+				this1.set_y(0);
+				if(17 == 1 || 17 == 17) {
+					set.set_x((flixel_FlxG.width - set.get_width()) / 2);
+				}
+				if(17 == 16 || 17 == 17) {
+					set.set_y((flixel_FlxG.height - set.get_height()) / 2);
+				}
+				_gthis.add(set);
+				flixel_tweens_FlxTween.tween(set,{ y : set.set_y(set.y + 100), alpha : 0},Conductor.crochet / 1000,{ ease : flixel_tweens_FlxEase.cubeInOut, onComplete : function(twn) {
+					set.destroy();
+				}});
+				flixel_FlxG.sound.play("assets/sounds/intro1.mp3",0.6);
+				break;
+			case 3:
+				var go = new flixel_FlxSprite().loadGraphic("assets/images/go.png");
+				var this1 = go.scrollFactor;
+				this1.set_x(0);
+				this1.set_y(0);
+				if(17 == 1 || 17 == 17) {
+					go.set_x((flixel_FlxG.width - go.get_width()) / 2);
+				}
+				if(17 == 16 || 17 == 17) {
+					go.set_y((flixel_FlxG.height - go.get_height()) / 2);
+				}
+				_gthis.add(go);
+				flixel_tweens_FlxTween.tween(go,{ y : go.set_y(go.y + 100), alpha : 0},Conductor.crochet / 1000,{ ease : flixel_tweens_FlxEase.cubeInOut, onComplete : function(twn) {
+					go.destroy();
+				}});
+				flixel_FlxG.sound.play("assets/sounds/introGo.mp3",0.6);
+				break;
+			case 4:
+				break;
+			}
+			swagCounter += 1;
+		},5);
 		this.camFollow = new flixel_FlxObject(0,0,1,1);
+		this.camFollow.setPosition(this.dad.getGraphicMidpoint().x,this.dad.getGraphicMidpoint().y);
 		this.add(this.camFollow);
 		flixel_FlxG.camera.follow(this.camFollow,flixel_FlxCameraFollowStyle.LOCKON,0.04);
 		flixel_FlxG.camera.set_zoom(1.05);
@@ -7854,14 +8588,55 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		_this.y = Y;
 		_this.width = Width;
 		_this.height = Height;
-		flixel_FlxState.prototype.create.call(this);
+		flixel_FlxG.fixedTimestep = false;
+		this.healthBarBG = new flixel_FlxSprite(0,flixel_FlxG.height * 0.9).loadGraphic("assets/images/healthBar.png");
+		var _this = this.healthBarBG;
+		var axes = 1;
+		if(axes == null) {
+			axes = 17;
+		}
+		if(axes == 1 || axes == 17) {
+			_this.set_x((flixel_FlxG.width - _this.get_width()) / 2);
+		}
+		if(axes == 16 || axes == 17) {
+			_this.set_y((flixel_FlxG.height - _this.get_height()) / 2);
+		}
+		var this1 = this.healthBarBG.scrollFactor;
+		this1.set_x(0);
+		this1.set_y(0);
+		this.add(this.healthBarBG);
+		this.healthBar = new flixel_ui_FlxBar(this.healthBarBG.x + 4,this.healthBarBG.y + 4,flixel_ui_FlxBarFillDirection.RIGHT_TO_LEFT,this.healthBarBG.get_width() - 8 | 0,this.healthBarBG.get_height() - 8 | 0,this,"health",0,2);
+		var this1 = this.healthBar.scrollFactor;
+		this1.set_x(0);
+		this1.set_y(0);
+		this.healthBar.createFilledBar(-65536,-10027213);
+		this.add(this.healthBar);
+		this.healthHeads = new flixel_FlxSprite();
+		var headTex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/healthHeads.png","assets/images/healthHeads.xml");
+		this.healthHeads.set_frames(headTex);
+		this.healthHeads.animation.add("healthy",[0]);
+		this.healthHeads.animation.add("unhealthy",[1]);
+		this.healthHeads.set_y(this.healthBar.y - this.healthHeads.get_height() / 2);
+		var this1 = this.healthHeads.scrollFactor;
+		this1.set_x(0);
+		this1.set_y(0);
+		this.add(this.healthHeads);
+		flixel_addons_transition_FlxTransitionableState.prototype.create.call(this);
+	}
+	,startSong: function() {
+		this.countingDown = false;
+		flixel_FlxG.sound.playMusic("assets/music/" + PlayState.curLevel + "_Inst.mp3");
+		this.vocals.play();
 	}
 	,generateSong: function(dataPath) {
-		var songData = JSON.parse(lime_utils_Assets.getText(dataPath));
-		flixel_FlxG.sound.playMusic("assets/music/" + songData.song + "_Inst.mp3");
-		this.vocals = new flixel_sound_FlxSound().loadEmbedded("assets/music/" + songData.song + "_Voices.mp3");
+		this.generatedMusic = true;
+		this.generateStaticArrows(0);
+		this.generateStaticArrows(1);
+		var songData = JSON.parse(lime_utils_Assets.getText("assets/data/" + dataPath + "/" + dataPath + ".json"));
+		Conductor.changeBPM(songData.bpm);
+		this.curSong = songData.song;
+		this.vocals = new flixel_sound_FlxSound().loadEmbedded("assets/music/" + this.curSong + "_Voices.mp3");
 		flixel_FlxG.sound.list.add(this.vocals);
-		this.vocals.play();
 		this.notes = new flixel_group_FlxTypedGroup();
 		this.add(this.notes);
 		var noteData = [];
@@ -7869,18 +8644,24 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		var _g1 = songData.sections + 1;
 		while(_g < _g1) {
 			var i = _g++;
-			haxe_Log.trace(i,{ fileName : "source/PlayState.hx", lineNumber : 111, className : "PlayState", methodName : "generateSong"});
 			noteData.push(ChartParser.parse(songData.song.toLowerCase(),i));
 		}
 		var playerCounter = 0;
 		while(playerCounter < 2) {
 			var daBeats = 0;
+			var totalLength = 0;
 			var _g = 0;
 			while(_g < noteData.length) {
 				var section = noteData[_g];
 				++_g;
 				var dumbassSection = section;
 				var daStep = 0;
+				var coolSection = section.length / 4 | 0;
+				if(coolSection <= 4) {
+					coolSection = 4;
+				} else if(coolSection <= 8) {
+					coolSection = 8;
+				}
 				var _g1 = 0;
 				while(_g1 < dumbassSection.length) {
 					var songNotes = dumbassSection[_g1];
@@ -7888,8 +8669,14 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 					this.sectionScores[0].push(0);
 					this.sectionScores[1].push(0);
 					if(songNotes != 0) {
-						var daStrumTime = daStep * Conductor.stepCrochet + Conductor.crochet * 8 * daBeats + Conductor.crochet * 4 * playerCounter;
-						var swagNote = new Note(daStrumTime,songNotes);
+						var daStrumTime = daStep * Conductor.stepCrochet + Conductor.crochet * 8 * totalLength + Conductor.crochet * coolSection * playerCounter;
+						var oldNote;
+						if(this.unspawnNotes.length > 0) {
+							oldNote = this.unspawnNotes[this.unspawnNotes.length - 1 | 0];
+						} else {
+							oldNote = null;
+						}
+						var swagNote = new Note(daStrumTime,songNotes,oldNote);
 						var this1 = swagNote.scrollFactor;
 						var x = 0;
 						var y = 0;
@@ -7901,100 +8688,269 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 						}
 						this1.set_x(x);
 						this1.set_y(y);
+						this.unspawnNotes.push(swagNote);
 						swagNote.set_x(swagNote.x + flixel_FlxG.width / 2 * playerCounter);
 						if(playerCounter == 1) {
 							swagNote.mustPress = true;
 						} else {
 							this.sectionScores[0][daBeats] += swagNote.noteScore;
 						}
-						if(this.notes.members.length > 0) {
-							swagNote.prevNote = this.notes.members[this.notes.members.length - 1];
-						} else {
-							swagNote.prevNote = swagNote;
-						}
-						this.notes.add(swagNote);
 					}
 					++daStep;
 				}
+				if(playerCounter == 0) {
+					this.sectionLengths.push(Math.round(coolSection / 4));
+				}
+				totalLength += Math.round(coolSection / 4);
 				++daBeats;
 			}
+			haxe_Log.trace(this.unspawnNotes.length,{ fileName : "source/PlayState.hx", lineNumber : 313, className : "PlayState", methodName : "generateSong"});
 			++playerCounter;
+		}
+		this.unspawnNotes.sort($bind(this,this.sortByShit));
+		haxe_Log.trace("FIRST NOTE " + Std.string(this.unspawnNotes[0]),{ fileName : "source/PlayState.hx", lineNumber : 318, className : "PlayState", methodName : "generateSong"});
+	}
+	,sortByShit: function(Obj1,Obj2) {
+		var Value1 = Obj1.strumTime;
+		var Value2 = Obj2.strumTime;
+		var result = 0;
+		if(Value1 < Value2) {
+			result = -1;
+		} else if(Value1 > Value2) {
+			result = 1;
+		}
+		return result;
+	}
+	,generateStaticArrows: function(player) {
+		var _g = 0;
+		while(_g < 4) {
+			var i = _g++;
+			flixel_FlxG.log.advanced(i,flixel_system_debug_log_LogStyle.NORMAL);
+			var babyArrow = new flixel_FlxSprite(0,this.strumLine.y);
+			var arrTex = flixel_graphics_frames_FlxAtlasFrames.fromSparrow("assets/images/NOTE_assets.png","assets/images/NOTE_assets.xml");
+			babyArrow.set_frames(arrTex);
+			babyArrow.animation.addByPrefix("green","arrowUP");
+			babyArrow.animation.addByPrefix("blue","arrowDOWN");
+			babyArrow.animation.addByPrefix("purple","arrowLEFT");
+			babyArrow.animation.addByPrefix("red","arrowRIGHT");
+			var this1 = babyArrow.scrollFactor;
+			this1.set_x(0);
+			this1.set_y(0);
+			babyArrow.setGraphicSize(babyArrow.get_width() * 0.7 | 0);
+			babyArrow.updateHitbox();
+			babyArrow.set_antialiasing(true);
+			babyArrow.set_y(babyArrow.y - 10);
+			babyArrow.set_alpha(0);
+			flixel_tweens_FlxTween.tween(babyArrow,{ y : babyArrow.y + 10, alpha : 1},1,{ ease : flixel_tweens_FlxEase.circOut, startDelay : 0.5 + 0.2 * i});
+			babyArrow.ID = i + 1;
+			if(player == 1) {
+				this.playerStrums.add(babyArrow);
+			}
+			switch(Math.abs(i + 1)) {
+			case 1:
+				babyArrow.set_x(babyArrow.x + Note.swagWidth * 2);
+				babyArrow.animation.addByPrefix("static","arrowUP");
+				babyArrow.animation.addByPrefix("pressed","up press",24,false);
+				babyArrow.animation.addByPrefix("confirm","up confirm",24,false);
+				break;
+			case 2:
+				babyArrow.set_x(babyArrow.x + Note.swagWidth * 3);
+				babyArrow.animation.addByPrefix("static","arrowRIGHT");
+				babyArrow.animation.addByPrefix("pressed","right press",24,false);
+				babyArrow.animation.addByPrefix("confirm","right confirm",24,false);
+				break;
+			case 3:
+				babyArrow.set_x(babyArrow.x + Note.swagWidth);
+				babyArrow.animation.addByPrefix("static","arrowDOWN");
+				babyArrow.animation.addByPrefix("pressed","down press",24,false);
+				babyArrow.animation.addByPrefix("confirm","down confirm",24,false);
+				break;
+			case 4:
+				babyArrow.set_x(babyArrow.x + Note.swagWidth * 0);
+				babyArrow.animation.addByPrefix("static","arrowLEFT");
+				babyArrow.animation.addByPrefix("pressed","left press",24,false);
+				babyArrow.animation.addByPrefix("confirm","left confirm",24,false);
+				break;
+			}
+			babyArrow.animation.play("static");
+			babyArrow.set_x(babyArrow.x + 50);
+			babyArrow.set_x(babyArrow.x + flixel_FlxG.width / 2 * player);
+			this.strumLineNotes.add(babyArrow);
 		}
 	}
 	,update: function(elapsed) {
 		var _gthis = this;
-		flixel_FlxState.prototype.update.call(this,elapsed);
-		var _this = flixel_FlxG.keys.justPressed;
-		if(_this.keyManager.checkStatusUnsafe(57,_this.status)) {
-			var nextState = flixel_util_typeLimit_NextState.fromState(new Charting());
-			var stateOnCall = flixel_FlxG.game._state;
-			if(!((nextState) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState)) {
+		flixel_addons_transition_FlxTransitionableState.prototype.update.call(this,elapsed);
+		this.healthHeads.setGraphicSize(100 + 0.98 * (this.healthHeads.get_width() - 100) | 0);
+		this.healthHeads.set_x(this.healthBar.x + this.healthBar.get_width() * (flixel_math_FlxMath.remapToRange(this.healthBar.get_percent(),0,100,100,0) * 0.01) - this.healthHeads.get_width() / 2);
+		if(this.healthBar.get_percent() < 10) {
+			this.healthHeads.animation.play("unhealthy");
+		} else {
+			this.healthHeads.animation.play("healthy");
+		}
+		if(this.countingDown) {
+			Conductor.songPosition += flixel_FlxG.elapsed * 1000;
+			if(Conductor.songPosition >= 0) {
+				this.startSong();
+			}
+		} else {
+			Conductor.songPosition = flixel_FlxG.sound.music._time;
+		}
+		var playerTurn = this.totalBeats % (this.sectionLengths[this.curSection] * 8);
+		if(playerTurn == this.sectionLengths[this.curSection] * 8 - 1 && !this.sectionScored) {
+			this.popUpScore();
+			this.sectionScored = true;
+		}
+		if(playerTurn == 0 && this.generatedMusic) {
+			if(this.camFollow.x != this.dad.getGraphicMidpoint().x + 150) {
+				this.camFollow.setPosition(this.dad.getGraphicMidpoint().x + 150,this.dad.getGraphicMidpoint().y - 100);
+			}
+			this.vocals.set_volume(1);
+		}
+		if(playerTurn == (this.sectionLengths[this.curSection] * 8 / 2 | 0) && this.camFollow.x != this.boyfriend.getGraphicMidpoint().x - 100) {
+			this.camFollow.setPosition(this.boyfriend.getGraphicMidpoint().x - 100,this.boyfriend.getGraphicMidpoint().y - 100);
+		}
+		if(this.camZooming) {
+			flixel_FlxG.camera.set_zoom(1.05 + 0.96 * (flixel_FlxG.camera.zoom - 1.05));
+		}
+		if(playerTurn < 4) {
+			this.sectionScored = false;
+		}
+		if(this.curSong == "Fresh") {
+			switch(this.totalBeats) {
+			case 16:
+				this.camZooming = true;
+				this.gfSpeed = 2;
+				break;
+			case 48:
+				this.gfSpeed = 1;
+				break;
+			case 80:
+				this.gfSpeed = 2;
+				break;
+			case 112:
+				this.gfSpeed = 1;
+				break;
+			case 163:
+				var _this = flixel_FlxG.sound.music;
+				_this.cleanup(_this.autoDestroy,true);
+				PlayState.curLevel = "Bopeebo";
+				var nextState = flixel_util_typeLimit_NextState.fromState(new TitleState());
+				var stateOnCall = flixel_FlxG.game._state;
+				if(!((nextState) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState)) {
+					flixel_FlxG.game._state.startOutro(function() {
+						if(flixel_FlxG.game._state == stateOnCall) {
+							flixel_FlxG.game._nextState = nextState;
+						} else {
+							flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+						}
+					});
+				}
+				break;
+			}
+		}
+		if(this.curSong == "Bopeebo") {
+			if(this.totalBeats == 127) {
+				var _this = flixel_FlxG.sound.music;
+				_this.cleanup(_this.autoDestroy,true);
+				PlayState.curLevel = "Fresh";
+				var nextState1 = flixel_util_typeLimit_NextState.fromState(new PlayState());
+				var stateOnCall1 = flixel_FlxG.game._state;
+				if(!((nextState1) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState1)) {
+					flixel_FlxG.game._state.startOutro(function() {
+						if(flixel_FlxG.game._state == stateOnCall1) {
+							flixel_FlxG.game._nextState = nextState1;
+						} else {
+							flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+						}
+					});
+				}
+			}
+		}
+		this.everyBeat();
+		this.everyStep();
+		if(this.health <= 0) {
+			this.boyfriend.stunned = true;
+			var nextState2 = flixel_util_typeLimit_NextState.fromState(new GameOverState());
+			var stateOnCall2 = flixel_FlxG.game._state;
+			if(!((nextState2) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState2)) {
 				flixel_FlxG.game._state.startOutro(function() {
-					if(flixel_FlxG.game._state == stateOnCall) {
-						flixel_FlxG.game._nextState = nextState;
+					if(flixel_FlxG.game._state == stateOnCall2) {
+						flixel_FlxG.game._nextState = nextState2;
 					} else {
 						flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
 					}
 				});
 			}
 		}
-		Conductor.songPosition = flixel_FlxG.sound.music._time;
-		var playerTurn = this.totalBeats % 8;
-		if(playerTurn == 7 && !this.sectionScored) {
-			this.popUpScore();
-			this.sectionScored = true;
-		}
-		if(playerTurn == 0) {
-			this.camFollow.setPosition(this.dad.getGraphicMidpoint().x + 150,this.dad.getGraphicMidpoint().y - 100);
-			this.vocals.set_volume(1);
-		}
-		if(playerTurn == 4) {
-			this.camFollow.setPosition(this.boyfriend.getGraphicMidpoint().x - 100,this.boyfriend.getGraphicMidpoint().y - 100);
-		}
-		if(playerTurn < 4) {
-			this.sectionScored = false;
-		}
-		this.everyBeat();
-		this.everyStep();
-		this.notes.forEachAlive(function(daNote) {
-			if(daNote.y > flixel_FlxG.height) {
-				daNote.set_active(false);
-				daNote.set_visible(false);
-			} else {
-				daNote.set_visible(true);
-				daNote.set_active(true);
+		if(this.unspawnNotes[0] != null) {
+			if(this.unspawnNotes[0].strumTime - Conductor.songPosition < 1500) {
+				var dunceNote = this.unspawnNotes[0];
+				this.notes.add(dunceNote);
+				var index = this.unspawnNotes.indexOf(dunceNote);
+				this.unspawnNotes.splice(index,1);
 			}
-			if(daNote.y < -daNote.get_height()) {
-				if(daNote.tooLate) {
-					_gthis.vocals.set_volume(0);
+		}
+		if(this.generatedMusic) {
+			this.notes.forEachAlive(function(daNote) {
+				if(daNote.y > flixel_FlxG.height) {
+					daNote.set_active(false);
+					daNote.set_visible(false);
+				} else {
+					daNote.set_visible(true);
+					daNote.set_active(true);
 				}
-				daNote.kill();
-			}
-			if(!daNote.mustPress && daNote.wasGoodHit) {
-				switch(Math.abs(daNote.noteData)) {
-				case 1:
-					_gthis.dad.animation.play("singUP");
-					break;
-				case 2:
-					_gthis.dad.animation.play("singRIGHT");
-					break;
-				case 3:
-					_gthis.dad.animation.play("singDOWN");
-					break;
-				case 4:
-					_gthis.dad.animation.play("singLEFT");
-					break;
+				if(!daNote.mustPress && daNote.wasGoodHit) {
+					switch(Math.abs(daNote.noteData)) {
+					case 1:
+						_gthis.dad.playAnim("singUP");
+						break;
+					case 2:
+						_gthis.dad.playAnim("singRIGHT");
+						break;
+					case 3:
+						_gthis.dad.playAnim("singDOWN");
+						break;
+					case 4:
+						_gthis.dad.playAnim("singLEFT");
+						break;
+					}
+					daNote.kill();
+					_gthis.notes.remove(daNote,true);
+					daNote.destroy();
 				}
-				daNote.kill();
-			}
-			daNote.set_y(_gthis.strumLine.y + 5 - daNote.get_height() / 2 - (Conductor.songPosition - daNote.strumTime) * 0.4);
-		});
+				daNote.set_y(_gthis.strumLine.y - (Conductor.songPosition - daNote.strumTime) * 0.45);
+				if(daNote.y < -daNote.get_height()) {
+					if(daNote.tooLate) {
+						_gthis.health -= 0.05;
+						_gthis.vocals.set_volume(0);
+					}
+					daNote.set_active(false);
+					daNote.set_visible(false);
+					daNote.kill();
+					_gthis.notes.remove(daNote,true);
+					daNote.destroy();
+				}
+				if(!_gthis.sortedNotes) {
+					var order = 1;
+					if(order == null) {
+						order = -1;
+					}
+					var _g = flixel_util_FlxSort.byY;
+					var a1 = order;
+					var tmp = function(a2,a3) {
+						return _g(a1,a2,a3);
+					};
+					_gthis.notes.members.sort(tmp);
+				}
+			});
+		}
 		this.keyShit();
 	}
 	,popUpScore: function() {
-		this.boyfriend.animation.play("hey");
+		this.boyfriend.playAnim("hey");
 		this.vocals.set_volume(1);
-		var placement = this.sectionScores[1][this.curSection] + "/" + this.sectionScores[0][this.curSection];
+		var placement = Std.string(this.combo);
 		var coolText = new flixel_text_FlxText(0,0,0,placement,32);
 		if(17 == 1 || 17 == 17) {
 			coolText.set_x((flixel_FlxG.width - coolText.get_width()) / 2);
@@ -8003,9 +8959,86 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 			coolText.set_y((flixel_FlxG.height - coolText.get_height()) / 2);
 		}
 		coolText.set_x(flixel_FlxG.width * 0.75);
-		this.add(coolText);
-		flixel_tweens_FlxTween.tween(coolText,{ alpha : 0},0.2,{ onComplete : function(tween) {
-			coolText.kill();
+		var rating = new flixel_FlxSprite();
+		var daRating = "shit";
+		if(this.combo > 60) {
+			daRating = "sick";
+		} else if(this.combo > 12) {
+			daRating = "good";
+		} else if(this.combo > 4) {
+			daRating = "bad";
+		}
+		rating.loadGraphic("assets/images/" + daRating + ".png");
+		if(17 == 1 || 17 == 17) {
+			rating.set_x((flixel_FlxG.width - rating.get_width()) / 2);
+		}
+		if(17 == 16 || 17 == 17) {
+			rating.set_y((flixel_FlxG.height - rating.get_height()) / 2);
+		}
+		rating.set_x(coolText.x - 40);
+		rating.set_y(rating.y - 60);
+		rating.acceleration.set_y(550);
+		rating.velocity.set_y(rating.velocity.y - flixel_FlxG.random.int(140,175));
+		rating.setGraphicSize(rating.get_width() * 0.7 | 0);
+		rating.updateHitbox();
+		rating.set_antialiasing(true);
+		rating.velocity.set_x(rating.velocity.x - flixel_FlxG.random.int(0,10));
+		var comboSpr = new flixel_FlxSprite().loadGraphic("assets/images/combo.png");
+		if(17 == 1 || 17 == 17) {
+			comboSpr.set_x((flixel_FlxG.width - comboSpr.get_width()) / 2);
+		}
+		if(17 == 16 || 17 == 17) {
+			comboSpr.set_y((flixel_FlxG.height - comboSpr.get_height()) / 2);
+		}
+		comboSpr.set_x(coolText.x);
+		comboSpr.acceleration.set_y(600);
+		comboSpr.set_antialiasing(true);
+		comboSpr.velocity.set_y(comboSpr.velocity.y - 150);
+		comboSpr.setGraphicSize(comboSpr.get_width() * 0.7 | 0);
+		comboSpr.updateHitbox();
+		comboSpr.velocity.set_x(comboSpr.velocity.x + flixel_FlxG.random.int(1,10));
+		this.add(comboSpr);
+		this.add(rating);
+		var seperatedScore = [];
+		seperatedScore.push(Math.floor(this.combo / 100));
+		seperatedScore.push(Math.floor((this.combo - seperatedScore[0] * 100) / 10));
+		seperatedScore.push(this.combo % 10);
+		var daLoop = 0;
+		var _g = 0;
+		while(_g < seperatedScore.length) {
+			var i = seperatedScore[_g];
+			++_g;
+			var numScore = [new flixel_FlxSprite().loadGraphic("assets/images/num" + (i | 0) + ".png")];
+			if(17 == 1 || 17 == 17) {
+				numScore[0].set_x((flixel_FlxG.width - numScore[0].get_width()) / 2);
+			}
+			if(17 == 16 || 17 == 17) {
+				numScore[0].set_y((flixel_FlxG.height - numScore[0].get_height()) / 2);
+			}
+			numScore[0].set_x(coolText.x + 43 * daLoop - 90);
+			numScore[0].set_y(numScore[0].y + 80);
+			numScore[0].set_antialiasing(true);
+			numScore[0].setGraphicSize(numScore[0].get_width() * 0.5 | 0);
+			numScore[0].updateHitbox();
+			numScore[0].acceleration.set_y(flixel_FlxG.random.int(200,300));
+			numScore[0].velocity.set_y(numScore[0].velocity.y - flixel_FlxG.random.int(140,160));
+			numScore[0].velocity.set_x(flixel_FlxG.random.float(-5,5));
+			this.add(numScore[0]);
+			flixel_tweens_FlxTween.tween(numScore[0],{ alpha : 0},0.2,{ onComplete : (function(numScore) {
+				return function(tween) {
+					numScore[0].destroy();
+				};
+			})(numScore), startDelay : Conductor.crochet * 0.002});
+			++daLoop;
+		}
+		haxe_Log.trace(this.combo,{ fileName : "source/PlayState.hx", lineNumber : 644, className : "PlayState", methodName : "popUpScore"});
+		haxe_Log.trace(seperatedScore,{ fileName : "source/PlayState.hx", lineNumber : 645, className : "PlayState", methodName : "popUpScore"});
+		coolText.set_text(Std.string(seperatedScore));
+		flixel_tweens_FlxTween.tween(rating,{ alpha : 0},0.2,{ startDelay : Conductor.crochet * 0.001});
+		flixel_tweens_FlxTween.tween(comboSpr,{ alpha : 0},0.2,{ onComplete : function(tween) {
+			coolText.destroy();
+			comboSpr.destroy();
+			rating.destroy();
 		}, startDelay : Conductor.crochet * 0.001});
 		this.curSection += 1;
 	}
@@ -8019,9 +9052,58 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 		var rightP = flixel_FlxG.keys.checkKeyArrayState([68,39],2);
 		var downP = flixel_FlxG.keys.checkKeyArrayState([83,40],2);
 		var leftP = flixel_FlxG.keys.checkKeyArrayState([65,37],2);
-		if(up || right || down || left) {
+		var upR = flixel_FlxG.keys.checkKeyArrayState([87,38],-1);
+		var rightR = flixel_FlxG.keys.checkKeyArrayState([68,39],-1);
+		var downR = flixel_FlxG.keys.checkKeyArrayState([83,40],-1);
+		var leftR = flixel_FlxG.keys.checkKeyArrayState([65,37],-1);
+		if((upP || rightP || downP || leftP) && !this.boyfriend.stunned && this.generatedMusic) {
+			var possibleNotes = [];
+			this.notes.forEachAlive(function(daNote) {
+				if(daNote.canBeHit && daNote.mustPress && !daNote.tooLate) {
+					possibleNotes.push(daNote);
+					haxe_Log.trace("NOTE-" + daNote.strumTime + " ADDED",{ fileName : "source/PlayState.hx", lineNumber : 696, className : "PlayState", methodName : "keyShit"});
+				}
+			});
+			if(possibleNotes.length > 0) {
+				var _g = 0;
+				while(_g < possibleNotes.length) {
+					var daNote = possibleNotes[_g];
+					++_g;
+					switch(daNote.noteData) {
+					case 1:
+						if(upP || rightP || downP || leftP) {
+							this.noteCheck(upP,daNote);
+						}
+						break;
+					case 2:
+						if(upP || rightP || downP || leftP) {
+							this.noteCheck(rightP,daNote);
+						}
+						break;
+					case 3:
+						if(upP || rightP || downP || leftP) {
+							this.noteCheck(downP,daNote);
+						}
+						break;
+					case 4:
+						if(upP || rightP || downP || leftP) {
+							this.noteCheck(leftP,daNote);
+						}
+						break;
+					}
+					if(daNote.wasGoodHit) {
+						daNote.kill();
+						this.notes.remove(daNote,true);
+						daNote.destroy();
+					}
+				}
+			} else {
+				this.badNoteCheck();
+			}
+		}
+		if((up || right || down || left) && !this.boyfriend.stunned && this.generatedMusic) {
 			this.notes.forEach(function(daNote) {
-				if(daNote.canBeHit) {
+				if(daNote.canBeHit && daNote.mustPress) {
 					switch(daNote.noteData) {
 					case -4:
 						if(left && daNote.prevNote.wasGoodHit) {
@@ -8043,80 +9125,173 @@ PlayState.prototype = $extend(flixel_FlxState.prototype,{
 							_gthis.goodNoteHit(daNote);
 						}
 						break;
-					case 1:
-						if(upP) {
-							_gthis.goodNoteHit(daNote);
-						}
-						break;
-					case 2:
-						if(rightP) {
-							_gthis.goodNoteHit(daNote);
-						}
-						break;
-					case 3:
-						if(downP) {
-							_gthis.goodNoteHit(daNote);
-						}
-						break;
-					case 4:
-						if(leftP) {
-							_gthis.goodNoteHit(daNote);
-						}
-						break;
-					}
-					if(daNote.wasGoodHit) {
-						daNote.kill();
 					}
 				}
 			});
 		}
+		this.playerStrums.forEach(function(spr) {
+			switch(spr.ID) {
+			case 1:
+				if(upP && spr.animation._curAnim.name != "confirm") {
+					spr.animation.play("pressed");
+				}
+				if(upR) {
+					spr.animation.play("static");
+				}
+				break;
+			case 2:
+				if(rightP && spr.animation._curAnim.name != "confirm") {
+					spr.animation.play("pressed");
+				}
+				if(rightR) {
+					spr.animation.play("static");
+				}
+				break;
+			case 3:
+				if(downP && spr.animation._curAnim.name != "confirm") {
+					spr.animation.play("pressed");
+				}
+				if(downR) {
+					spr.animation.play("static");
+				}
+				break;
+			case 4:
+				if(leftP && spr.animation._curAnim.name != "confirm") {
+					spr.animation.play("pressed");
+				}
+				if(leftR) {
+					spr.animation.play("static");
+				}
+				break;
+			}
+			if(spr.animation._curAnim.name == "confirm") {
+				spr.centerOffsets();
+				spr.offset.set_x(spr.offset.x - 13);
+				spr.offset.set_y(spr.offset.y - 13);
+			} else {
+				spr.centerOffsets();
+			}
+		});
+	}
+	,noteMiss: function(direction) {
+		if(direction == null) {
+			direction = 1;
+		}
+		var _gthis = this;
+		if(!this.boyfriend.stunned) {
+			this.health -= 0.08;
+			if(this.combo > 5) {
+				this.gf.playAnim("sad");
+			}
+			this.combo = 0;
+			flixel_FlxG.sound.play("assets/sounds/missnote" + flixel_FlxG.random.int(1,3) + ".mp3",flixel_FlxG.random.float(0.05,0.2));
+			this.boyfriend.stunned = true;
+			new flixel_util_FlxTimer().start(0.083333333333333329,function(tmr) {
+				_gthis.boyfriend.stunned = false;
+			});
+			switch(direction) {
+			case 1:
+				this.boyfriend.playAnim("singUPmiss",true);
+				break;
+			case 2:
+				this.boyfriend.playAnim("singRIGHTmiss",true);
+				break;
+			case 3:
+				this.boyfriend.playAnim("singDOWNmiss",true);
+				break;
+			case 4:
+				this.boyfriend.playAnim("singLEFTmiss",true);
+				break;
+			}
+		}
+	}
+	,badNoteCheck: function() {
+		var upP = flixel_FlxG.keys.checkKeyArrayState([87,38],2);
+		var rightP = flixel_FlxG.keys.checkKeyArrayState([68,39],2);
+		var downP = flixel_FlxG.keys.checkKeyArrayState([83,40],2);
+		var leftP = flixel_FlxG.keys.checkKeyArrayState([65,37],2);
+		if(leftP) {
+			this.noteMiss(4);
+		}
+		if(upP) {
+			this.noteMiss(1);
+		}
+		if(rightP) {
+			this.noteMiss(2);
+		}
+		if(downP) {
+			this.noteMiss(3);
+		}
+	}
+	,noteCheck: function(keyP,note) {
+		haxe_Log.trace(note.noteData + " note check here " + (keyP == null ? "null" : "" + keyP),{ fileName : "source/PlayState.hx", lineNumber : 852, className : "PlayState", methodName : "noteCheck"});
+		if(keyP) {
+			this.goodNoteHit(note);
+		} else {
+			this.badNoteCheck();
+		}
 	}
 	,goodNoteHit: function(note) {
 		if(!note.wasGoodHit) {
+			this.combo += 1;
+			if(note.noteData > 0) {
+				this.health += 0.03;
+			} else {
+				this.health += 0.007;
+			}
 			switch(Math.abs(note.noteData)) {
 			case 1:
-				this.boyfriend.animation.play("singUP");
+				this.boyfriend.playAnim("singUP");
 				break;
 			case 2:
-				this.boyfriend.animation.play("singRIGHT");
+				this.boyfriend.playAnim("singRIGHT");
 				break;
 			case 3:
-				this.boyfriend.animation.play("singDOWN");
+				this.boyfriend.playAnim("singDOWN");
 				break;
 			case 4:
-				this.boyfriend.animation.play("singLEFT");
+				this.boyfriend.playAnim("singLEFT");
 				break;
 			}
+			this.playerStrums.forEach(function(spr) {
+				if(Math.abs(note.noteData) == spr.ID) {
+					spr.animation.play("confirm",true);
+				}
+			});
 			this.sectionScores[1][this.curSection] += note.noteScore;
 			note.wasGoodHit = true;
 			this.vocals.set_volume(1);
+			note.kill();
+			this.notes.remove(note,true);
+			note.destroy();
 		}
 	}
 	,everyBeat: function() {
 		if(Conductor.songPosition > this.lastBeat + Conductor.crochet - Conductor.safeZoneOffset || Conductor.songPosition < this.lastBeat + Conductor.safeZoneOffset) {
 			if(Conductor.songPosition > this.lastBeat + Conductor.crochet) {
 				this.lastBeat += Conductor.crochet;
-				var fh = this.canHitText;
-				fh.set_text(fh.text + "\nWEED\nWEED");
+				if(this.camZooming && flixel_FlxG.camera.zoom < 1.35 && this.totalBeats % 4 == 0) {
+					var fh = flixel_FlxG.camera;
+					fh.set_zoom(fh.zoom + 0.025);
+				}
 				this.totalBeats += 1;
-				this.dad.animation.play("idle");
+				this.dad.playAnim("idle");
+				this.healthHeads.setGraphicSize(this.healthHeads.get_width() + 20 | 0);
+				if(this.totalBeats % this.gfSpeed == 0) {
+					this.gf.dance();
+				}
 				if(!StringTools.startsWith(this.boyfriend.animation._curAnim.name,"sing")) {
-					this.boyfriend.animation.play("idle");
+					this.boyfriend.playAnim("idle");
 				}
 			}
 		}
 	}
 	,everyStep: function() {
 		if(Conductor.songPosition > this.lastStep + Conductor.stepCrochet - Conductor.safeZoneOffset || Conductor.songPosition < this.lastStep + Conductor.safeZoneOffset) {
-			this.canHit = true;
 			if(Conductor.songPosition > this.lastStep + Conductor.stepCrochet) {
 				this.totalSteps += 1;
 				this.lastStep += Conductor.stepCrochet;
-				var fh = this.canHitText;
-				fh.set_text(fh.text + "\nWEED\nWEED");
 			}
-		} else {
-			this.canHit = false;
 		}
 	}
 	,__class__: PlayState
@@ -8366,6 +9541,154 @@ StringTools.hex = function(n,digits) {
 	}
 	return s;
 };
+var TitleState = function(TransIn,TransOut) {
+	this.transitioning = false;
+	flixel_addons_transition_FlxTransitionableState.call(this,TransIn,TransOut);
+};
+$hxClasses["TitleState"] = TitleState;
+TitleState.__name__ = "TitleState";
+TitleState.__super__ = flixel_addons_transition_FlxTransitionableState;
+TitleState.prototype = $extend(flixel_addons_transition_FlxTransitionableState.prototype,{
+	create: function() {
+		flixel_addons_transition_FlxTransitionableState.prototype.create.call(this);
+		if(!TitleState.initialized) {
+			var diamond = flixel_graphics_FlxGraphic.fromClass(flixel_addons_transition_GraphicTransTileDiamond);
+			diamond.persist = true;
+			diamond.set_destroyOnNoUse(false);
+			var x = 0;
+			var y = -1;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var x1 = x;
+			var y1 = y;
+			if(y1 == null) {
+				y1 = 0;
+			}
+			if(x1 == null) {
+				x1 = 0;
+			}
+			var x = x1;
+			var y = y1;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+			point._inPool = false;
+			flixel_addons_transition_FlxTransitionableState.defaultTransIn = new flixel_addons_transition_TransitionData("fade",-16777216,2,point,{ asset : diamond, width : 32, height : 32},new flixel_math_FlxRect(0,0,flixel_FlxG.width,flixel_FlxG.height));
+			var x = 0;
+			var y = 1;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var x1 = x;
+			var y1 = y;
+			if(y1 == null) {
+				y1 = 0;
+			}
+			if(x1 == null) {
+				x1 = 0;
+			}
+			var x = x1;
+			var y = y1;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+			point._inPool = false;
+			flixel_addons_transition_FlxTransitionableState.defaultTransOut = new flixel_addons_transition_TransitionData("fade",-16777216,1.3,point,{ asset : diamond, width : 32, height : 32},new flixel_math_FlxRect(0,0,flixel_FlxG.width,flixel_FlxG.height));
+			TitleState.initialized = true;
+			flixel_addons_transition_FlxTransitionableState.defaultTransIn.tileData = { asset : diamond, width : 32, height : 32};
+			flixel_addons_transition_FlxTransitionableState.defaultTransOut.tileData = { asset : diamond, width : 32, height : 32};
+			this.transIn = flixel_addons_transition_FlxTransitionableState.defaultTransIn;
+			this.transOut = flixel_addons_transition_FlxTransitionableState.defaultTransOut;
+		}
+		this.persistentUpdate = true;
+		var bg = new flixel_FlxSprite().loadGraphic("assets/images/stageback.png");
+		bg.set_antialiasing(true);
+		bg.setGraphicSize(bg.get_width() * 0.6 | 0);
+		bg.updateHitbox();
+		this.add(bg);
+		var logoBl = new flixel_FlxSprite().loadGraphic("assets/images/logo.png");
+		if(17 == 1 || 17 == 17) {
+			logoBl.set_x((flixel_FlxG.width - logoBl.get_width()) / 2);
+		}
+		if(17 == 16 || 17 == 17) {
+			logoBl.set_y((flixel_FlxG.height - logoBl.get_height()) / 2);
+		}
+		logoBl.set_color(-16777216);
+		this.add(logoBl);
+		var logo = new flixel_FlxSprite().loadGraphic("assets/images/logo.png");
+		if(17 == 1 || 17 == 17) {
+			logo.set_x((flixel_FlxG.width - logo.get_width()) / 2);
+		}
+		if(17 == 16 || 17 == 17) {
+			logo.set_y((flixel_FlxG.height - logo.get_height()) / 2);
+		}
+		logo.set_antialiasing(true);
+		this.add(logo);
+		flixel_tweens_FlxTween.tween(logoBl,{ y : logoBl.y + 50},0.6,{ ease : flixel_tweens_FlxEase.quadInOut, type : 4});
+		flixel_tweens_FlxTween.tween(logo,{ y : logoBl.y + 50},0.6,{ ease : flixel_tweens_FlxEase.quadInOut, type : 4, startDelay : 0.1});
+		flixel_FlxG.sound.playMusic("assets/music/title" + TitleState.soundExt,0,false);
+		var _this = flixel_FlxG.sound.music;
+		var Duration = 4;
+		var From = 0;
+		var To = 0.7;
+		if(To == null) {
+			To = 1;
+		}
+		if(From == null) {
+			From = 0;
+		}
+		if(Duration == null) {
+			Duration = 1;
+		}
+		if(_this._channel == null) {
+			_this.play();
+		}
+		if(_this.fadeTween != null) {
+			_this.fadeTween.cancel();
+		}
+		_this.fadeTween = flixel_tweens_FlxTween.num(From,To,Duration,{ onComplete : null},$bind(_this,_this.volumeTween));
+	}
+	,update: function(elapsed) {
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(13,_this.status) && !this.transitioning) {
+			flixel_FlxG.camera.flash(-1,1);
+			this.transitioning = true;
+			var _this = flixel_FlxG.sound.music;
+			_this.cleanup(_this.autoDestroy,true);
+			new flixel_util_FlxTimer().start(2,function(tmr) {
+				var nextState = flixel_util_typeLimit_NextState.fromState(new PlayState());
+				var stateOnCall = flixel_FlxG.game._state;
+				if(!((nextState) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState)) {
+					flixel_FlxG.game._state.startOutro(function() {
+						if(flixel_FlxG.game._state == stateOnCall) {
+							flixel_FlxG.game._nextState = nextState;
+						} else {
+							flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+						}
+					});
+				}
+			});
+			flixel_FlxG.sound.play("assets/music/titleShoot" + TitleState.soundExt,0.7);
+		}
+		flixel_addons_transition_FlxTransitionableState.prototype.update.call(this,elapsed);
+	}
+	,__class__: TitleState
+});
 var ValueType = $hxEnums["ValueType"] = { __ename__:"ValueType",__constructs__:null
 	,TNull: {_hx_name:"TNull",_hx_index:0,__enum__:"ValueType",toString:$estr}
 	,TInt: {_hx_name:"TInt",_hx_index:1,__enum__:"ValueType",toString:$estr}
@@ -15425,6 +16748,3839 @@ flixel_FlxSubState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,__class__: flixel_FlxSubState
 });
+var flixel_addons_display_FlxGridOverlay = function() { };
+$hxClasses["flixel.addons.display.FlxGridOverlay"] = flixel_addons_display_FlxGridOverlay;
+flixel_addons_display_FlxGridOverlay.__name__ = "flixel.addons.display.FlxGridOverlay";
+flixel_addons_display_FlxGridOverlay.create = function(CellWidth,CellHeight,Width,Height,Alternate,Color1,Color2) {
+	if(Color2 == null) {
+		Color2 = -2501163;
+	}
+	if(Color1 == null) {
+		Color1 = -1579290;
+	}
+	if(Alternate == null) {
+		Alternate = true;
+	}
+	if(Height == null) {
+		Height = -1;
+	}
+	if(Width == null) {
+		Width = -1;
+	}
+	if(Width == -1) {
+		Width = flixel_FlxG.width;
+	}
+	if(Height == -1) {
+		Height = flixel_FlxG.height;
+	}
+	if(Width < CellWidth || Height < CellHeight) {
+		return null;
+	}
+	var grid = flixel_addons_display_FlxGridOverlay.createGrid(CellWidth,CellHeight,Width,Height,Alternate,Color1,Color2);
+	var output = new flixel_FlxSprite();
+	output.set_pixels(grid);
+	output.dirty = true;
+	return output;
+};
+flixel_addons_display_FlxGridOverlay.overlay = function(Sprite,CellWidth,CellHeight,Width,Height,Alternate,Color1,Color2) {
+	if(Color2 == null) {
+		Color2 = -1998989867;
+	}
+	if(Color1 == null) {
+		Color1 = -1998067994;
+	}
+	if(Alternate == null) {
+		Alternate = true;
+	}
+	if(Height == null) {
+		Height = -1;
+	}
+	if(Width == null) {
+		Width = -1;
+	}
+	if(Width == -1) {
+		Width = flixel_FlxG.width;
+	}
+	if(Height == -1) {
+		Height = flixel_FlxG.height;
+	}
+	if(Width < CellWidth || Height < CellHeight) {
+		return null;
+	}
+	var grid = flixel_addons_display_FlxGridOverlay.createGrid(CellWidth,CellHeight,Width,Height,Alternate,Color1,Color2);
+	Sprite.get_pixels().copyPixels(grid,new openfl_geom_Rectangle(0,0,Width,Height),new openfl_geom_Point(0,0),null,null,true);
+	return Sprite;
+};
+flixel_addons_display_FlxGridOverlay.createGrid = function(CellWidth,CellHeight,Width,Height,Alternate,Color1,Color2) {
+	var rowColor = Color1;
+	var lastColor = Color1;
+	var grid = new openfl_display_BitmapData(Width,Height,true);
+	var y = 0;
+	while(y <= Height) {
+		if(y > 0 && lastColor == rowColor && Alternate) {
+			if(lastColor == Color1) {
+				lastColor = Color2;
+			} else {
+				lastColor = Color1;
+			}
+		} else if(y > 0 && lastColor != rowColor && Alternate == false) {
+			if(lastColor == Color2) {
+				lastColor = Color1;
+			} else {
+				lastColor = Color2;
+			}
+		}
+		var x = 0;
+		while(x <= Width) {
+			if(x == 0) {
+				rowColor = lastColor;
+			}
+			grid.fillRect(new openfl_geom_Rectangle(x,y,CellWidth,CellHeight),lastColor);
+			if(lastColor == Color1) {
+				lastColor = Color2;
+			} else {
+				lastColor = Color1;
+			}
+			x += CellWidth;
+		}
+		y += CellHeight;
+	}
+	return grid;
+};
+var openfl_geom_Rectangle = function(x,y,width,height) {
+	if(height == null) {
+		height = 0;
+	}
+	if(width == null) {
+		width = 0;
+	}
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this.x = x;
+	this.y = y;
+	this.width = width;
+	this.height = height;
+};
+$hxClasses["openfl.geom.Rectangle"] = openfl_geom_Rectangle;
+openfl_geom_Rectangle.__name__ = "openfl.geom.Rectangle";
+openfl_geom_Rectangle.prototype = {
+	clone: function() {
+		return new openfl_geom_Rectangle(this.x,this.y,this.width,this.height);
+	}
+	,contains: function(x,y) {
+		if(x >= this.x && y >= this.y && x < this.get_right()) {
+			return y < this.get_bottom();
+		} else {
+			return false;
+		}
+	}
+	,containsPoint: function(point) {
+		return this.contains(point.x,point.y);
+	}
+	,containsRect: function(rect) {
+		if(rect.width <= 0 || rect.height <= 0) {
+			if(rect.x > this.x && rect.y > this.y && rect.get_right() < this.get_right()) {
+				return rect.get_bottom() < this.get_bottom();
+			} else {
+				return false;
+			}
+		} else if(rect.x >= this.x && rect.y >= this.y && rect.get_right() <= this.get_right()) {
+			return rect.get_bottom() <= this.get_bottom();
+		} else {
+			return false;
+		}
+	}
+	,copyFrom: function(sourceRect) {
+		this.x = sourceRect.x;
+		this.y = sourceRect.y;
+		this.width = sourceRect.width;
+		this.height = sourceRect.height;
+	}
+	,equals: function(toCompare) {
+		if(toCompare == this) {
+			return true;
+		} else if(toCompare != null && this.x == toCompare.x && this.y == toCompare.y && this.width == toCompare.width) {
+			return this.height == toCompare.height;
+		} else {
+			return false;
+		}
+	}
+	,inflate: function(dx,dy) {
+		this.x -= dx;
+		this.width += dx * 2;
+		this.y -= dy;
+		this.height += dy * 2;
+	}
+	,inflatePoint: function(point) {
+		this.inflate(point.x,point.y);
+	}
+	,intersection: function(toIntersect) {
+		var x0 = this.x < toIntersect.x ? toIntersect.x : this.x;
+		var x1 = this.get_right() > toIntersect.get_right() ? toIntersect.get_right() : this.get_right();
+		if(x1 <= x0) {
+			return new openfl_geom_Rectangle();
+		}
+		var y0 = this.y < toIntersect.y ? toIntersect.y : this.y;
+		var y1 = this.get_bottom() > toIntersect.get_bottom() ? toIntersect.get_bottom() : this.get_bottom();
+		if(y1 <= y0) {
+			return new openfl_geom_Rectangle();
+		}
+		return new openfl_geom_Rectangle(x0,y0,x1 - x0,y1 - y0);
+	}
+	,intersectionToOutput: function(toIntersect,output) {
+		if(output == null) {
+			output = new openfl_geom_Rectangle();
+		}
+		var x0 = this.x < toIntersect.x ? toIntersect.x : this.x;
+		var x1 = this.get_right() > toIntersect.get_right() ? toIntersect.get_right() : this.get_right();
+		if(x1 <= x0) {
+			output.setTo(0.0,0.0,0.0,0.0);
+			return output;
+		}
+		var y0 = this.y < toIntersect.y ? toIntersect.y : this.y;
+		var y1 = this.get_bottom() > toIntersect.get_bottom() ? toIntersect.get_bottom() : this.get_bottom();
+		if(y1 <= y0) {
+			output.setTo(0.0,0.0,0.0,0.0);
+			return output;
+		}
+		output.setTo(x0,y0,x1 - x0,y1 - y0);
+		return output;
+	}
+	,intersects: function(toIntersect) {
+		var x0 = this.x < toIntersect.x ? toIntersect.x : this.x;
+		var x1 = this.get_right() > toIntersect.get_right() ? toIntersect.get_right() : this.get_right();
+		if(x1 <= x0) {
+			return false;
+		}
+		var y0 = this.y < toIntersect.y ? toIntersect.y : this.y;
+		var y1 = this.get_bottom() > toIntersect.get_bottom() ? toIntersect.get_bottom() : this.get_bottom();
+		return y1 > y0;
+	}
+	,isEmpty: function() {
+		if(!(this.width <= 0)) {
+			return this.height <= 0;
+		} else {
+			return true;
+		}
+	}
+	,offset: function(dx,dy) {
+		this.x += dx;
+		this.y += dy;
+	}
+	,offsetPoint: function(point) {
+		this.x += point.x;
+		this.y += point.y;
+	}
+	,setEmpty: function() {
+		this.x = this.y = this.width = this.height = 0;
+	}
+	,setTo: function(xa,ya,widtha,heighta) {
+		this.x = xa;
+		this.y = ya;
+		this.width = widtha;
+		this.height = heighta;
+	}
+	,toString: function() {
+		return "(x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";
+	}
+	,union: function(toUnion) {
+		if(this.width == 0 || this.height == 0) {
+			return toUnion.clone();
+		} else if(toUnion.width == 0 || toUnion.height == 0) {
+			return this.clone();
+		}
+		var x0 = this.x > toUnion.x ? toUnion.x : this.x;
+		var x1 = this.get_right() < toUnion.get_right() ? toUnion.get_right() : this.get_right();
+		var y0 = this.y > toUnion.y ? toUnion.y : this.y;
+		var y1 = this.get_bottom() < toUnion.get_bottom() ? toUnion.get_bottom() : this.get_bottom();
+		return new openfl_geom_Rectangle(x0,y0,x1 - x0,y1 - y0);
+	}
+	,unionToOutput: function(toUnion,output) {
+		if(output == null) {
+			output = new openfl_geom_Rectangle();
+		}
+		if(this.width == 0 || this.height == 0) {
+			output.setTo(toUnion.x,toUnion.y,toUnion.width,toUnion.height);
+			return output;
+		} else if(toUnion.width == 0 || toUnion.height == 0) {
+			output.setTo(this.x,this.y,this.width,this.height);
+			return output;
+		}
+		var x0 = this.x > toUnion.x ? toUnion.x : this.x;
+		var x1 = this.get_right() < toUnion.get_right() ? toUnion.get_right() : this.get_right();
+		var y0 = this.y > toUnion.y ? toUnion.y : this.y;
+		var y1 = this.get_bottom() < toUnion.get_bottom() ? toUnion.get_bottom() : this.get_bottom();
+		output.setTo(x0,y0,x1 - x0,y1 - y0);
+		return output;
+	}
+	,__contract: function(x,y,width,height) {
+		if(this.width == 0 && this.height == 0) {
+			return;
+		}
+		var offsetX = 0.0;
+		var offsetY = 0.0;
+		var offsetRight = 0.0;
+		var offsetBottom = 0.0;
+		if(this.x < x) {
+			offsetX = x - this.x;
+		}
+		if(this.y < y) {
+			offsetY = y - this.y;
+		}
+		if(this.get_right() > x + width) {
+			offsetRight = x + width - this.get_right();
+		}
+		if(this.get_bottom() > y + height) {
+			offsetBottom = y + height - this.get_bottom();
+		}
+		this.x += offsetX;
+		this.y += offsetY;
+		this.width += offsetRight - offsetX;
+		this.height += offsetBottom - offsetY;
+	}
+	,__expand: function(x,y,width,height) {
+		if(this.width == 0 && this.height == 0) {
+			this.x = x;
+			this.y = y;
+			this.width = width;
+			this.height = height;
+			return;
+		}
+		var cacheRight = this.get_right();
+		var cacheBottom = this.get_bottom();
+		if(this.x > x) {
+			this.x = x;
+			this.width = cacheRight - x;
+		}
+		if(this.y > y) {
+			this.y = y;
+			this.height = cacheBottom - y;
+		}
+		if(cacheRight < x + width) {
+			this.width = x + width - this.x;
+		}
+		if(cacheBottom < y + height) {
+			this.height = y + height - this.y;
+		}
+	}
+	,__toLimeRectangle: function() {
+		if(openfl_geom_Rectangle.__limeRectangle == null) {
+			openfl_geom_Rectangle.__limeRectangle = new lime_math_Rectangle();
+		}
+		openfl_geom_Rectangle.__limeRectangle.setTo(this.x,this.y,this.width,this.height);
+		return openfl_geom_Rectangle.__limeRectangle;
+	}
+	,__transform: function(rect,m) {
+		var tx0 = m.a * this.x + m.c * this.y;
+		var tx1 = tx0;
+		var ty0 = m.b * this.x + m.d * this.y;
+		var ty1 = ty0;
+		var tx = m.a * (this.x + this.width) + m.c * this.y;
+		var ty = m.b * (this.x + this.width) + m.d * this.y;
+		if(tx < tx0) {
+			tx0 = tx;
+		}
+		if(ty < ty0) {
+			ty0 = ty;
+		}
+		if(tx > tx1) {
+			tx1 = tx;
+		}
+		if(ty > ty1) {
+			ty1 = ty;
+		}
+		tx = m.a * (this.x + this.width) + m.c * (this.y + this.height);
+		ty = m.b * (this.x + this.width) + m.d * (this.y + this.height);
+		if(tx < tx0) {
+			tx0 = tx;
+		}
+		if(ty < ty0) {
+			ty0 = ty;
+		}
+		if(tx > tx1) {
+			tx1 = tx;
+		}
+		if(ty > ty1) {
+			ty1 = ty;
+		}
+		tx = m.a * this.x + m.c * (this.y + this.height);
+		ty = m.b * this.x + m.d * (this.y + this.height);
+		if(tx < tx0) {
+			tx0 = tx;
+		}
+		if(ty < ty0) {
+			ty0 = ty;
+		}
+		if(tx > tx1) {
+			tx1 = tx;
+		}
+		if(ty > ty1) {
+			ty1 = ty;
+		}
+		rect.setTo(tx0 + m.tx,ty0 + m.ty,tx1 - tx0,ty1 - ty0);
+	}
+	,get_bottom: function() {
+		return this.y + this.height;
+	}
+	,set_bottom: function(b) {
+		this.height = b - this.y;
+		return b;
+	}
+	,get_bottomRight: function() {
+		return new openfl_geom_Point(this.x + this.width,this.y + this.height);
+	}
+	,set_bottomRight: function(p) {
+		this.width = p.x - this.x;
+		this.height = p.y - this.y;
+		return p.clone();
+	}
+	,get_left: function() {
+		return this.x;
+	}
+	,set_left: function(l) {
+		this.width -= l - this.x;
+		this.x = l;
+		return l;
+	}
+	,get_right: function() {
+		return this.x + this.width;
+	}
+	,set_right: function(r) {
+		this.width = r - this.x;
+		return r;
+	}
+	,get_size: function() {
+		return new openfl_geom_Point(this.width,this.height);
+	}
+	,set_size: function(p) {
+		this.width = p.x;
+		this.height = p.y;
+		return p.clone();
+	}
+	,get_top: function() {
+		return this.y;
+	}
+	,set_top: function(t) {
+		this.height -= t - this.y;
+		this.y = t;
+		return t;
+	}
+	,get_topLeft: function() {
+		return new openfl_geom_Point(this.x,this.y);
+	}
+	,set_topLeft: function(p) {
+		this.x = p.x;
+		this.y = p.y;
+		return p.clone();
+	}
+	,__class__: openfl_geom_Rectangle
+	,__properties__: {set_topLeft:"set_topLeft",get_topLeft:"get_topLeft",set_top:"set_top",get_top:"get_top",set_size:"set_size",get_size:"get_size",set_right:"set_right",get_right:"get_right",set_left:"set_left",get_left:"get_left",set_bottomRight:"set_bottomRight",get_bottomRight:"get_bottomRight",set_bottom:"set_bottom",get_bottom:"get_bottom"}
+};
+var lime_math_Vector2 = function(x,y) {
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this.x = x;
+	this.y = y;
+};
+$hxClasses["lime.math.Vector2"] = lime_math_Vector2;
+lime_math_Vector2.__name__ = "lime.math.Vector2";
+lime_math_Vector2.distance = function(pt1,pt2) {
+	var dx = pt1.x - pt2.x;
+	var dy = pt1.y - pt2.y;
+	return Math.sqrt(dx * dx + dy * dy);
+};
+lime_math_Vector2.interpolate = function(pt1,pt2,f,result) {
+	if(result == null) {
+		result = new lime_math_Vector2();
+	}
+	result.x = pt2.x + f * (pt1.x - pt2.x);
+	result.y = pt2.y + f * (pt1.y - pt2.y);
+	return result;
+};
+lime_math_Vector2.polar = function(len,angle,result) {
+	if(result == null) {
+		result = new lime_math_Vector2();
+	}
+	var ya = len * Math.sin(angle);
+	result.x = len * Math.cos(angle);
+	result.y = ya;
+	return result;
+};
+lime_math_Vector2.prototype = {
+	add: function(v,result) {
+		if(result == null) {
+			result = new lime_math_Vector2();
+		}
+		result.x = v.x + this.x;
+		result.y = v.y + this.y;
+		return result;
+	}
+	,clone: function() {
+		return new lime_math_Vector2(this.x,this.y);
+	}
+	,equals: function(toCompare) {
+		if(toCompare != null && toCompare.x == this.x) {
+			return toCompare.y == this.y;
+		} else {
+			return false;
+		}
+	}
+	,normalize: function(thickness) {
+		if(this.x == 0 && this.y == 0) {
+			return;
+		} else {
+			var norm = thickness / Math.sqrt(this.x * this.x + this.y * this.y);
+			this.x *= norm;
+			this.y *= norm;
+		}
+	}
+	,offset: function(dx,dy) {
+		this.x += dx;
+		this.y += dy;
+	}
+	,setTo: function(xa,ya) {
+		this.x = xa;
+		this.y = ya;
+	}
+	,subtract: function(v,result) {
+		if(result == null) {
+			result = new lime_math_Vector2();
+		}
+		result.x = this.x - v.x;
+		result.y = this.y - v.y;
+		return result;
+	}
+	,__toFlashPoint: function() {
+		return null;
+	}
+	,get_length: function() {
+		return Math.sqrt(this.x * this.x + this.y * this.y);
+	}
+	,get_lengthSquared: function() {
+		return this.x * this.x + this.y * this.y;
+	}
+	,__class__: lime_math_Vector2
+	,__properties__: {get_lengthSquared:"get_lengthSquared",get_length:"get_length"}
+};
+var openfl_display_BitmapData = function(width,height,transparent,fillColor) {
+	if(fillColor == null) {
+		fillColor = -1;
+	}
+	if(transparent == null) {
+		transparent = true;
+	}
+	this.__drawableType = 0;
+	this.transparent = transparent;
+	if(width == null) {
+		width = 0;
+	}
+	if(height == null) {
+		height = 0;
+	}
+	if(width < 0) {
+		width = 0;
+	}
+	if(height < 0) {
+		height = 0;
+	}
+	this.width = width;
+	this.height = height;
+	this.rect = new openfl_geom_Rectangle(0,0,width,height);
+	this.__textureWidth = width;
+	this.__textureHeight = height;
+	if(width > 0 && height > 0) {
+		if(transparent) {
+			if((fillColor & -16777216) == 0) {
+				fillColor = 0;
+			}
+		} else {
+			fillColor = -16777216 | fillColor & 16777215;
+		}
+		fillColor = fillColor << 8 | fillColor >>> 24 & 255;
+		this.image = new lime_graphics_Image(null,0,0,width,height,fillColor);
+		this.image.set_transparent(transparent);
+		this.__isValid = true;
+		this.readable = true;
+	}
+	this.__renderTransform = new openfl_geom_Matrix();
+	this.__worldAlpha = 1;
+	this.__worldTransform = new openfl_geom_Matrix();
+	this.__worldColorTransform = new openfl_geom_ColorTransform();
+	this.__renderable = true;
+	this.__asset = false;
+};
+$hxClasses["openfl.display.BitmapData"] = openfl_display_BitmapData;
+openfl_display_BitmapData.__name__ = "openfl.display.BitmapData";
+openfl_display_BitmapData.__interfaces__ = [openfl_display_IBitmapDrawable];
+openfl_display_BitmapData.fromBase64 = function(base64,type) {
+	return null;
+};
+openfl_display_BitmapData.fromBytes = function(bytes,rawAlpha) {
+	return null;
+};
+openfl_display_BitmapData.fromCanvas = function(canvas,transparent) {
+	if(transparent == null) {
+		transparent = true;
+	}
+	if(canvas == null) {
+		return null;
+	}
+	var bitmapData = new openfl_display_BitmapData(0,0,transparent,0);
+	bitmapData.__fromImage(lime_graphics_Image.fromCanvas(canvas));
+	bitmapData.image.set_transparent(transparent);
+	return bitmapData;
+};
+openfl_display_BitmapData.fromFile = function(path) {
+	return null;
+};
+openfl_display_BitmapData.fromImage = function(image,transparent) {
+	if(transparent == null) {
+		transparent = true;
+	}
+	if(image == null || image.buffer == null) {
+		return null;
+	}
+	var bitmapData = new openfl_display_BitmapData(0,0,transparent,0);
+	bitmapData.__fromImage(image);
+	bitmapData.image.set_transparent(transparent);
+	if(bitmapData.image != null) {
+		return bitmapData;
+	} else {
+		return null;
+	}
+};
+openfl_display_BitmapData.fromTexture = function(texture) {
+	if(texture == null) {
+		return null;
+	}
+	var bitmapData = new openfl_display_BitmapData(texture.__width,texture.__height,true,0);
+	bitmapData.readable = false;
+	bitmapData.__texture = texture;
+	bitmapData.__textureContext = texture.__textureContext;
+	bitmapData.image = null;
+	return bitmapData;
+};
+openfl_display_BitmapData.loadFromBase64 = function(base64,type) {
+	return lime_graphics_Image.loadFromBase64(base64,type).then(function(image) {
+		return lime_app_Future.withValue(openfl_display_BitmapData.fromImage(image));
+	});
+};
+openfl_display_BitmapData.loadFromBytes = function(bytes,rawAlpha) {
+	return lime_graphics_Image.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(image) {
+		var bitmapData = openfl_display_BitmapData.fromImage(image);
+		if(rawAlpha != null) {
+			bitmapData.__applyAlpha(rawAlpha);
+		}
+		return lime_app_Future.withValue(bitmapData);
+	});
+};
+openfl_display_BitmapData.loadFromFile = function(path) {
+	return lime_graphics_Image.loadFromFile(path).then(function(image) {
+		return lime_app_Future.withValue(openfl_display_BitmapData.fromImage(image));
+	});
+};
+openfl_display_BitmapData.prototype = {
+	applyFilter: function(sourceBitmapData,sourceRect,destPoint,filter) {
+		if(!this.readable || sourceBitmapData == null || !sourceBitmapData.readable) {
+			return;
+		}
+		var needSecondBitmapData = filter.__needSecondBitmapData;
+		var needCopyOfOriginal = filter.__preserveObject;
+		var bitmapData2 = null;
+		var bitmapData3 = null;
+		if(needSecondBitmapData) {
+			bitmapData2 = new openfl_display_BitmapData(this.width,this.height,true,0);
+		} else {
+			bitmapData2 = this;
+		}
+		if(needCopyOfOriginal) {
+			bitmapData3 = new openfl_display_BitmapData(this.width,this.height,true,0);
+		}
+		if(filter.__preserveObject) {
+			bitmapData3.copyPixels(this,this.rect,destPoint);
+		}
+		var lastBitmap = filter.__applyFilter(bitmapData2,this,sourceRect,destPoint);
+		if(filter.__preserveObject) {
+			lastBitmap.draw(bitmapData3,null,null);
+		}
+		if(needSecondBitmapData && lastBitmap == bitmapData2) {
+			bitmapData2.image.version = this.image.version;
+			this.image = bitmapData2.image;
+		}
+		this.image.dirty = true;
+		this.image.version++;
+	}
+	,clone: function() {
+		var bitmapData;
+		if(!this.__isValid) {
+			bitmapData = new openfl_display_BitmapData(this.width,this.height,this.transparent,0);
+		} else if(!this.readable && this.image == null) {
+			bitmapData = new openfl_display_BitmapData(0,0,this.transparent,0);
+			bitmapData.width = this.width;
+			bitmapData.height = this.height;
+			bitmapData.__textureWidth = this.__textureWidth;
+			bitmapData.__textureHeight = this.__textureHeight;
+			bitmapData.rect.copyFrom(this.rect);
+			bitmapData.__framebuffer = this.__framebuffer;
+			bitmapData.__framebufferContext = this.__framebufferContext;
+			bitmapData.__texture = this.__texture;
+			bitmapData.__textureContext = this.__textureContext;
+			bitmapData.__isValid = true;
+		} else {
+			bitmapData = openfl_display_BitmapData.fromImage(this.image.clone(),this.transparent);
+		}
+		bitmapData.__worldTransform.copyFrom(this.__worldTransform);
+		bitmapData.__renderTransform.copyFrom(this.__renderTransform);
+		return bitmapData;
+	}
+	,colorTransform: function(rect,colorTransform) {
+		if(!this.readable) {
+			return;
+		}
+		this.image.colorTransform(rect.__toLimeRectangle(),colorTransform.__toLimeColorMatrix());
+	}
+	,compare: function(otherBitmapData) {
+		if(otherBitmapData == this) {
+			return 0;
+		} else if(otherBitmapData == null) {
+			return -1;
+		} else if(this.readable == false || otherBitmapData.readable == false) {
+			return -2;
+		} else if(this.width != otherBitmapData.width) {
+			return -3;
+		} else if(this.height != otherBitmapData.height) {
+			return -4;
+		}
+		if(this.image != null && otherBitmapData.image != null && this.image.get_format() == otherBitmapData.image.get_format()) {
+			var bytes = this.image.get_data();
+			var otherBytes = otherBitmapData.image.get_data();
+			var equal = true;
+			var _g = 0;
+			var _g1 = bytes.length;
+			while(_g < _g1) {
+				var i = _g++;
+				if(bytes[i] != otherBytes[i]) {
+					equal = false;
+					break;
+				}
+			}
+			if(equal) {
+				return 0;
+			}
+		}
+		var bitmapData = null;
+		var foundDifference = false;
+		var pixel;
+		var otherPixel;
+		var comparePixel;
+		var _g = 0;
+		var _g1 = this.height;
+		while(_g < _g1) {
+			var y = _g++;
+			var _g2 = 0;
+			var _g3 = this.width;
+			while(_g2 < _g3) {
+				var x = _g2++;
+				foundDifference = false;
+				pixel = this.getPixel32(x,y);
+				otherPixel = otherBitmapData.getPixel32(x,y);
+				comparePixel = 0;
+				if(pixel != otherPixel) {
+					var r = (pixel >>> 16 & 255) - (otherPixel >>> 16 & 255);
+					var g = (pixel >>> 8 & 255) - (otherPixel >>> 8 & 255);
+					var b = (pixel & 255) - (otherPixel & 255);
+					if(r < 0) {
+						r *= -1;
+					}
+					if(g < 0) {
+						g *= -1;
+					}
+					if(b < 0) {
+						b *= -1;
+					}
+					if(r == 0 && g == 0 && b == 0) {
+						var a = (pixel >>> 24 & 255) - (otherPixel >>> 24 & 255);
+						if(a != 0) {
+							comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | 16711680 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
+							comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | 65280 | comparePixel & 255 & 255;
+							comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | 255;
+							comparePixel = (a & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
+							foundDifference = true;
+						}
+					} else {
+						comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (r & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
+						comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (g & 255) << 8 | comparePixel & 255 & 255;
+						comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | b & 255;
+						comparePixel = -16777216 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
+						foundDifference = true;
+					}
+				}
+				if(foundDifference) {
+					if(bitmapData == null) {
+						bitmapData = new openfl_display_BitmapData(this.width,this.height,this.transparent || otherBitmapData.transparent,0);
+					}
+					bitmapData.setPixel32(x,y,comparePixel);
+				}
+			}
+		}
+		if(bitmapData == null) {
+			return 0;
+		}
+		return bitmapData;
+	}
+	,copyChannel: function(sourceBitmapData,sourceRect,destPoint,sourceChannel,destChannel) {
+		if(!this.readable) {
+			return;
+		}
+		var sourceChannel1;
+		switch(sourceChannel) {
+		case 1:
+			sourceChannel1 = lime_graphics_ImageChannel.RED;
+			break;
+		case 2:
+			sourceChannel1 = lime_graphics_ImageChannel.GREEN;
+			break;
+		case 4:
+			sourceChannel1 = lime_graphics_ImageChannel.BLUE;
+			break;
+		case 8:
+			sourceChannel1 = lime_graphics_ImageChannel.ALPHA;
+			break;
+		default:
+			return;
+		}
+		var destChannel1;
+		switch(destChannel) {
+		case 1:
+			destChannel1 = lime_graphics_ImageChannel.RED;
+			break;
+		case 2:
+			destChannel1 = lime_graphics_ImageChannel.GREEN;
+			break;
+		case 4:
+			destChannel1 = lime_graphics_ImageChannel.BLUE;
+			break;
+		case 8:
+			destChannel1 = lime_graphics_ImageChannel.ALPHA;
+			break;
+		default:
+			return;
+		}
+		this.image.copyChannel(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),sourceChannel1,destChannel1);
+	}
+	,copyPixels: function(sourceBitmapData,sourceRect,destPoint,alphaBitmapData,alphaPoint,mergeAlpha) {
+		if(mergeAlpha == null) {
+			mergeAlpha = false;
+		}
+		if(!this.readable || sourceBitmapData == null) {
+			return;
+		}
+		if(alphaPoint != null) {
+			openfl_display_BitmapData.__tempVector.x = alphaPoint.x;
+			openfl_display_BitmapData.__tempVector.y = alphaPoint.y;
+		}
+		this.image.copyPixels(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),alphaBitmapData != null ? alphaBitmapData.image : null,alphaPoint != null ? openfl_display_BitmapData.__tempVector : null,mergeAlpha);
+	}
+	,dispose: function() {
+		if(this.image != null && this.image.type == lime_graphics_ImageType.CANVAS && !this.__asset) {
+			var canvas = this.image.buffer.__srcCanvas;
+			var context = this.image.buffer.__srcContext;
+			if(canvas != null) {
+				canvas.width = 0;
+				canvas.height = 0;
+				canvas = null;
+			}
+			if(context != null) {
+				context.clearRect(0,0,0,0);
+				context = null;
+			}
+		}
+		this.image = null;
+		this.width = 0;
+		this.height = 0;
+		this.rect = null;
+		this.__isValid = false;
+		this.readable = false;
+		this.__surface = null;
+		this.__vertexBuffer = null;
+		this.__framebuffer = null;
+		this.__framebufferContext = null;
+		this.__texture = null;
+		this.__textureContext = null;
+	}
+	,disposeImage: function() {
+		this.readable = false;
+	}
+	,draw: function(source,matrix,colorTransform,blendMode,clipRect,smoothing) {
+		if(smoothing == null) {
+			smoothing = false;
+		}
+		if(source == null) {
+			return;
+		}
+		var wasVisible = true;
+		var sourceAsDisplayObject = null;
+		if(((source) instanceof openfl_display_DisplayObject)) {
+			sourceAsDisplayObject = js_Boot.__cast(source , openfl_display_DisplayObject);
+			if(!sourceAsDisplayObject.get_visible()) {
+				wasVisible = false;
+				sourceAsDisplayObject.set_visible(true);
+			}
+		}
+		source.__update(false,true);
+		var transform = openfl_geom_Matrix.__pool.get();
+		transform.copyFrom(source.__renderTransform);
+		transform.invert();
+		if(matrix != null) {
+			transform.concat(matrix);
+		}
+		if(sourceAsDisplayObject != null && sourceAsDisplayObject.__scrollRect != null) {
+			transform.translate(-sourceAsDisplayObject.__scrollRect.x,-sourceAsDisplayObject.__scrollRect.y);
+		}
+		var clipMatrix = null;
+		if(clipRect != null) {
+			clipMatrix = openfl_geom_Matrix.__pool.get();
+			clipMatrix.copyFrom(transform);
+			clipMatrix.invert();
+		}
+		var _colorTransform = new openfl_geom_ColorTransform();
+		_colorTransform.__copyFrom(source.__worldColorTransform);
+		_colorTransform.__invert();
+		if(!this.readable && openfl_Lib.get_current().stage.context3D != null) {
+			if(this.__textureContext == null) {
+				this.__textureContext = lime_app_Application.current.__window.context;
+			}
+			if(colorTransform != null) {
+				_colorTransform.__combine(colorTransform);
+			}
+			var renderer = new openfl_display_OpenGLRenderer(openfl_Lib.get_current().stage.context3D,this);
+			renderer.__allowSmoothing = smoothing;
+			renderer.__pixelRatio = openfl_Lib.get_current().stage.window.__scale;
+			renderer.__overrideBlendMode = blendMode;
+			renderer.__worldTransform = transform;
+			renderer.__worldAlpha = 1 / source.__worldAlpha;
+			renderer.__worldColorTransform = _colorTransform;
+			renderer.__resize(this.width,this.height);
+			if(clipRect != null) {
+				renderer.__pushMaskRect(clipRect,clipMatrix);
+			}
+			this.__drawGL(source,renderer);
+			if(clipRect != null) {
+				renderer.__popMaskRect();
+				openfl_geom_Matrix.__pool.release(clipMatrix);
+			}
+		} else {
+			if(colorTransform != null) {
+				var bounds = openfl_geom_Rectangle.__pool.get();
+				var boundsMatrix = openfl_geom_Matrix.__pool.get();
+				source.__getBounds(bounds,boundsMatrix);
+				var width = Math.ceil(bounds.width);
+				var height = Math.ceil(bounds.height);
+				boundsMatrix.tx = -bounds.x;
+				boundsMatrix.ty = -bounds.y;
+				var copy = new openfl_display_BitmapData(width,height,true,0);
+				copy.draw(source,boundsMatrix);
+				copy.colorTransform(copy.rect,colorTransform);
+				copy.__renderTransform.identity();
+				copy.__renderTransform.tx = bounds.x;
+				copy.__renderTransform.ty = bounds.y;
+				copy.__renderTransform.concat(source.__renderTransform);
+				copy.__worldAlpha = source.__worldAlpha;
+				copy.__worldColorTransform.__copyFrom(source.__worldColorTransform);
+				source = copy;
+				openfl_geom_Rectangle.__pool.release(bounds);
+				openfl_geom_Matrix.__pool.release(boundsMatrix);
+			}
+			lime__$internal_graphics_ImageCanvasUtil.convertToCanvas(this.image);
+			var renderer = new openfl_display_CanvasRenderer(this.image.buffer.__srcContext);
+			renderer.__allowSmoothing = smoothing;
+			renderer.__overrideBlendMode = blendMode;
+			renderer.__worldTransform = transform;
+			renderer.__worldAlpha = 1 / source.__worldAlpha;
+			renderer.__worldColorTransform = _colorTransform;
+			if(clipRect != null) {
+				renderer.__pushMaskRect(clipRect,clipMatrix);
+			}
+			this.__drawCanvas(source,renderer);
+			if(clipRect != null) {
+				renderer.__popMaskRect();
+				openfl_geom_Matrix.__pool.release(clipMatrix);
+			}
+		}
+		openfl_geom_Matrix.__pool.release(transform);
+		if(sourceAsDisplayObject != null && !wasVisible) {
+			sourceAsDisplayObject.set_visible(false);
+		}
+	}
+	,drawWithQuality: function(source,matrix,colorTransform,blendMode,clipRect,smoothing,quality) {
+		if(smoothing == null) {
+			smoothing = false;
+		}
+		this.draw(source,matrix,colorTransform,blendMode,clipRect,quality != 2 && smoothing);
+	}
+	,encode: function(rect,compressor,byteArray) {
+		if(!this.readable || rect == null) {
+			byteArray = null;
+			return byteArray;
+		}
+		if(byteArray == null) {
+			byteArray = new openfl_utils_ByteArrayData(0);
+		}
+		var image = this.image;
+		if(!rect.equals(this.rect)) {
+			var matrix = openfl_geom_Matrix.__pool.get();
+			matrix.tx = Math.round(-rect.x);
+			matrix.ty = Math.round(-rect.y);
+			var bitmapData = new openfl_display_BitmapData(Math.ceil(rect.width),Math.ceil(rect.height),true,0);
+			bitmapData.draw(this,matrix);
+			image = bitmapData.image;
+			openfl_geom_Matrix.__pool.release(matrix);
+		}
+		if(((compressor) instanceof openfl_display_PNGEncoderOptions)) {
+			byteArray.writeBytes(openfl_utils_ByteArray.fromBytes(image.encode(lime_graphics_ImageFileFormat.PNG)),0,0);
+			return byteArray;
+		} else if(((compressor) instanceof openfl_display_JPEGEncoderOptions)) {
+			byteArray.writeBytes(openfl_utils_ByteArray.fromBytes(image.encode(lime_graphics_ImageFileFormat.JPEG,(js_Boot.__cast(compressor , openfl_display_JPEGEncoderOptions)).quality)),0,0);
+			return byteArray;
+		}
+		byteArray = null;
+		return byteArray;
+	}
+	,fillRect: function(rect,color) {
+		this.__fillRect(rect,color,true);
+	}
+	,floodFill: function(x,y,color) {
+		if(!this.readable) {
+			return;
+		}
+		this.image.floodFill(x,y,color,1);
+	}
+	,generateFilterRect: function(sourceRect,filter) {
+		return sourceRect.clone();
+	}
+	,getIndexBuffer: function(context,scale9Grid) {
+		var gl = context.gl;
+		if(this.__indexBuffer == null || this.__indexBufferContext != context.__context || scale9Grid != null && this.__indexBufferGrid == null || this.__indexBufferGrid != null && !this.__indexBufferGrid.equals(scale9Grid)) {
+			this.__indexBufferContext = context.__context;
+			this.__indexBuffer = null;
+			if(scale9Grid != null) {
+				if(this.__indexBufferGrid == null) {
+					this.__indexBufferGrid = new openfl_geom_Rectangle();
+				}
+				this.__indexBufferGrid.copyFrom(scale9Grid);
+				var centerX = scale9Grid.width;
+				var centerY = scale9Grid.height;
+				if(centerX != 0 && centerY != 0) {
+					var array = null;
+					var vector = null;
+					var view = null;
+					var buffer = null;
+					var len = null;
+					this.__indexBufferData = new Uint16Array(54);
+					this.__indexBufferData[0] = 0;
+					this.__indexBufferData[1] = 1;
+					this.__indexBufferData[2] = 2;
+					this.__indexBufferData[3] = 2;
+					this.__indexBufferData[4] = 1;
+					this.__indexBufferData[5] = 3;
+					this.__indexBufferData[6] = 4;
+					this.__indexBufferData[7] = 0;
+					this.__indexBufferData[8] = 5;
+					this.__indexBufferData[9] = 5;
+					this.__indexBufferData[10] = 0;
+					this.__indexBufferData[11] = 2;
+					this.__indexBufferData[12] = 6;
+					this.__indexBufferData[13] = 4;
+					this.__indexBufferData[14] = 7;
+					this.__indexBufferData[15] = 7;
+					this.__indexBufferData[16] = 4;
+					this.__indexBufferData[17] = 5;
+					this.__indexBufferData[18] = 8;
+					this.__indexBufferData[19] = 9;
+					this.__indexBufferData[20] = 0;
+					this.__indexBufferData[21] = 0;
+					this.__indexBufferData[22] = 9;
+					this.__indexBufferData[23] = 1;
+					this.__indexBufferData[24] = 10;
+					this.__indexBufferData[25] = 8;
+					this.__indexBufferData[26] = 4;
+					this.__indexBufferData[27] = 4;
+					this.__indexBufferData[28] = 8;
+					this.__indexBufferData[29] = 0;
+					this.__indexBufferData[30] = 11;
+					this.__indexBufferData[31] = 10;
+					this.__indexBufferData[32] = 6;
+					this.__indexBufferData[33] = 6;
+					this.__indexBufferData[34] = 10;
+					this.__indexBufferData[35] = 4;
+					this.__indexBufferData[36] = 12;
+					this.__indexBufferData[37] = 13;
+					this.__indexBufferData[38] = 8;
+					this.__indexBufferData[39] = 8;
+					this.__indexBufferData[40] = 13;
+					this.__indexBufferData[41] = 9;
+					this.__indexBufferData[42] = 14;
+					this.__indexBufferData[43] = 12;
+					this.__indexBufferData[44] = 10;
+					this.__indexBufferData[45] = 10;
+					this.__indexBufferData[46] = 12;
+					this.__indexBufferData[47] = 8;
+					this.__indexBufferData[48] = 15;
+					this.__indexBufferData[49] = 14;
+					this.__indexBufferData[50] = 11;
+					this.__indexBufferData[51] = 11;
+					this.__indexBufferData[52] = 14;
+					this.__indexBufferData[53] = 10;
+					this.__indexBuffer = context.createIndexBuffer(54);
+				} else if(centerX == 0 && centerY != 0) {
+					var array = null;
+					var vector = null;
+					var view = null;
+					var buffer = null;
+					var len = null;
+					this.__indexBufferData = new Uint16Array(18);
+					this.__indexBufferData[0] = 0;
+					this.__indexBufferData[1] = 1;
+					this.__indexBufferData[2] = 2;
+					this.__indexBufferData[3] = 2;
+					this.__indexBufferData[4] = 1;
+					this.__indexBufferData[5] = 3;
+					this.__indexBufferData[6] = 4;
+					this.__indexBufferData[7] = 5;
+					this.__indexBufferData[8] = 0;
+					this.__indexBufferData[9] = 0;
+					this.__indexBufferData[10] = 5;
+					this.__indexBufferData[11] = 1;
+					this.__indexBufferData[12] = 6;
+					this.__indexBufferData[13] = 7;
+					this.__indexBufferData[14] = 4;
+					this.__indexBufferData[15] = 4;
+					this.__indexBufferData[16] = 7;
+					this.__indexBufferData[17] = 5;
+					this.__indexBuffer = context.createIndexBuffer(18);
+				} else if(centerX != 0 && centerY == 0) {
+					var array = null;
+					var vector = null;
+					var view = null;
+					var buffer = null;
+					var len = null;
+					this.__indexBufferData = new Uint16Array(18);
+					this.__indexBufferData[0] = 0;
+					this.__indexBufferData[1] = 1;
+					this.__indexBufferData[2] = 2;
+					this.__indexBufferData[3] = 2;
+					this.__indexBufferData[4] = 1;
+					this.__indexBufferData[5] = 3;
+					this.__indexBufferData[6] = 4;
+					this.__indexBufferData[7] = 0;
+					this.__indexBufferData[8] = 5;
+					this.__indexBufferData[9] = 5;
+					this.__indexBufferData[10] = 0;
+					this.__indexBufferData[11] = 2;
+					this.__indexBufferData[12] = 6;
+					this.__indexBufferData[13] = 4;
+					this.__indexBufferData[14] = 7;
+					this.__indexBufferData[15] = 7;
+					this.__indexBufferData[16] = 4;
+					this.__indexBufferData[17] = 5;
+					this.__indexBuffer = context.createIndexBuffer(18);
+				}
+			} else {
+				this.__indexBufferGrid = null;
+			}
+			if(this.__indexBuffer == null) {
+				var array = null;
+				var vector = null;
+				var view = null;
+				var buffer = null;
+				var len = null;
+				this.__indexBufferData = new Uint16Array(6);
+				this.__indexBufferData[0] = 0;
+				this.__indexBufferData[1] = 1;
+				this.__indexBufferData[2] = 2;
+				this.__indexBufferData[3] = 2;
+				this.__indexBufferData[4] = 1;
+				this.__indexBufferData[5] = 3;
+				this.__indexBuffer = context.createIndexBuffer(6);
+			}
+			this.__indexBuffer.uploadFromTypedArray(this.__indexBufferData);
+		}
+		return this.__indexBuffer;
+	}
+	,getVertexBuffer: function(context,scale9Grid,targetObject) {
+		var gl = context.gl;
+		if(this.__vertexBuffer == null || this.__vertexBufferContext != context.__context || scale9Grid != null && this.__vertexBufferGrid == null || this.__vertexBufferGrid != null && !this.__vertexBufferGrid.equals(scale9Grid) || targetObject != null && (this.__vertexBufferWidth != targetObject.get_width() || this.__vertexBufferHeight != targetObject.get_height() || this.__vertexBufferScaleX != targetObject.get_scaleX() || this.__vertexBufferScaleY != targetObject.get_scaleY())) {
+			this.__uvRect = new openfl_geom_Rectangle(0,0,this.width,this.height);
+			var uvWidth = 1;
+			var uvHeight = 1;
+			this.__vertexBufferContext = context.__context;
+			this.__vertexBuffer = null;
+			if(targetObject != null) {
+				this.__vertexBufferWidth = targetObject.get_width();
+				this.__vertexBufferHeight = targetObject.get_height();
+				this.__vertexBufferScaleX = targetObject.get_scaleX();
+				this.__vertexBufferScaleY = targetObject.get_scaleY();
+			}
+			if(scale9Grid != null && targetObject != null) {
+				if(this.__vertexBufferGrid == null) {
+					this.__vertexBufferGrid = new openfl_geom_Rectangle();
+				}
+				this.__vertexBufferGrid.copyFrom(scale9Grid);
+				this.__vertexBufferWidth = targetObject.get_width();
+				this.__vertexBufferHeight = targetObject.get_height();
+				this.__vertexBufferScaleX = targetObject.get_scaleX();
+				this.__vertexBufferScaleY = targetObject.get_scaleY();
+				var centerX = scale9Grid.width;
+				var centerY = scale9Grid.height;
+				if(centerX != 0 && centerY != 0) {
+					var array = null;
+					var vector = null;
+					var view = null;
+					var buffer = null;
+					var len = null;
+					this.__vertexBufferData = new Float32Array(224);
+					var left = scale9Grid.x;
+					var top = scale9Grid.y;
+					var right = this.width - centerX - left;
+					var bottom = this.height - centerY - top;
+					var uvLeft = left / this.width;
+					var uvTop = top / this.height;
+					var uvCenterX = centerX / this.width;
+					var uvCenterY = centerY / this.height;
+					var uvRight = right / this.width;
+					var uvBottom = bottom / this.height;
+					var renderedLeft = left / targetObject.get_scaleX();
+					var renderedTop = top / targetObject.get_scaleY();
+					var renderedRight = right / targetObject.get_scaleX();
+					var renderedBottom = bottom / targetObject.get_scaleY();
+					var renderedCenterX = targetObject.get_width() / targetObject.get_scaleX() - renderedLeft - renderedRight;
+					var renderedCenterY = targetObject.get_height() / targetObject.get_scaleY() - renderedTop - renderedBottom;
+					this.__vertexBufferData[0] = renderedLeft;
+					this.__vertexBufferData[1] = renderedTop;
+					this.__vertexBufferData[3] = uvWidth * uvLeft;
+					this.__vertexBufferData[4] = uvHeight * uvTop;
+					this.__vertexBufferData[15] = renderedTop;
+					this.__vertexBufferData[18] = uvHeight * uvTop;
+					this.__vertexBufferData[28] = renderedLeft;
+					this.__vertexBufferData[31] = uvWidth * uvLeft;
+					this.__vertexBufferData[56] = renderedLeft + renderedCenterX;
+					this.__vertexBufferData[57] = renderedTop;
+					this.__vertexBufferData[59] = uvWidth * (uvLeft + uvCenterX);
+					this.__vertexBufferData[60] = uvHeight * uvTop;
+					this.__vertexBufferData[70] = renderedLeft + renderedCenterX;
+					this.__vertexBufferData[73] = uvWidth * (uvLeft + uvCenterX);
+					this.__vertexBufferData[84] = this.width;
+					this.__vertexBufferData[85] = renderedTop;
+					this.__vertexBufferData[87] = uvWidth;
+					this.__vertexBufferData[88] = uvHeight * uvTop;
+					this.__vertexBufferData[98] = this.width;
+					this.__vertexBufferData[101] = uvWidth;
+					this.__vertexBufferData[112] = renderedLeft;
+					this.__vertexBufferData[113] = renderedTop + renderedCenterY;
+					this.__vertexBufferData[115] = uvWidth * uvLeft;
+					this.__vertexBufferData[116] = uvHeight * (uvTop + uvCenterY);
+					this.__vertexBufferData[127] = renderedTop + renderedCenterY;
+					this.__vertexBufferData[130] = uvHeight * (uvTop + uvCenterY);
+					this.__vertexBufferData[140] = renderedLeft + renderedCenterX;
+					this.__vertexBufferData[141] = renderedTop + renderedCenterY;
+					this.__vertexBufferData[143] = uvWidth * (uvLeft + uvCenterX);
+					this.__vertexBufferData[144] = uvHeight * (uvTop + uvCenterY);
+					this.__vertexBufferData[154] = this.width;
+					this.__vertexBufferData[155] = renderedTop + renderedCenterY;
+					this.__vertexBufferData[157] = uvWidth;
+					this.__vertexBufferData[158] = uvHeight * (uvTop + uvCenterY);
+					this.__vertexBufferData[168] = renderedLeft;
+					this.__vertexBufferData[169] = this.height;
+					this.__vertexBufferData[171] = uvWidth * uvLeft;
+					this.__vertexBufferData[172] = uvHeight;
+					this.__vertexBufferData[183] = this.height;
+					this.__vertexBufferData[186] = uvHeight;
+					this.__vertexBufferData[196] = renderedLeft + renderedCenterX;
+					this.__vertexBufferData[197] = this.height;
+					this.__vertexBufferData[199] = uvWidth * (uvLeft + uvCenterX);
+					this.__vertexBufferData[200] = uvHeight;
+					this.__vertexBufferData[210] = this.width;
+					this.__vertexBufferData[211] = this.height;
+					this.__vertexBufferData[213] = uvWidth;
+					this.__vertexBufferData[214] = uvHeight;
+					this.__vertexBuffer = context.createVertexBuffer(16,14);
+				} else if(centerX == 0 && centerY != 0) {
+					var array = null;
+					var vector = null;
+					var view = null;
+					var buffer = null;
+					var len = null;
+					this.__vertexBufferData = new Float32Array(112);
+					var top = scale9Grid.y;
+					var bottom = this.height - centerY - top;
+					var uvTop = top / this.height;
+					var uvCenterY = centerY / this.height;
+					var uvBottom = bottom / this.height;
+					var renderedTop = top / targetObject.get_scaleY();
+					var renderedBottom = bottom / targetObject.get_scaleY();
+					var renderedCenterY = targetObject.get_height() / targetObject.get_scaleY() - renderedTop - renderedBottom;
+					var renderedWidth = targetObject.get_width() / targetObject.get_scaleX();
+					this.__vertexBufferData[0] = renderedWidth;
+					this.__vertexBufferData[1] = renderedTop;
+					this.__vertexBufferData[3] = uvWidth;
+					this.__vertexBufferData[4] = uvHeight * uvTop;
+					this.__vertexBufferData[15] = renderedTop;
+					this.__vertexBufferData[18] = uvHeight * uvTop;
+					this.__vertexBufferData[28] = renderedWidth;
+					this.__vertexBufferData[31] = uvWidth;
+					this.__vertexBufferData[56] = renderedWidth;
+					this.__vertexBufferData[57] = renderedTop + renderedCenterY;
+					this.__vertexBufferData[59] = uvWidth;
+					this.__vertexBufferData[60] = uvHeight * (uvTop + uvCenterY);
+					this.__vertexBufferData[71] = renderedTop + renderedCenterY;
+					this.__vertexBufferData[74] = uvHeight * (uvTop + uvCenterY);
+					this.__vertexBufferData[84] = renderedWidth;
+					this.__vertexBufferData[85] = this.height;
+					this.__vertexBufferData[87] = uvWidth;
+					this.__vertexBufferData[88] = uvHeight;
+					this.__vertexBufferData[99] = this.height;
+					this.__vertexBufferData[102] = uvHeight;
+					this.__vertexBuffer = context.createVertexBuffer(8,14);
+				} else if(centerY == 0 && centerX != 0) {
+					var array = null;
+					var vector = null;
+					var view = null;
+					var buffer = null;
+					var len = null;
+					this.__vertexBufferData = new Float32Array(112);
+					var left = scale9Grid.x;
+					var right = this.width - centerX - left;
+					var uvLeft = left / this.width;
+					var uvCenterX = centerX / this.width;
+					var uvRight = right / this.width;
+					var renderedLeft = left / targetObject.get_scaleX();
+					var renderedRight = right / targetObject.get_scaleX();
+					var renderedCenterX = targetObject.get_width() / targetObject.get_scaleX() - renderedLeft - renderedRight;
+					var renderedHeight = targetObject.get_height() / targetObject.get_scaleY();
+					this.__vertexBufferData[0] = renderedLeft;
+					this.__vertexBufferData[1] = renderedHeight;
+					this.__vertexBufferData[3] = uvWidth * uvLeft;
+					this.__vertexBufferData[4] = uvHeight;
+					this.__vertexBufferData[15] = renderedHeight;
+					this.__vertexBufferData[18] = uvHeight;
+					this.__vertexBufferData[28] = renderedLeft;
+					this.__vertexBufferData[31] = uvWidth * uvLeft;
+					this.__vertexBufferData[56] = renderedLeft + renderedCenterX;
+					this.__vertexBufferData[57] = renderedHeight;
+					this.__vertexBufferData[59] = uvWidth * (uvLeft + uvCenterX);
+					this.__vertexBufferData[60] = uvHeight;
+					this.__vertexBufferData[70] = renderedLeft + renderedCenterX;
+					this.__vertexBufferData[73] = uvWidth * (uvLeft + uvCenterX);
+					this.__vertexBufferData[84] = this.width;
+					this.__vertexBufferData[85] = renderedHeight;
+					this.__vertexBufferData[87] = uvWidth;
+					this.__vertexBufferData[88] = uvHeight;
+					this.__vertexBufferData[98] = this.width;
+					this.__vertexBufferData[101] = uvWidth;
+					this.__vertexBuffer = context.createVertexBuffer(8,14);
+				}
+			} else {
+				this.__vertexBufferGrid = null;
+			}
+			if(this.__vertexBuffer == null) {
+				var array = null;
+				var vector = null;
+				var view = null;
+				var buffer = null;
+				var len = null;
+				this.__vertexBufferData = new Float32Array(56);
+				this.__vertexBufferData[0] = this.width;
+				this.__vertexBufferData[1] = this.height;
+				this.__vertexBufferData[3] = uvWidth;
+				this.__vertexBufferData[4] = uvHeight;
+				this.__vertexBufferData[15] = this.height;
+				this.__vertexBufferData[18] = uvHeight;
+				this.__vertexBufferData[28] = this.width;
+				this.__vertexBufferData[31] = uvWidth;
+				this.__vertexBuffer = context.createVertexBuffer(3,14);
+			}
+			this.__vertexBuffer.uploadFromTypedArray(lime_utils_Float32Array.toArrayBufferView(this.__vertexBufferData));
+		}
+		return this.__vertexBuffer;
+	}
+	,getColorBoundsRect: function(mask,color,findColor) {
+		if(findColor == null) {
+			findColor = true;
+		}
+		if(!this.readable) {
+			return new openfl_geom_Rectangle(0,0,this.width,this.height);
+		}
+		if(!this.transparent || (mask >> 24 & 255) > 0) {
+			var color1 = color;
+			if((color1 >>> 24 & 255) == 0) {
+				color1 = 0;
+			}
+		}
+		var rect = this.image.getColorBoundsRect(mask,color,findColor,1);
+		return new openfl_geom_Rectangle(rect.x,rect.y,rect.width,rect.height);
+	}
+	,getPixel: function(x,y) {
+		if(!this.readable) {
+			return 0;
+		}
+		return this.image.getPixel(x,y,1);
+	}
+	,getPixel32: function(x,y) {
+		if(!this.readable) {
+			return 0;
+		}
+		return this.image.getPixel32(x,y,1);
+	}
+	,getPixels: function(rect) {
+		if(!this.readable) {
+			return null;
+		}
+		if(rect == null) {
+			rect = this.rect;
+		}
+		var byteArray = openfl_utils_ByteArray.fromBytes(this.image.getPixels(rect.__toLimeRectangle(),1));
+		byteArray.__endian = 0;
+		return byteArray;
+	}
+	,getSurface: function() {
+		if(!this.readable) {
+			return null;
+		}
+		if(this.__surface == null) {
+			this.__surface = lime_graphics_cairo_CairoImageSurface.fromImage(this.image);
+		}
+		return this.__surface;
+	}
+	,getTexture: function(context) {
+		if(!this.__isValid) {
+			return null;
+		}
+		if(this.__texture == null || this.__textureContext != context.__context) {
+			this.__textureContext = context.__context;
+			this.__texture = context.createRectangleTexture(this.width,this.height,1,false);
+			this.__textureVersion = -1;
+		}
+		lime__$internal_graphics_ImageCanvasUtil.sync(this.image,false);
+		if(this.image != null && this.image.version > this.__textureVersion) {
+			if(this.__surface != null) {
+				lime_graphics_cairo_CairoSurface.flush(this.__surface);
+			}
+			var textureImage = this.image;
+			if(!openfl_display3D_textures_TextureBase.__supportsBGRA && textureImage.get_format() != 0) {
+				textureImage = textureImage.clone();
+				textureImage.set_format(0);
+			}
+			this.__texture.__uploadFromImage(textureImage);
+			this.__textureVersion = this.image.version;
+			this.__textureWidth = textureImage.buffer.width;
+			this.__textureHeight = textureImage.buffer.height;
+		}
+		if(!this.readable && this.image != null) {
+			this.__surface = null;
+			this.image = null;
+		}
+		return this.__texture;
+	}
+	,getVector: function(rect) {
+		var pixels = this.getPixels(rect);
+		var length = UInt.toFloat(openfl_utils_ByteArray.get_length(pixels)) / UInt.toFloat(4) | 0;
+		var result = openfl_Vector.toIntVector(null,length,true);
+		var _g = 0;
+		var _g1 = length;
+		while(_g < _g1) {
+			var i = _g++;
+			result.set(i,pixels.readUnsignedInt());
+		}
+		return result;
+	}
+	,histogram: function(hRect) {
+		var rect = hRect != null ? hRect : new openfl_geom_Rectangle(0,0,this.width,this.height);
+		var pixels = this.getPixels(rect);
+		var _g = [];
+		var _g1 = [];
+		var _g2 = 0;
+		while(_g2 < 256) {
+			var j = _g2++;
+			_g1.push(0);
+		}
+		_g.push(_g1);
+		var _g1 = [];
+		var _g2 = 0;
+		while(_g2 < 256) {
+			var j = _g2++;
+			_g1.push(0);
+		}
+		_g.push(_g1);
+		var _g1 = [];
+		var _g2 = 0;
+		while(_g2 < 256) {
+			var j = _g2++;
+			_g1.push(0);
+		}
+		_g.push(_g1);
+		var _g1 = [];
+		var _g2 = 0;
+		while(_g2 < 256) {
+			var j = _g2++;
+			_g1.push(0);
+		}
+		_g.push(_g1);
+		var result = _g;
+		var _g = 0;
+		var _g1 = openfl_utils_ByteArray.get_length(pixels);
+		while(_g < _g1) {
+			var i = _g++;
+			var result1 = result[i % 4];
+			++result1[pixels.readUnsignedByte()];
+		}
+		return result;
+	}
+	,hitTest: function(firstPoint,firstAlphaThreshold,secondObject,secondBitmapDataPoint,secondAlphaThreshold) {
+		if(secondAlphaThreshold == null) {
+			secondAlphaThreshold = 1;
+		}
+		if(!this.readable) {
+			return false;
+		}
+		if(((secondObject) instanceof openfl_display_Bitmap)) {
+			secondObject = (js_Boot.__cast(secondObject , openfl_display_Bitmap)).__bitmapData;
+		}
+		if(((secondObject) instanceof openfl_geom_Point)) {
+			var secondPoint = secondObject;
+			var x = secondPoint.x - firstPoint.x | 0;
+			var y = secondPoint.y - firstPoint.y | 0;
+			if(this.rect.contains(x,y)) {
+				var pixel = this.getPixel32(x,y);
+				if((pixel >> 24 & 255) > firstAlphaThreshold) {
+					return true;
+				}
+			}
+		} else if(((secondObject) instanceof openfl_display_BitmapData)) {
+			var secondBitmapData = secondObject;
+			var x;
+			var y;
+			if(secondBitmapDataPoint == null) {
+				x = 0;
+				y = 0;
+			} else {
+				x = Math.round(secondBitmapDataPoint.x - firstPoint.x);
+				y = Math.round(secondBitmapDataPoint.y - firstPoint.y);
+			}
+			var hitRect = openfl_geom_Rectangle.__pool.get();
+			hitRect.setTo(x,y,secondBitmapData.width,secondBitmapData.height);
+			if(this.rect.intersects(hitRect)) {
+				if(x < 0) {
+					hitRect.x = 0;
+					hitRect.width = Math.min(secondBitmapData.width + x,this.width);
+				} else {
+					hitRect.width = Math.min(secondBitmapData.width,this.width - x);
+				}
+				if(y < 0) {
+					hitRect.y = 0;
+					hitRect.height = Math.min(secondBitmapData.height + y,this.height);
+				} else {
+					hitRect.height = Math.min(secondBitmapData.height,this.height - y);
+				}
+				var pixels = this.getPixels(hitRect);
+				hitRect.x = x < 0 ? -x : 0;
+				hitRect.y = y < 0 ? -y : 0;
+				var testPixels = secondBitmapData.getPixels(hitRect);
+				var length = hitRect.width * hitRect.height | 0;
+				var pixel;
+				var testPixel;
+				var _g = 0;
+				var _g1 = length;
+				while(_g < _g1) {
+					var i = _g++;
+					pixel = pixels.readUnsignedInt();
+					testPixel = testPixels.readUnsignedInt();
+					if(UInt.gt(pixel >>> 24 & 255,firstAlphaThreshold) && UInt.gt(testPixel >>> 24 & 255,secondAlphaThreshold)) {
+						openfl_geom_Rectangle.__pool.release(hitRect);
+						return true;
+					}
+				}
+			}
+			openfl_geom_Rectangle.__pool.release(hitRect);
+		} else if(((secondObject) instanceof openfl_geom_Rectangle)) {
+			var secondRectangle = openfl_geom_Rectangle.__pool.get();
+			secondRectangle.copyFrom(secondObject);
+			secondRectangle.offset(-firstPoint.x,-firstPoint.y);
+			secondRectangle.__contract(0,0,this.width,this.height);
+			if(secondRectangle.width > 0 && secondRectangle.height > 0) {
+				var pixels = this.getPixels(secondRectangle);
+				var length = UInt.toFloat(openfl_utils_ByteArray.get_length(pixels)) / UInt.toFloat(4) | 0;
+				var pixel;
+				var _g = 0;
+				var _g1 = length;
+				while(_g < _g1) {
+					var i = _g++;
+					pixel = pixels.readUnsignedInt();
+					if(UInt.gt(pixel >>> 24 & 255,firstAlphaThreshold)) {
+						openfl_geom_Rectangle.__pool.release(secondRectangle);
+						return true;
+					}
+				}
+			}
+			openfl_geom_Rectangle.__pool.release(secondRectangle);
+		}
+		return false;
+	}
+	,lock: function() {
+	}
+	,merge: function(sourceBitmapData,sourceRect,destPoint,redMultiplier,greenMultiplier,blueMultiplier,alphaMultiplier) {
+		if(!this.readable || sourceBitmapData == null || !sourceBitmapData.readable || sourceRect == null || destPoint == null) {
+			return;
+		}
+		this.image.merge(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),redMultiplier,greenMultiplier,blueMultiplier,alphaMultiplier);
+	}
+	,noise: function(randomSeed,low,high,channelOptions,grayScale) {
+		if(grayScale == null) {
+			grayScale = false;
+		}
+		if(channelOptions == null) {
+			channelOptions = 7;
+		}
+		if(high == null) {
+			high = 255;
+		}
+		if(low == null) {
+			low = 0;
+		}
+		if(!this.readable) {
+			return;
+		}
+		var func = function() {
+			randomSeed = randomSeed * 1103515245 + 12345;
+			return (Math.abs(randomSeed / 65536) | 0) % 32768;
+		};
+		var rand = func;
+		rand();
+		var range = high - low;
+		var redChannel = (channelOptions & 1) == 1;
+		var greenChannel = (channelOptions & 2) >> 1 == 1;
+		var blueChannel = (channelOptions & 4) >> 2 == 1;
+		var alphaChannel = (channelOptions & 8) >> 3 == 1;
+		var _g = 0;
+		var _g1 = this.height;
+		while(_g < _g1) {
+			var y = _g++;
+			var _g2 = 0;
+			var _g3 = this.width;
+			while(_g2 < _g3) {
+				var x = _g2++;
+				var red = 0;
+				var blue = 0;
+				var green = 0;
+				var alpha = 255;
+				if(grayScale) {
+					blue = low + rand() % range;
+					green = blue;
+					red = green;
+					alpha = 255;
+				} else {
+					if(redChannel) {
+						red = low + rand() % range;
+					}
+					if(greenChannel) {
+						green = low + rand() % range;
+					}
+					if(blueChannel) {
+						blue = low + rand() % range;
+					}
+					if(alphaChannel) {
+						alpha = low + rand() % range;
+					}
+				}
+				var rgb = alpha;
+				rgb = (rgb << 8) + red;
+				rgb = (rgb << 8) + green;
+				rgb = (rgb << 8) + blue;
+				this.setPixel32(x,y,rgb);
+			}
+		}
+	}
+	,paletteMap: function(sourceBitmapData,sourceRect,destPoint,redArray,greenArray,blueArray,alphaArray) {
+		var sw = sourceRect.width | 0;
+		var sh = sourceRect.height | 0;
+		var pixels = sourceBitmapData.getPixels(sourceRect);
+		var pixelValue;
+		var r;
+		var g;
+		var b;
+		var a;
+		var color;
+		var _g = 0;
+		var _g1 = sh * sw;
+		while(_g < _g1) {
+			var i = _g++;
+			pixelValue = pixels.readUnsignedInt();
+			a = alphaArray == null ? pixelValue & -16777216 : alphaArray[pixelValue >> 24 & 255];
+			r = redArray == null ? pixelValue & 16711680 : redArray[pixelValue >> 16 & 255];
+			g = greenArray == null ? pixelValue & 65280 : greenArray[pixelValue >> 8 & 255];
+			b = blueArray == null ? pixelValue & 255 : blueArray[pixelValue & 255];
+			color = a + r + g + b;
+			pixels.position = i * 4;
+			pixels.writeUnsignedInt(color);
+		}
+		pixels.position = 0;
+		var destRect = openfl_geom_Rectangle.__pool.get();
+		destRect.setTo(destPoint.x,destPoint.y,sw,sh);
+		this.setPixels(destRect,pixels);
+		openfl_geom_Rectangle.__pool.release(destRect);
+	}
+	,perlinNoise: function(baseX,baseY,numOctaves,randomSeed,stitch,fractalNoise,channelOptions,grayScale,offsets) {
+		if(grayScale == null) {
+			grayScale = false;
+		}
+		if(channelOptions == null) {
+			channelOptions = 7;
+		}
+		if(!this.readable) {
+			return;
+		}
+		var noise = new openfl_display__$internal_PerlinNoise(randomSeed,numOctaves,channelOptions,grayScale,0.5,stitch,0.15);
+		noise.fill(this,baseX,baseY,0);
+	}
+	,scroll: function(x,y) {
+		if(!this.readable) {
+			return;
+		}
+		this.image.scroll(x,y);
+	}
+	,setPixel: function(x,y,color) {
+		if(!this.readable) {
+			return;
+		}
+		this.image.setPixel(x,y,color,1);
+	}
+	,setPixel32: function(x,y,color) {
+		if(!this.readable) {
+			return;
+		}
+		this.image.setPixel32(x,y,color,1);
+	}
+	,setPixels: function(rect,byteArray) {
+		if(!this.readable || rect == null) {
+			return;
+		}
+		var length = rect.width * rect.height * 4;
+		if(UInt.toFloat(byteArray.length - byteArray.position) < length) {
+			throw new openfl_errors_Error("End of file was encountered.",2030);
+		}
+		this.image.setPixels(rect.__toLimeRectangle(),openfl_utils_ByteArray.toBytePointer(byteArray),1,openfl_utils_Endian.toLimeEndian(byteArray.__endian));
+	}
+	,setVector: function(rect,inputVector) {
+		var byteArray = new openfl_utils_ByteArrayData(0);
+		openfl_utils_ByteArray.set_length(byteArray,inputVector.get_length() * 4);
+		var color = inputVector.iterator();
+		while(color.hasNext()) {
+			var color1 = color.next();
+			byteArray.writeUnsignedInt(color1);
+		}
+		byteArray.position = 0;
+		this.setPixels(rect,byteArray);
+	}
+	,threshold: function(sourceBitmapData,sourceRect,destPoint,operation,threshold,color,mask,copySource) {
+		if(copySource == null) {
+			copySource = false;
+		}
+		if(mask == null) {
+			mask = -1;
+		}
+		if(color == null) {
+			color = 0;
+		}
+		if(sourceBitmapData == null || sourceRect == null || destPoint == null || sourceRect.x > sourceBitmapData.width || sourceRect.y > sourceBitmapData.height || destPoint.x > this.width || destPoint.y > this.height) {
+			return 0;
+		}
+		return this.image.threshold(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),operation,threshold,color,mask,copySource,1);
+	}
+	,unlock: function(changeRect) {
+	}
+	,__applyAlpha: function(alpha) {
+		lime__$internal_graphics_ImageCanvasUtil.convertToCanvas(this.image);
+		lime__$internal_graphics_ImageCanvasUtil.createImageData(this.image);
+		var data = this.image.buffer.data;
+		var _g = 0;
+		var _g1 = openfl_utils_ByteArray.get_length(alpha);
+		while(_g < _g1) {
+			var i = _g++;
+			data[i * 4 + 3] = alpha.readUnsignedByte();
+		}
+		this.image.version++;
+	}
+	,__drawCairo: function(source,renderer) {
+	}
+	,__drawCanvas: function(source,renderer) {
+		var buffer = this.image.buffer;
+		if(!renderer.__allowSmoothing) {
+			renderer.applySmoothing(buffer.__srcContext,false);
+		}
+		renderer.__render(source);
+		if(!renderer.__allowSmoothing) {
+			renderer.applySmoothing(buffer.__srcContext,true);
+		}
+		buffer.__srcContext.setTransform(1,0,0,1,0,0);
+		buffer.__srcImageData = null;
+		buffer.data = null;
+		this.image.dirty = true;
+		this.image.version++;
+	}
+	,__drawGL: function(source,renderer) {
+		var context = renderer.__context3D;
+		var cacheRTT = context.__state.renderToTexture;
+		var cacheRTTDepthStencil = context.__state.renderToTextureDepthStencil;
+		var cacheRTTAntiAlias = context.__state.renderToTextureAntiAlias;
+		var cacheRTTSurfaceSelector = context.__state.renderToTextureSurfaceSelector;
+		context.setRenderToTexture(this.getTexture(context),true);
+		renderer.__render(source);
+		if(cacheRTT != null) {
+			context.setRenderToTexture(cacheRTT,cacheRTTDepthStencil,cacheRTTAntiAlias,cacheRTTSurfaceSelector);
+		} else {
+			context.setRenderToBackBuffer();
+		}
+	}
+	,__fillRect: function(rect,color,allowFramebuffer) {
+		if(rect == null) {
+			return;
+		}
+		if(this.transparent && (color & -16777216) == 0) {
+			color = 0;
+		}
+		if(allowFramebuffer && this.__texture != null && this.__texture.__glFramebuffer != null && openfl_Lib.get_current().stage.__renderer.__type == "opengl") {
+			var renderer = openfl_Lib.get_current().stage.__renderer;
+			var context = renderer.__context3D;
+			var color1 = color;
+			var useScissor = !this.rect.equals(rect);
+			var cacheRTT = context.__state.renderToTexture;
+			var cacheRTTDepthStencil = context.__state.renderToTextureDepthStencil;
+			var cacheRTTAntiAlias = context.__state.renderToTextureAntiAlias;
+			var cacheRTTSurfaceSelector = context.__state.renderToTextureSurfaceSelector;
+			context.setRenderToTexture(this.__texture);
+			if(useScissor) {
+				var x = Math.floor(rect.x);
+				var y = Math.floor(rect.y);
+				var width = rect.width > 0 ? Math.ceil(rect.get_right()) - x : 0;
+				var height = rect.height > 0 ? Math.ceil(rect.get_bottom()) - y : 0;
+				if(context.__backBufferWantsBestResolution) {
+					x = Math.floor(rect.x / context.__stage.window.__scale);
+					y = Math.floor(rect.y / context.__stage.window.__scale);
+					width = rect.width > 0 ? Math.ceil(rect.get_right() / context.__stage.window.__scale) - x : 0;
+					height = rect.height > 0 ? Math.ceil(rect.get_bottom() / context.__stage.window.__scale) - y : 0;
+				}
+				openfl_display_BitmapData.__fillRectRectangle.setTo(x,y,width,height);
+				context.setScissorRectangle(openfl_display_BitmapData.__fillRectRectangle);
+			}
+			context.__clear(useScissor,(color1 >>> 16 & 255) / 255,(color1 >>> 8 & 255) / 255,(color1 & 255) / 255,this.transparent ? (color1 >>> 24 & 255) / 255 : 1,0,0,1);
+			if(useScissor) {
+				context.setScissorRectangle(null);
+			}
+			if(cacheRTT != null) {
+				context.setRenderToTexture(cacheRTT,cacheRTTDepthStencil,cacheRTTAntiAlias,cacheRTTSurfaceSelector);
+			} else {
+				context.setRenderToBackBuffer();
+			}
+		} else if(this.readable) {
+			this.image.fillRect(rect.__toLimeRectangle(),color,1);
+		}
+	}
+	,__fromBase64: function(base64,type) {
+		var image = lime_graphics_Image.fromBase64(base64,type);
+		this.__fromImage(image);
+	}
+	,__fromBytes: function(bytes,rawAlpha) {
+		var image = lime_graphics_Image.fromBytes(openfl_utils_ByteArray.toBytes(bytes));
+		this.__fromImage(image);
+		if(rawAlpha != null) {
+			this.__applyAlpha(rawAlpha);
+		}
+	}
+	,__fromFile: function(path) {
+		var image = lime_graphics_Image.fromFile(path);
+		this.__fromImage(image);
+	}
+	,__fromImage: function(image) {
+		if(image != null && image.buffer != null) {
+			this.image = image;
+			this.width = image.width;
+			this.height = image.height;
+			this.rect = new openfl_geom_Rectangle(0,0,image.width,image.height);
+			this.__textureWidth = this.width;
+			this.__textureHeight = this.height;
+			this.readable = true;
+			this.__isValid = true;
+		}
+	}
+	,__getBounds: function(rect,matrix) {
+		var bounds = openfl_geom_Rectangle.__pool.get();
+		this.rect.__transform(bounds,matrix);
+		rect.__expand(bounds.x,bounds.y,bounds.width,bounds.height);
+		openfl_geom_Rectangle.__pool.release(bounds);
+	}
+	,__loadFromBase64: function(base64,type) {
+		var _gthis = this;
+		return lime_graphics_Image.loadFromBase64(base64,type).then(function(image) {
+			_gthis.__fromImage(image);
+			return lime_app_Future.withValue(_gthis);
+		});
+	}
+	,__loadFromBytes: function(bytes,rawAlpha) {
+		var _gthis = this;
+		return lime_graphics_Image.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(image) {
+			_gthis.__fromImage(image);
+			if(rawAlpha != null) {
+				_gthis.__applyAlpha(rawAlpha);
+			}
+			return lime_app_Future.withValue(_gthis);
+		});
+	}
+	,__loadFromFile: function(path) {
+		var _gthis = this;
+		return lime_graphics_Image.loadFromFile(path).then(function(image) {
+			_gthis.__fromImage(image);
+			return lime_app_Future.withValue(_gthis);
+		});
+	}
+	,__resize: function(width,height) {
+		this.width = width;
+		this.height = height;
+		this.rect.width = width;
+		this.rect.height = height;
+		this.__textureWidth = width;
+		this.__textureHeight = height;
+	}
+	,__setUVRect: function(context,x,y,width,height) {
+		var buffer = this.getVertexBuffer(context);
+		if(buffer != null && (width != this.__uvRect.width || height != this.__uvRect.height || x != this.__uvRect.x || y != this.__uvRect.y)) {
+			var gl = context.gl;
+			if(this.__uvRect == null) {
+				this.__uvRect = new openfl_geom_Rectangle();
+			}
+			this.__uvRect.setTo(x,y,width,height);
+			var uvX = this.__textureWidth > 0 ? x / this.__textureWidth : 0;
+			var uvY = this.__textureHeight > 0 ? y / this.__textureHeight : 0;
+			var uvWidth = this.__textureWidth > 0 ? width / this.__textureWidth : 0;
+			var uvHeight = this.__textureHeight > 0 ? height / this.__textureHeight : 0;
+			this.__vertexBufferData[0] = width;
+			this.__vertexBufferData[1] = height;
+			this.__vertexBufferData[3] = uvX + uvWidth;
+			this.__vertexBufferData[4] = uvY + uvHeight;
+			this.__vertexBufferData[15] = height;
+			this.__vertexBufferData[17] = uvX;
+			this.__vertexBufferData[18] = uvY + uvHeight;
+			this.__vertexBufferData[28] = width;
+			this.__vertexBufferData[31] = uvX + uvWidth;
+			this.__vertexBufferData[32] = uvY;
+			this.__vertexBufferData[45] = uvX;
+			this.__vertexBufferData[46] = uvY;
+			this.__vertexBuffer.uploadFromTypedArray(lime_utils_Float32Array.toArrayBufferView(this.__vertexBufferData));
+		}
+	}
+	,__sync: function() {
+		lime__$internal_graphics_ImageCanvasUtil.sync(this.image,false);
+	}
+	,__update: function(transformOnly,updateChildren) {
+		this.__updateTransforms();
+	}
+	,__updateTransforms: function(overrideTransform) {
+		if(overrideTransform == null) {
+			this.__worldTransform.identity();
+		} else {
+			this.__worldTransform.copyFrom(overrideTransform);
+		}
+		this.__renderTransform.copyFrom(this.__worldTransform);
+	}
+	,__class__: openfl_display_BitmapData
+};
+var flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle = function(width,height,transparent,fillRGBA,onload) {
+	if(fillRGBA == null) {
+		fillRGBA = -1;
+	}
+	if(transparent == null) {
+		transparent = true;
+	}
+	openfl_display_BitmapData.call(this,0,0,transparent,fillRGBA);
+	if(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.preload != null) {
+		this.__fromImage(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.preload);
+	} else {
+		var _gthis = this;
+		lime_graphics_Image.loadFromBase64(haxe_Resource.getString(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.resourceName),flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.resourceType).then(function(image) {
+			_gthis.__fromImage(image);
+			return lime_app_Future.withValue(_gthis);
+		}).onComplete(function(b) {
+			if(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.preload == null) {
+				flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.preload = b.image;
+			}
+			if(onload != null && Reflect.isFunction(onload)) {
+				onload(b);
+			}
+		});
+	}
+};
+$hxClasses["flixel.addons.transition._FlxTransitionSprite.RawGraphicTransTileCircle"] = flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle;
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.__name__ = "flixel.addons.transition._FlxTransitionSprite.RawGraphicTransTileCircle";
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.__super__ = openfl_display_BitmapData;
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.prototype = $extend(openfl_display_BitmapData.prototype,{
+	__class__: flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle
+});
+var flixel_addons_transition_GraphicTransTileCircle = function(onLoad) {
+	flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.call(this,544,32,true,-1,onLoad);
+	this.width = 544;
+	this.height = 32;
+};
+$hxClasses["flixel.addons.transition.GraphicTransTileCircle"] = flixel_addons_transition_GraphicTransTileCircle;
+flixel_addons_transition_GraphicTransTileCircle.__name__ = "flixel.addons.transition.GraphicTransTileCircle";
+flixel_addons_transition_GraphicTransTileCircle.__super__ = flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle;
+flixel_addons_transition_GraphicTransTileCircle.prototype = $extend(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.prototype,{
+	__class__: flixel_addons_transition_GraphicTransTileCircle
+});
+var flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond = function(width,height,transparent,fillRGBA,onload) {
+	if(fillRGBA == null) {
+		fillRGBA = -1;
+	}
+	if(transparent == null) {
+		transparent = true;
+	}
+	openfl_display_BitmapData.call(this,0,0,transparent,fillRGBA);
+	if(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.preload != null) {
+		this.__fromImage(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.preload);
+	} else {
+		var _gthis = this;
+		lime_graphics_Image.loadFromBase64(haxe_Resource.getString(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.resourceName),flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.resourceType).then(function(image) {
+			_gthis.__fromImage(image);
+			return lime_app_Future.withValue(_gthis);
+		}).onComplete(function(b) {
+			if(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.preload == null) {
+				flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.preload = b.image;
+			}
+			if(onload != null && Reflect.isFunction(onload)) {
+				onload(b);
+			}
+		});
+	}
+};
+$hxClasses["flixel.addons.transition._FlxTransitionSprite.RawGraphicTransTileDiamond"] = flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond;
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.__name__ = "flixel.addons.transition._FlxTransitionSprite.RawGraphicTransTileDiamond";
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.__super__ = openfl_display_BitmapData;
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.prototype = $extend(openfl_display_BitmapData.prototype,{
+	__class__: flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond
+});
+var flixel_addons_transition_GraphicTransTileDiamond = function(onLoad) {
+	flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.call(this,544,32,true,-1,onLoad);
+	this.width = 544;
+	this.height = 32;
+};
+$hxClasses["flixel.addons.transition.GraphicTransTileDiamond"] = flixel_addons_transition_GraphicTransTileDiamond;
+flixel_addons_transition_GraphicTransTileDiamond.__name__ = "flixel.addons.transition.GraphicTransTileDiamond";
+flixel_addons_transition_GraphicTransTileDiamond.__super__ = flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond;
+flixel_addons_transition_GraphicTransTileDiamond.prototype = $extend(flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.prototype,{
+	__class__: flixel_addons_transition_GraphicTransTileDiamond
+});
+var flixel_addons_transition_RawGraphicTransTileSquare = function(width,height,transparent,fillRGBA,onload) {
+	if(fillRGBA == null) {
+		fillRGBA = -1;
+	}
+	if(transparent == null) {
+		transparent = true;
+	}
+	openfl_display_BitmapData.call(this,0,0,transparent,fillRGBA);
+	if(flixel_addons_transition_RawGraphicTransTileSquare.preload != null) {
+		this.__fromImage(flixel_addons_transition_RawGraphicTransTileSquare.preload);
+	} else {
+		var _gthis = this;
+		lime_graphics_Image.loadFromBase64(haxe_Resource.getString(flixel_addons_transition_RawGraphicTransTileSquare.resourceName),flixel_addons_transition_RawGraphicTransTileSquare.resourceType).then(function(image) {
+			_gthis.__fromImage(image);
+			return lime_app_Future.withValue(_gthis);
+		}).onComplete(function(b) {
+			if(flixel_addons_transition_RawGraphicTransTileSquare.preload == null) {
+				flixel_addons_transition_RawGraphicTransTileSquare.preload = b.image;
+			}
+			if(onload != null && Reflect.isFunction(onload)) {
+				onload(b);
+			}
+		});
+	}
+};
+$hxClasses["flixel.addons.transition.RawGraphicTransTileSquare"] = flixel_addons_transition_RawGraphicTransTileSquare;
+flixel_addons_transition_RawGraphicTransTileSquare.__name__ = "flixel.addons.transition.RawGraphicTransTileSquare";
+flixel_addons_transition_RawGraphicTransTileSquare.__super__ = openfl_display_BitmapData;
+flixel_addons_transition_RawGraphicTransTileSquare.prototype = $extend(openfl_display_BitmapData.prototype,{
+	__class__: flixel_addons_transition_RawGraphicTransTileSquare
+});
+var flixel_addons_transition_GraphicTransTileSquare = function(onLoad) {
+	flixel_addons_transition_RawGraphicTransTileSquare.call(this,544,32,true,-1,onLoad);
+	this.width = 544;
+	this.height = 32;
+};
+$hxClasses["flixel.addons.transition.GraphicTransTileSquare"] = flixel_addons_transition_GraphicTransTileSquare;
+flixel_addons_transition_GraphicTransTileSquare.__name__ = "flixel.addons.transition.GraphicTransTileSquare";
+flixel_addons_transition_GraphicTransTileSquare.__super__ = flixel_addons_transition_RawGraphicTransTileSquare;
+flixel_addons_transition_GraphicTransTileSquare.prototype = $extend(flixel_addons_transition_RawGraphicTransTileSquare.prototype,{
+	__class__: flixel_addons_transition_GraphicTransTileSquare
+});
+var flixel_addons_transition_FlxTransitionSprite = function(X,Y,Delay,Graphic,GraphicWidth,GraphicHeight,FrameRate) {
+	if(FrameRate == null) {
+		FrameRate = 40;
+	}
+	if(GraphicHeight == null) {
+		GraphicHeight = 32;
+	}
+	if(GraphicWidth == null) {
+		GraphicWidth = 32;
+	}
+	if(Y == null) {
+		Y = 0;
+	}
+	if(X == null) {
+		X = 0;
+	}
+	this._newStatus = -1;
+	this.status = 0;
+	this._finished = false;
+	this._starting = true;
+	flixel_FlxSprite.call(this,X,Y);
+	if(Graphic == null) {
+		Graphic = flixel_graphics_FlxGraphic.fromClass(flixel_addons_transition_GraphicTransTileDiamond);
+		GraphicWidth = 32;
+		GraphicHeight = 32;
+	}
+	this._delay = Delay;
+	this.loadGraphic(Graphic,true,GraphicWidth,GraphicHeight);
+	if(this.graphic == null) {
+		return;
+	}
+	this.graphic.persist = true;
+	this.graphic.set_destroyOnNoUse(false);
+	var inArray = [];
+	var outArray = [];
+	var _g = 1;
+	var _g1 = this.get_numFrames() - 1;
+	while(_g < _g1) {
+		var i = _g++;
+		inArray.push(i);
+	}
+	outArray = inArray.slice();
+	outArray.reverse();
+	this.animation.add("empty",[0],0,false);
+	this.animation.add("in",inArray,FrameRate,false);
+	this.animation.add("full",[this.get_numFrames() - 1],0,false);
+	this.animation.add("out",outArray,FrameRate,false);
+	this.setStatus(3);
+};
+$hxClasses["flixel.addons.transition.FlxTransitionSprite"] = flixel_addons_transition_FlxTransitionSprite;
+flixel_addons_transition_FlxTransitionSprite.__name__ = "flixel.addons.transition.FlxTransitionSprite";
+flixel_addons_transition_FlxTransitionSprite.__super__ = flixel_FlxSprite;
+flixel_addons_transition_FlxTransitionSprite.prototype = $extend(flixel_FlxSprite.prototype,{
+	start: function(NewStatus) {
+		this._starting = true;
+		this._finished = false;
+		this._count = 0;
+		this._newStatus = NewStatus;
+	}
+	,startStatus: function(NewStatus) {
+		this.setStatus(NewStatus);
+	}
+	,setStatus: function(Status) {
+		var anim;
+		switch(Status) {
+		case -1:case 2:
+			anim = "empty";
+			break;
+		case 0:
+			anim = "in";
+			break;
+		case 1:
+			anim = "out";
+			break;
+		case 3:
+			anim = "full";
+			break;
+		}
+		this.animation.play(anim);
+		if(!this.animation.onFinish.has($bind(this,this.onFinishAnim))) {
+			this.animation.onFinish.add($bind(this,this.onFinishAnim));
+		}
+		this.status = Status;
+	}
+	,onFinishAnim: function(str) {
+		if(!this._finished) {
+			this._finished = true;
+			switch(this.status) {
+			case 0:
+				this.setStatus(3);
+				break;
+			case 1:
+				this.setStatus(2);
+				break;
+			default:
+			}
+		}
+	}
+	,update: function(elapsed) {
+		flixel_FlxSprite.prototype.update.call(this,elapsed);
+		if(this._starting) {
+			this._count += elapsed;
+			if(this._count >= this._delay) {
+				this.onTime();
+			}
+		}
+	}
+	,onTime: function() {
+		this._starting = false;
+		this._count = 0;
+		this.setStatus(this._newStatus);
+		this._newStatus = -1;
+	}
+	,__class__: flixel_addons_transition_FlxTransitionSprite
+});
+var flixel_addons_transition_Transition = function(data) {
+	flixel_FlxSubState.call(this,0);
+	this._effect = this.createEffect(data);
+	var this1 = this._effect.scrollFactor;
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this1.set_x(x);
+	this1.set_y(y);
+	this.add(this._effect);
+};
+$hxClasses["flixel.addons.transition.Transition"] = flixel_addons_transition_Transition;
+flixel_addons_transition_Transition.__name__ = "flixel.addons.transition.Transition";
+flixel_addons_transition_Transition.__super__ = flixel_FlxSubState;
+flixel_addons_transition_Transition.prototype = $extend(flixel_FlxSubState.prototype,{
+	destroy: function() {
+		flixel_FlxSubState.prototype.destroy.call(this);
+		this.set_finishCallback(null);
+		this._effect = flixel_util_FlxDestroyUtil.destroy(this._effect);
+	}
+	,start: function(newStatus) {
+		this._effect.start(newStatus);
+	}
+	,setStatus: function(newStatus) {
+		this._effect.setStatus(newStatus);
+	}
+	,createEffect: function(data) {
+		switch(data.type) {
+		case "fade":
+			return new flixel_addons_transition_TransitionFade(data);
+		case "none":
+			throw haxe_Exception.thrown("Unexpected TransitionType: NONE");
+		case "tiles":
+			return new flixel_addons_transition_TransitionTiles(data);
+		}
+	}
+	,get_finishCallback: function() {
+		if(this._effect != null) {
+			return this._effect.finishCallback;
+		}
+		return null;
+	}
+	,set_finishCallback: function(callback) {
+		if(this._effect != null) {
+			this._effect.finishCallback = callback;
+			return callback;
+		}
+		return null;
+	}
+	,__class__: flixel_addons_transition_Transition
+	,__properties__: $extend(flixel_FlxSubState.prototype.__properties__,{set_finishCallback:"set_finishCallback",get_finishCallback:"get_finishCallback"})
+});
+var flixel_addons_transition_TransitionCameraMode = $hxEnums["flixel.addons.transition.TransitionCameraMode"] = { __ename__:"flixel.addons.transition.TransitionCameraMode",__constructs__:null
+	,TOP: {_hx_name:"TOP",_hx_index:0,__enum__:"flixel.addons.transition.TransitionCameraMode",toString:$estr}
+	,NEW: {_hx_name:"NEW",_hx_index:1,__enum__:"flixel.addons.transition.TransitionCameraMode",toString:$estr}
+	,DEFAULT: {_hx_name:"DEFAULT",_hx_index:2,__enum__:"flixel.addons.transition.TransitionCameraMode",toString:$estr}
+};
+flixel_addons_transition_TransitionCameraMode.__constructs__ = [flixel_addons_transition_TransitionCameraMode.TOP,flixel_addons_transition_TransitionCameraMode.NEW,flixel_addons_transition_TransitionCameraMode.DEFAULT];
+var flixel_addons_transition_TransitionData = function(type,color,duration,direction,tileData,region,cameraMode) {
+	if(cameraMode == null) {
+		cameraMode = flixel_addons_transition_TransitionCameraMode.TOP;
+	}
+	if(duration == null) {
+		duration = 1.0;
+	}
+	if(color == null) {
+		color = -1;
+	}
+	if(type == null) {
+		type = "fade";
+	}
+	this.cameraMode = flixel_addons_transition_TransitionCameraMode.TOP;
+	this.duration = 1.0;
+	this.type = type;
+	this.tileData = tileData;
+	this.duration = duration;
+	this.color = color;
+	if(direction == null) {
+		var x = 0;
+		var y = 0;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var x1 = x;
+		var y1 = y;
+		if(y1 == null) {
+			y1 = 0;
+		}
+		if(x1 == null) {
+			x1 = 0;
+		}
+		var x = x1;
+		var y = y1;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+		point._inPool = false;
+		direction = point;
+	} else {
+		var Value = direction.x;
+		var lowerBound = Value < -1 ? -1 : Value;
+		direction.set_x(lowerBound > 1 ? 1 : lowerBound);
+		var Value = direction.y;
+		var lowerBound = Value < -1 ? -1 : Value;
+		direction.set_y(lowerBound > 1 ? 1 : lowerBound);
+	}
+	this.direction = direction;
+	this.tweenOptions = { onComplete : null};
+	if(region == null) {
+		region = new flixel_math_FlxRect(0,0,flixel_FlxG.width,flixel_FlxG.height);
+	}
+	this.region = region;
+	this.cameraMode = cameraMode;
+};
+$hxClasses["flixel.addons.transition.TransitionData"] = flixel_addons_transition_TransitionData;
+flixel_addons_transition_TransitionData.__name__ = "flixel.addons.transition.TransitionData";
+flixel_addons_transition_TransitionData.__interfaces__ = [flixel_util_IFlxDestroyable];
+flixel_addons_transition_TransitionData.prototype = {
+	destroy: function() {
+		this.tileData = null;
+		this.direction = null;
+		this.tweenOptions = null;
+		this.region = null;
+		this.direction = null;
+	}
+	,__class__: flixel_addons_transition_TransitionData
+};
+var flixel_group_FlxTypedSpriteGroup = function(x,y,maxSize) {
+	if(maxSize == null) {
+		maxSize = 0;
+	}
+	if(y == null) {
+		y = 0.0;
+	}
+	if(x == null) {
+		x = 0.0;
+	}
+	this._skipTransformChildren = false;
+	this.directAlpha = false;
+	this.initGroup(maxSize);
+	flixel_FlxSprite.call(this,x,y);
+};
+$hxClasses["flixel.group.FlxTypedSpriteGroup"] = flixel_group_FlxTypedSpriteGroup;
+flixel_group_FlxTypedSpriteGroup.__name__ = "flixel.group.FlxTypedSpriteGroup";
+flixel_group_FlxTypedSpriteGroup.__super__ = flixel_FlxSprite;
+flixel_group_FlxTypedSpriteGroup.prototype = $extend(flixel_FlxSprite.prototype,{
+	transformChildren_flixel_math_FlxRect: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,transformChildren_openfl_display_BlendMode: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,transformChildren_Int: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,transformChildren_Bool: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,transformChildren_Array_flixel_FlxCamera: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,transformChildren_flixel_FlxCamera: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,multiTransformChildren_Float: function(FunctionArray,ValueArray) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var numProps = FunctionArray.length;
+		if(numProps > ValueArray.length) {
+			return;
+		}
+		var lambda;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null && sprite.exists) {
+				var _g2 = 0;
+				var _g3 = numProps;
+				while(_g2 < _g3) {
+					var i = _g2++;
+					lambda = FunctionArray[i];
+					lambda(sprite,ValueArray[i]);
+				}
+			}
+		}
+	}
+	,transformChildren_Float: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,transformChildren_flixel_math_FlxPoint: function(Function1,Value) {
+		if(this._skipTransformChildren || this.group == null) {
+			return;
+		}
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				Function1(sprite,Value);
+			}
+		}
+	}
+	,initGroup: function(maxSize) {
+		this.set_group(new flixel_group_FlxTypedGroup(maxSize));
+	}
+	,initVars: function() {
+		this.flixelType = 4;
+		this.offset = new flixel_math_FlxCallbackPoint($bind(this,this.offsetCallback));
+		this.origin = new flixel_math_FlxCallbackPoint($bind(this,this.originCallback));
+		this.scale = new flixel_math_FlxCallbackPoint($bind(this,this.scaleCallback));
+		this.scrollFactor = new flixel_math_FlxCallbackPoint($bind(this,this.scrollFactorCallback));
+		var this1 = this.scale;
+		var x = 1;
+		var y = 1;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var this1 = this.scrollFactor;
+		var x = 1;
+		var y = 1;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var x = 0;
+		var y = 0;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+		point._inPool = false;
+		this.velocity = point;
+		var x = 0;
+		var y = 0;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+		point._inPool = false;
+		this.acceleration = point;
+		var x = 0;
+		var y = 0;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+		point._inPool = false;
+		this.drag = point;
+		var x = 10000;
+		var y = 10000;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var x1 = x;
+		var y1 = y;
+		if(y1 == null) {
+			y1 = 0;
+		}
+		if(x1 == null) {
+			x1 = 0;
+		}
+		var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+		point._inPool = false;
+		this.maxVelocity = point;
+	}
+	,destroy: function() {
+		this.offset = flixel_util_FlxDestroyUtil.destroy(this.offset);
+		this.origin = flixel_util_FlxDestroyUtil.destroy(this.origin);
+		this.scale = flixel_util_FlxDestroyUtil.destroy(this.scale);
+		this.scrollFactor = flixel_util_FlxDestroyUtil.destroy(this.scrollFactor);
+		this.group = flixel_util_FlxDestroyUtil.destroy(this.group);
+		flixel_FlxSprite.prototype.destroy.call(this);
+	}
+	,clone: function() {
+		var newGroup = new flixel_group_FlxTypedSpriteGroup(this.x,this.y,this.group.maxSize);
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				newGroup.add(sprite.clone());
+			}
+		}
+		return newGroup;
+	}
+	,isOnScreen: function(Camera) {
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null && sprite.exists && sprite.visible && sprite.isOnScreen(Camera)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	,overlapsPoint: function(point,InScreenSpace,Camera) {
+		if(InScreenSpace == null) {
+			InScreenSpace = false;
+		}
+		var result = false;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null && sprite.exists && sprite.visible) {
+				result = result || sprite.overlapsPoint(point,InScreenSpace,Camera);
+			}
+		}
+		return result;
+	}
+	,pixelsOverlapPoint: function(point,Mask,Camera) {
+		if(Mask == null) {
+			Mask = 255;
+		}
+		var result = false;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null && sprite.exists && sprite.visible) {
+				result = result || sprite.pixelsOverlapPoint(point,Mask,Camera);
+			}
+		}
+		return result;
+	}
+	,update: function(elapsed) {
+		this.group.update(elapsed);
+		if(this.path != null && this.path.active) {
+			this.path.update(elapsed);
+		}
+		if(this.moves) {
+			this.updateMotion(elapsed);
+		}
+	}
+	,draw: function() {
+		this.group.draw();
+	}
+	,replaceColor: function(Color,NewColor,FetchPositions) {
+		if(FetchPositions == null) {
+			FetchPositions = false;
+		}
+		var positions = null;
+		if(FetchPositions) {
+			positions = [];
+		}
+		var spritePositions;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				spritePositions = sprite.replaceColor(Color,NewColor,FetchPositions);
+				if(FetchPositions) {
+					positions = positions.concat(spritePositions);
+				}
+			}
+		}
+		return positions;
+	}
+	,add: function(Sprite) {
+		this.preAdd(Sprite);
+		return this.group.add(Sprite);
+	}
+	,insert: function(Position,Sprite) {
+		this.preAdd(Sprite);
+		return this.group.insert(Position,Sprite);
+	}
+	,preAdd: function(sprite) {
+		sprite.set_x(sprite.x + this.x);
+		sprite.set_y(sprite.y + this.y);
+		sprite.set_alpha(sprite.alpha * this.alpha);
+		var this1 = sprite.scrollFactor;
+		var p = this.scrollFactor;
+		var x = p.x;
+		var y = p.y;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var _this = p;
+		if(_this._weak) {
+			_this.put();
+		}
+		sprite.set_cameras(this._cameras);
+		if(this.clipRect != null) {
+			var ClipRect = this.clipRect;
+			if(ClipRect == null) {
+				sprite.set_clipRect(null);
+			} else {
+				var X = ClipRect.x - sprite.x + this.x;
+				var Y = ClipRect.y - sprite.y + this.y;
+				var Width = ClipRect.width;
+				var Height = ClipRect.height;
+				if(Height == null) {
+					Height = 0;
+				}
+				if(Width == null) {
+					Width = 0;
+				}
+				if(Y == null) {
+					Y = 0;
+				}
+				if(X == null) {
+					X = 0;
+				}
+				var _this = flixel_math_FlxRect._pool.get();
+				var X1 = X;
+				var Y1 = Y;
+				var Width1 = Width;
+				var Height1 = Height;
+				if(Height1 == null) {
+					Height1 = 0;
+				}
+				if(Width1 == null) {
+					Width1 = 0;
+				}
+				if(Y1 == null) {
+					Y1 = 0;
+				}
+				if(X1 == null) {
+					X1 = 0;
+				}
+				_this.x = X1;
+				_this.y = Y1;
+				_this.width = Width1;
+				_this.height = Height1;
+				var rect = _this;
+				rect._inPool = false;
+				sprite.set_clipRect(rect);
+			}
+		}
+	}
+	,recycle: function(ObjectClass,ObjectFactory,Force,Revive) {
+		if(Revive == null) {
+			Revive = true;
+		}
+		if(Force == null) {
+			Force = false;
+		}
+		return this.group.recycle(ObjectClass,ObjectFactory,Force,Revive);
+	}
+	,remove: function(sprite,splice) {
+		if(splice == null) {
+			splice = false;
+		}
+		sprite.set_x(sprite.x - this.x);
+		sprite.set_y(sprite.y - this.y);
+		sprite.set_cameras(null);
+		return this.group.remove(sprite,splice);
+	}
+	,replace: function(oldObject,newObject) {
+		this.preAdd(newObject);
+		return this.group.replace(oldObject,newObject);
+	}
+	,sort: function(Function1,Order) {
+		if(Order == null) {
+			Order = -1;
+		}
+		var order = Order;
+		if(order == null) {
+			order = -1;
+		}
+		var _g = Function1;
+		var a1 = order;
+		var tmp = function(a2,a3) {
+			return _g(a1,a2,a3);
+		};
+		this.group.members.sort(tmp);
+	}
+	,getFirstAvailable: function(ObjectClass,Force) {
+		if(Force == null) {
+			Force = false;
+		}
+		return this.group.getFirstAvailable(ObjectClass,Force);
+	}
+	,getFirstNull: function() {
+		return this.group.getFirstNull();
+	}
+	,getFirstExisting: function() {
+		return this.group.getFirstExisting();
+	}
+	,getFirstAlive: function() {
+		return this.group.getFirstAlive();
+	}
+	,getFirstDead: function() {
+		return this.group.getFirstDead();
+	}
+	,countLiving: function() {
+		return this.group.countLiving();
+	}
+	,countDead: function() {
+		return this.group.countDead();
+	}
+	,getRandom: function(StartIndex,Length) {
+		if(Length == null) {
+			Length = 0;
+		}
+		if(StartIndex == null) {
+			StartIndex = 0;
+		}
+		return this.group.getRandom(StartIndex,Length);
+	}
+	,iterator: function(filter) {
+		return new flixel_group_FlxTypedGroupIterator(this.group.members,filter);
+	}
+	,forEach: function(Function1,Recurse) {
+		if(Recurse == null) {
+			Recurse = false;
+		}
+		this.group.forEach(Function1,Recurse);
+	}
+	,forEachAlive: function(Function1,Recurse) {
+		if(Recurse == null) {
+			Recurse = false;
+		}
+		this.group.forEachAlive(Function1,Recurse);
+	}
+	,forEachDead: function(Function1,Recurse) {
+		if(Recurse == null) {
+			Recurse = false;
+		}
+		this.group.forEachDead(Function1,Recurse);
+	}
+	,forEachExists: function(Function1,Recurse) {
+		if(Recurse == null) {
+			Recurse = false;
+		}
+		this.group.forEachExists(Function1,Recurse);
+	}
+	,forEachOfType: function(ObjectClass,Function1,Recurse) {
+		if(Recurse == null) {
+			Recurse = false;
+		}
+		this.group.forEachOfType(ObjectClass,Function1,Recurse);
+	}
+	,clear: function() {
+		this.group.clear();
+	}
+	,kill: function() {
+		this._skipTransformChildren = true;
+		flixel_FlxSprite.prototype.kill.call(this);
+		this._skipTransformChildren = false;
+		this.group.kill();
+	}
+	,revive: function() {
+		this._skipTransformChildren = true;
+		flixel_FlxSprite.prototype.revive.call(this);
+		this._skipTransformChildren = false;
+		this.group.revive();
+	}
+	,reset: function(X,Y) {
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var sprite = _g1[_g];
+			++_g;
+			if(sprite != null) {
+				sprite.reset(sprite.x + X - this.x,sprite.y + Y - this.y);
+			}
+		}
+		this._skipTransformChildren = true;
+		this.touching = 0;
+		this.wasTouching = 0;
+		this.set_x(X);
+		this.set_y(Y);
+		var this1 = this.velocity;
+		this1.set_x(0);
+		this1.set_y(0);
+		flixel_FlxSprite.prototype.revive.call(this);
+		this._skipTransformChildren = false;
+	}
+	,setPosition: function(X,Y) {
+		if(Y == null) {
+			Y = 0;
+		}
+		if(X == null) {
+			X = 0;
+		}
+		var dx = X - this.x;
+		var dy = Y - this.y;
+		this.multiTransformChildren_Float([$bind(this,this.xTransform),$bind(this,this.yTransform)],[dx,dy]);
+		this._skipTransformChildren = true;
+		this.set_x(X);
+		this.set_y(Y);
+		this._skipTransformChildren = false;
+	}
+	,set_camera: function(Value) {
+		if(this.get_camera() != Value) {
+			this.transformChildren_flixel_FlxCamera($bind(this,this.cameraTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_camera.call(this,Value);
+	}
+	,set_cameras: function(Value) {
+		if(this._cameras != Value) {
+			this.transformChildren_Array_flixel_FlxCamera($bind(this,this.camerasTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_cameras.call(this,Value);
+	}
+	,set_exists: function(Value) {
+		if(this.exists != Value) {
+			this.transformChildren_Bool($bind(this,this.existsTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_exists.call(this,Value);
+	}
+	,set_visible: function(Value) {
+		if(this.exists && this.visible != Value) {
+			this.transformChildren_Bool($bind(this,this.visibleTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_visible.call(this,Value);
+	}
+	,set_active: function(Value) {
+		if(this.exists && this.active != Value) {
+			this.transformChildren_Bool($bind(this,this.activeTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_active.call(this,Value);
+	}
+	,set_alive: function(Value) {
+		if(this.alive != Value) {
+			this.transformChildren_Bool($bind(this,this.aliveTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_alive.call(this,Value);
+	}
+	,set_x: function(Value) {
+		if(this.exists && this.x != Value) {
+			this.transformChildren_Float($bind(this,this.xTransform),Value - this.x);
+		}
+		return this.x = Value;
+	}
+	,set_y: function(Value) {
+		if(this.exists && this.y != Value) {
+			this.transformChildren_Float($bind(this,this.yTransform),Value - this.y);
+		}
+		return this.y = Value;
+	}
+	,set_angle: function(Value) {
+		if(this.exists && this.angle != Value) {
+			this.transformChildren_Float($bind(this,this.angleTransform),Value - this.angle);
+		}
+		return this.angle = Value;
+	}
+	,set_alpha: function(Value) {
+		var lowerBound = Value < 0 ? 0 : Value;
+		Value = lowerBound > 1 ? 1 : lowerBound;
+		if(this.exists && this.alpha != Value) {
+			var factor = this.alpha > 0 ? Value / this.alpha : 0;
+			if(!this.directAlpha && this.alpha != 0) {
+				this.transformChildren_Float($bind(this,this.alphaTransform),factor);
+			} else {
+				this.transformChildren_Float($bind(this,this.directAlphaTransform),Value);
+			}
+		}
+		return this.alpha = Value;
+	}
+	,set_facing: function(Value) {
+		if(this.exists && this.facing != Value) {
+			this.transformChildren_Int($bind(this,this.facingTransform),Value);
+		}
+		return this.facing = Value;
+	}
+	,set_flipX: function(Value) {
+		if(this.exists && this.flipX != Value) {
+			this.transformChildren_Bool($bind(this,this.flipXTransform),Value);
+		}
+		return this.flipX = Value;
+	}
+	,set_flipY: function(Value) {
+		if(this.exists && this.flipY != Value) {
+			this.transformChildren_Bool($bind(this,this.flipYTransform),Value);
+		}
+		return this.flipY = Value;
+	}
+	,set_moves: function(Value) {
+		if(this.exists && this.moves != Value) {
+			this.transformChildren_Bool($bind(this,this.movesTransform),Value);
+		}
+		return this.moves = Value;
+	}
+	,set_immovable: function(Value) {
+		if(this.exists && this.immovable != Value) {
+			this.transformChildren_Bool($bind(this,this.immovableTransform),Value);
+		}
+		return this.immovable = Value;
+	}
+	,set_solid: function(Value) {
+		if(this.exists && (this.allowCollisions & 4369) > 0 != Value) {
+			this.transformChildren_Bool($bind(this,this.solidTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_solid.call(this,Value);
+	}
+	,set_color: function(Value) {
+		if(this.exists && this.color != Value) {
+			this.transformChildren_Int($bind(this,this.gColorTransform),Value);
+		}
+		return this.color = Value;
+	}
+	,set_blend: function(Value) {
+		if(this.exists && this.blend != Value) {
+			this.transformChildren_openfl_display_BlendMode($bind(this,this.blendTransform),Value);
+		}
+		return this.blend = Value;
+	}
+	,set_clipRect: function(rect) {
+		if(this.exists) {
+			this.transformChildren_flixel_math_FlxRect($bind(this,this.clipRectTransform),rect);
+		}
+		return flixel_FlxSprite.prototype.set_clipRect.call(this,rect);
+	}
+	,set_pixelPerfectRender: function(Value) {
+		if(this.exists && this.pixelPerfectRender != Value) {
+			this.transformChildren_Bool($bind(this,this.pixelPerfectTransform),Value);
+		}
+		return flixel_FlxSprite.prototype.set_pixelPerfectRender.call(this,Value);
+	}
+	,set_width: function(Value) {
+		return Value;
+	}
+	,get_width: function() {
+		if(this.group.length == 0) {
+			return 0;
+		}
+		return this.findMaxXHelper() - this.findMinXHelper();
+	}
+	,findMinX: function() {
+		if(this.group.length == 0) {
+			return this.x;
+		} else {
+			return this.findMinXHelper();
+		}
+	}
+	,findMinXHelper: function() {
+		var value = Infinity;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var member = _g1[_g];
+			++_g;
+			if(member == null) {
+				continue;
+			}
+			var minX;
+			if(member.flixelType == 4) {
+				minX = member.findMinX();
+			} else {
+				minX = member.x;
+			}
+			if(minX < value) {
+				value = minX;
+			}
+		}
+		return value;
+	}
+	,findMaxX: function() {
+		if(this.group.length == 0) {
+			return this.x;
+		} else {
+			return this.findMaxXHelper();
+		}
+	}
+	,findMaxXHelper: function() {
+		var value = -Infinity;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var member = _g1[_g];
+			++_g;
+			if(member == null) {
+				continue;
+			}
+			var maxX;
+			if(member.flixelType == 4) {
+				maxX = member.findMaxX();
+			} else {
+				maxX = member.x + member.get_width();
+			}
+			if(maxX > value) {
+				value = maxX;
+			}
+		}
+		return value;
+	}
+	,set_height: function(Value) {
+		return Value;
+	}
+	,get_height: function() {
+		if(this.group.length == 0) {
+			return 0;
+		}
+		return this.findMaxYHelper() - this.findMinYHelper();
+	}
+	,findMinY: function() {
+		if(this.group.length == 0) {
+			return this.y;
+		} else {
+			return this.findMinYHelper();
+		}
+	}
+	,findMinYHelper: function() {
+		var value = Infinity;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var member = _g1[_g];
+			++_g;
+			if(member == null) {
+				continue;
+			}
+			var minY;
+			if(member.flixelType == 4) {
+				minY = member.findMinY();
+			} else {
+				minY = member.y;
+			}
+			if(minY < value) {
+				value = minY;
+			}
+		}
+		return value;
+	}
+	,findMaxY: function() {
+		if(this.group.length == 0) {
+			return this.y;
+		} else {
+			return this.findMaxYHelper();
+		}
+	}
+	,findMaxYHelper: function() {
+		var value = -Infinity;
+		var _g = 0;
+		var _g1 = this.group.members;
+		while(_g < _g1.length) {
+			var member = _g1[_g];
+			++_g;
+			if(member == null) {
+				continue;
+			}
+			var maxY;
+			if(member.flixelType == 4) {
+				maxY = member.findMaxY();
+			} else {
+				maxY = member.y + member.get_height();
+			}
+			if(maxY > value) {
+				value = maxY;
+			}
+		}
+		return value;
+	}
+	,get_length: function() {
+		return this.group.length;
+	}
+	,get_maxSize: function() {
+		return this.group.maxSize;
+	}
+	,set_maxSize: function(Size) {
+		return this.group.set_maxSize(Size);
+	}
+	,get_members: function() {
+		return this.group.members;
+	}
+	,xTransform: function(Sprite,X) {
+		Sprite.set_x(Sprite.x + X);
+	}
+	,yTransform: function(Sprite,Y) {
+		Sprite.set_y(Sprite.y + Y);
+	}
+	,angleTransform: function(Sprite,Angle) {
+		Sprite.set_angle(Sprite.angle + Angle);
+	}
+	,alphaTransform: function(Sprite,Alpha) {
+		if(Sprite.alpha != 0 || Alpha == 0) {
+			Sprite.set_alpha(Sprite.alpha * Alpha);
+		} else {
+			Sprite.set_alpha(1 / Alpha);
+		}
+	}
+	,directAlphaTransform: function(Sprite,Alpha) {
+		Sprite.set_alpha(Alpha);
+	}
+	,facingTransform: function(Sprite,Facing) {
+		Sprite.set_facing(Facing);
+	}
+	,flipXTransform: function(Sprite,FlipX) {
+		Sprite.set_flipX(FlipX);
+	}
+	,flipYTransform: function(Sprite,FlipY) {
+		Sprite.set_flipY(FlipY);
+	}
+	,movesTransform: function(Sprite,Moves) {
+		Sprite.set_moves(Moves);
+	}
+	,pixelPerfectTransform: function(Sprite,PixelPerfect) {
+		Sprite.set_pixelPerfectRender(PixelPerfect);
+	}
+	,gColorTransform: function(Sprite,Color) {
+		Sprite.set_color(Color);
+	}
+	,blendTransform: function(Sprite,Blend) {
+		Sprite.set_blend(Blend);
+	}
+	,immovableTransform: function(Sprite,Immovable) {
+		Sprite.set_immovable(Immovable);
+	}
+	,visibleTransform: function(Sprite,Visible) {
+		Sprite.set_visible(Visible);
+	}
+	,activeTransform: function(Sprite,Active) {
+		Sprite.set_active(Active);
+	}
+	,solidTransform: function(Sprite,Solid) {
+		Sprite.set_solid(Solid);
+	}
+	,aliveTransform: function(Sprite,Alive) {
+		Sprite.set_alive(Alive);
+	}
+	,existsTransform: function(Sprite,Exists) {
+		Sprite.set_exists(Exists);
+	}
+	,cameraTransform: function(Sprite,Camera) {
+		Sprite.set_camera(Camera);
+	}
+	,camerasTransform: function(Sprite,Cameras) {
+		Sprite.set_cameras(Cameras);
+	}
+	,offsetTransform: function(Sprite,Offset) {
+		var this1 = Sprite.offset;
+		var x = Offset.x;
+		var y = Offset.y;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var _this = Offset;
+		if(_this._weak) {
+			_this.put();
+		}
+	}
+	,originTransform: function(Sprite,Origin) {
+		var this1 = Sprite.origin;
+		var x = Origin.x;
+		var y = Origin.y;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var _this = Origin;
+		if(_this._weak) {
+			_this.put();
+		}
+	}
+	,scaleTransform: function(Sprite,Scale) {
+		var this1 = Sprite.scale;
+		var x = Scale.x;
+		var y = Scale.y;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var _this = Scale;
+		if(_this._weak) {
+			_this.put();
+		}
+	}
+	,scrollFactorTransform: function(Sprite,ScrollFactor) {
+		var this1 = Sprite.scrollFactor;
+		var x = ScrollFactor.x;
+		var y = ScrollFactor.y;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		this1.set_x(x);
+		this1.set_y(y);
+		var _this = ScrollFactor;
+		if(_this._weak) {
+			_this.put();
+		}
+	}
+	,clipRectTransform: function(Sprite,ClipRect) {
+		if(ClipRect == null) {
+			Sprite.set_clipRect(null);
+		} else {
+			var X = ClipRect.x - Sprite.x + this.x;
+			var Y = ClipRect.y - Sprite.y + this.y;
+			var Width = ClipRect.width;
+			var Height = ClipRect.height;
+			if(Height == null) {
+				Height = 0;
+			}
+			if(Width == null) {
+				Width = 0;
+			}
+			if(Y == null) {
+				Y = 0;
+			}
+			if(X == null) {
+				X = 0;
+			}
+			var _this = flixel_math_FlxRect._pool.get();
+			var X1 = X;
+			var Y1 = Y;
+			var Width1 = Width;
+			var Height1 = Height;
+			if(Height1 == null) {
+				Height1 = 0;
+			}
+			if(Width1 == null) {
+				Width1 = 0;
+			}
+			if(Y1 == null) {
+				Y1 = 0;
+			}
+			if(X1 == null) {
+				X1 = 0;
+			}
+			_this.x = X1;
+			_this.y = Y1;
+			_this.width = Width1;
+			_this.height = Height1;
+			var rect = _this;
+			rect._inPool = false;
+			Sprite.set_clipRect(rect);
+		}
+	}
+	,offsetCallback: function(Offset) {
+		this.transformChildren_flixel_math_FlxPoint($bind(this,this.offsetTransform),Offset);
+	}
+	,originCallback: function(Origin) {
+		this.transformChildren_flixel_math_FlxPoint($bind(this,this.originTransform),Origin);
+	}
+	,scaleCallback: function(Scale) {
+		this.transformChildren_flixel_math_FlxPoint($bind(this,this.scaleTransform),Scale);
+	}
+	,scrollFactorCallback: function(ScrollFactor) {
+		this.transformChildren_flixel_math_FlxPoint($bind(this,this.scrollFactorTransform),ScrollFactor);
+	}
+	,loadGraphicFromSprite: function(Sprite) {
+		return this;
+	}
+	,loadGraphic: function(Graphic,Animated,Width,Height,Unique,Key) {
+		if(Unique == null) {
+			Unique = false;
+		}
+		if(Height == null) {
+			Height = 0;
+		}
+		if(Width == null) {
+			Width = 0;
+		}
+		if(Animated == null) {
+			Animated = false;
+		}
+		return this;
+	}
+	,loadRotatedGraphic: function(Graphic,Rotations,Frame,AntiAliasing,AutoBuffer,Key) {
+		if(AutoBuffer == null) {
+			AutoBuffer = false;
+		}
+		if(AntiAliasing == null) {
+			AntiAliasing = false;
+		}
+		if(Frame == null) {
+			Frame = -1;
+		}
+		if(Rotations == null) {
+			Rotations = 16;
+		}
+		return this;
+	}
+	,makeGraphic: function(Width,Height,Color,Unique,Key) {
+		if(Unique == null) {
+			Unique = false;
+		}
+		if(Color == null) {
+			Color = -1;
+		}
+		return this;
+	}
+	,set_pixels: function(Value) {
+		return Value;
+	}
+	,set_frame: function(Value) {
+		return Value;
+	}
+	,get_pixels: function() {
+		return null;
+	}
+	,get__sprites: function() {
+		return this.group.members;
+	}
+	,set_group: function(value) {
+		return this.group = value;
+	}
+	,calcFrame: function(RunOnCpp) {
+		if(RunOnCpp == null) {
+			RunOnCpp = false;
+		}
+	}
+	,resetHelpers: function() {
+	}
+	,stamp: function(Brush,X,Y) {
+		if(Y == null) {
+			Y = 0;
+		}
+		if(X == null) {
+			X = 0;
+		}
+	}
+	,set_frames: function(Frames) {
+		return Frames;
+	}
+	,updateColorTransform: function() {
+	}
+	,__class__: flixel_group_FlxTypedSpriteGroup
+	,__properties__: $extend(flixel_FlxSprite.prototype.__properties__,{get__sprites:"get__sprites",set_maxSize:"set_maxSize",get_maxSize:"get_maxSize",get_length:"get_length",get_members:"get_members",set_group:"set_group"})
+});
+var flixel_group_FlxTypedSpriteContainer = function(x,y,maxSize) {
+	flixel_group_FlxTypedSpriteGroup.call(this,x,y,maxSize);
+};
+$hxClasses["flixel.group.FlxTypedSpriteContainer"] = flixel_group_FlxTypedSpriteContainer;
+flixel_group_FlxTypedSpriteContainer.__name__ = "flixel.group.FlxTypedSpriteContainer";
+flixel_group_FlxTypedSpriteContainer.__super__ = flixel_group_FlxTypedSpriteGroup;
+flixel_group_FlxTypedSpriteContainer.prototype = $extend(flixel_group_FlxTypedSpriteGroup.prototype,{
+	initGroup: function(maxSize) {
+		this.group = new flixel_group__$FlxSpriteContainer_SpriteContainer(this,maxSize);
+	}
+	,draw: function() {
+		var oldDefaultCameras = flixel_FlxCamera._defaultCameras;
+		if(this._cameras != null) {
+			flixel_FlxCamera._defaultCameras = this._cameras;
+		}
+		flixel_group_FlxTypedSpriteGroup.prototype.draw.call(this);
+		flixel_FlxCamera._defaultCameras = oldDefaultCameras;
+	}
+	,set_group: function(value) {
+		throw haxe_Exception.thrown("FlxSpriteContainer.group cannot be set in FlxSpriteContainers");
+	}
+	,set_camera: function(value) {
+		this._cameras = value == null ? null : [value];
+		return value;
+	}
+	,set_cameras: function(value) {
+		return this._cameras = value;
+	}
+	,__class__: flixel_group_FlxTypedSpriteContainer
+});
+var flixel_addons_transition_TransitionEffect = function(data) {
+	this._finalDelayTime = 0.0;
+	this._started = false;
+	this.finished = false;
+	this._data = data;
+	flixel_group_FlxTypedSpriteContainer.call(this);
+};
+$hxClasses["flixel.addons.transition.TransitionEffect"] = flixel_addons_transition_TransitionEffect;
+flixel_addons_transition_TransitionEffect.__name__ = "flixel.addons.transition.TransitionEffect";
+flixel_addons_transition_TransitionEffect.__super__ = flixel_group_FlxTypedSpriteContainer;
+flixel_addons_transition_TransitionEffect.prototype = $extend(flixel_group_FlxTypedSpriteContainer.prototype,{
+	destroy: function() {
+		flixel_group_FlxTypedSpriteContainer.prototype.destroy.call(this);
+		this.finishCallback = null;
+		if(this._customCamera != null) {
+			if(flixel_FlxG.cameras.list.indexOf(this._customCamera) != -1) {
+				flixel_FlxG.cameras.remove(this._customCamera,true);
+			}
+			this._customCamera = null;
+		}
+	}
+	,start: function(newStatus) {
+		this._started = true;
+		if(newStatus == 0) {
+			this._endStatus = 3;
+		} else {
+			this._endStatus = 2;
+		}
+		switch(this._data.cameraMode._hx_index) {
+		case 0:
+			var cams = flixel_FlxG.cameras.list;
+			this.set_camera(cams[cams.length - 1]);
+			break;
+		case 1:
+			this._customCamera = new flixel_FlxCamera(0,0,this._data.region.width | 0,this._data.region.height | 0);
+			this._customCamera.bgColor = 0;
+			flixel_FlxG.cameras.add(this._customCamera,false);
+			this.set_camera(this._customCamera);
+			break;
+		case 2:
+			break;
+		}
+	}
+	,setStatus: function(newStatus) {
+	}
+	,delayThenFinish: function() {
+		new flixel_util_FlxTimer().start(this._finalDelayTime,$bind(this,this.onFinish));
+	}
+	,onFinish: function(f) {
+		this.finished = true;
+		if(this.finishCallback != null) {
+			var callback = this.finishCallback;
+			this.finishCallback = null;
+			callback();
+		}
+	}
+	,__class__: flixel_addons_transition_TransitionEffect
+});
+var flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient = function(width,height,transparent,fillRGBA,onload) {
+	if(fillRGBA == null) {
+		fillRGBA = -1;
+	}
+	if(transparent == null) {
+		transparent = true;
+	}
+	openfl_display_BitmapData.call(this,0,0,transparent,fillRGBA);
+	if(flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.preload != null) {
+		this.__fromImage(flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.preload);
+	} else {
+		var _gthis = this;
+		lime_graphics_Image.loadFromBase64(haxe_Resource.getString(flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.resourceName),flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.resourceType).then(function(image) {
+			_gthis.__fromImage(image);
+			return lime_app_Future.withValue(_gthis);
+		}).onComplete(function(b) {
+			if(flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.preload == null) {
+				flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.preload = b.image;
+			}
+			if(onload != null && Reflect.isFunction(onload)) {
+				onload(b);
+			}
+		});
+	}
+};
+$hxClasses["flixel.addons.transition._TransitionFade.RawGraphicDiagonalGradient"] = flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient;
+flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.__name__ = "flixel.addons.transition._TransitionFade.RawGraphicDiagonalGradient";
+flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.__super__ = openfl_display_BitmapData;
+flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.prototype = $extend(openfl_display_BitmapData.prototype,{
+	__class__: flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient
+});
+var flixel_addons_transition_GraphicDiagonalGradient = function(onLoad) {
+	flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.call(this,319,128,true,-1,onLoad);
+	this.width = 319;
+	this.height = 128;
+};
+$hxClasses["flixel.addons.transition.GraphicDiagonalGradient"] = flixel_addons_transition_GraphicDiagonalGradient;
+flixel_addons_transition_GraphicDiagonalGradient.__name__ = "flixel.addons.transition.GraphicDiagonalGradient";
+flixel_addons_transition_GraphicDiagonalGradient.__super__ = flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient;
+flixel_addons_transition_GraphicDiagonalGradient.prototype = $extend(flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.prototype,{
+	__class__: flixel_addons_transition_GraphicDiagonalGradient
+});
+var flixel_addons_transition_TransitionFade = function(data) {
+	flixel_addons_transition_TransitionEffect.call(this,data);
+	this.back = this.makeSprite(data.direction.x,data.direction.y,data.region);
+	var this1 = this.back.scrollFactor;
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this1.set_x(x);
+	this1.set_y(y);
+	this.add(this.back);
+};
+$hxClasses["flixel.addons.transition.TransitionFade"] = flixel_addons_transition_TransitionFade;
+flixel_addons_transition_TransitionFade.__name__ = "flixel.addons.transition.TransitionFade";
+flixel_addons_transition_TransitionFade.__super__ = flixel_addons_transition_TransitionEffect;
+flixel_addons_transition_TransitionFade.prototype = $extend(flixel_addons_transition_TransitionEffect.prototype,{
+	destroy: function() {
+		flixel_addons_transition_TransitionEffect.prototype.destroy.call(this);
+		this.back = null;
+	}
+	,start: function(newStatus) {
+		flixel_addons_transition_TransitionEffect.prototype.start.call(this,newStatus);
+		var endValues = { };
+		this.setTweenValues(newStatus == 0,this._data.direction.x,this._data.direction.y,this.back,endValues);
+		this._data.tweenOptions.onComplete = $bind(this,this.finishTween);
+		flixel_tweens_FlxTween.tween(this.back,endValues,this._data.duration,this._data.tweenOptions);
+	}
+	,setTweenValues: function(isIn,dirX,dirY,sprite,values) {
+		var isOut = !isIn;
+		if(dirX == 0 && dirY == 0) {
+			sprite.set_alpha(isIn ? 0 : 1);
+			values.alpha = isOut ? 0 : 1;
+		} else if(dirX != 0 && dirY != 0) {
+			if(dirX > 0) {
+				sprite.set_x(isIn ? -this.back.get_width() : 0);
+				values.x = isOut ? -this.back.get_width() : 0;
+			} else {
+				sprite.set_x(isIn ? flixel_FlxG.width : flixel_FlxG.width - this.back.get_width());
+				values.x = isOut ? flixel_FlxG.width : flixel_FlxG.width - this.back.get_width();
+			}
+			return;
+		} else if(dirX != 0) {
+			if(dirX > 0) {
+				sprite.set_x(isIn ? -this.back.get_width() : 0);
+				values.x = isOut ? -this.back.get_width() : 0;
+			} else {
+				sprite.set_x(isIn ? flixel_FlxG.width : -this.back.get_width() / 2);
+				values.x = isOut ? flixel_FlxG.width : -this.back.get_width() / 2;
+			}
+		} else if(dirY > 0) {
+			sprite.set_y(isIn ? -this.back.get_height() : 0);
+			values.y = isOut ? -this.back.get_height() : 0;
+		} else {
+			sprite.set_y(isIn ? flixel_FlxG.height : -this.back.get_height() / 2);
+			values.y = isOut ? flixel_FlxG.height : -this.back.get_height() / 2;
+		}
+	}
+	,getBitmapKey: function(dirX,dirY,color) {
+		return "transition" + color + "x" + dirX + "y" + dirY;
+	}
+	,makeSprite: function(dirX,dirY,region) {
+		var sprite = new flixel_FlxSprite(region.x,region.y);
+		var bitmapKey = "transition" + this._data.color + "x" + dirX + "y" + dirY;
+		sprite.set_antialiasing(false);
+		if(dirX == 0 && dirY == 0) {
+			sprite.makeGraphic(1,1,this._data.color,false,bitmapKey);
+			var this1 = sprite.scale;
+			var x = region.width | 0;
+			var y = region.height | 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
+			sprite.updateHitbox();
+		} else if(dirX == 0 && dirY != 0) {
+			sprite.makeGraphic(1,region.height * 2 | 0,this._data.color,false,bitmapKey);
+			var angle = dirY > 0 ? 90 : 270;
+			var gradient = flixel_util_FlxGradient.createGradientBitmapData(1,region.height | 0,[this._data.color,0],1,angle);
+			var destY = dirY > 0 ? region.height : 0;
+			sprite.get_pixels().copyPixels(gradient,gradient.rect,new openfl_geom_Point(0,destY));
+			var this1 = sprite.scale;
+			var x = region.width;
+			var y = 1.0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
+			sprite.updateHitbox();
+		} else if(dirX != 0 && dirY == 0) {
+			var destX = dirX > 0 ? region.width : 0;
+			var angle = dirX > 0 ? 0 : 180;
+			sprite.makeGraphic(region.width * 2 | 0,1,this._data.color,false,bitmapKey);
+			var gradient = flixel_util_FlxGradient.createGradientBitmapData(region.width | 0,1,[this._data.color,0],1,angle);
+			sprite.get_pixels().copyPixels(gradient,gradient.rect,new openfl_geom_Point(destX,0));
+			var this1 = sprite.scale;
+			var x = 1.0;
+			var y = region.height;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
+			sprite.updateHitbox();
+		} else if(dirX != 0 && dirY != 0) {
+			sprite.loadGraphic(this.getGradient());
+			sprite.set_color(this._data.color);
+			sprite.set_flipX(dirX < 0);
+			sprite.set_flipY(dirY < 0);
+		}
+		return sprite;
+	}
+	,getGradient: function() {
+		var gameWidth = flixel_FlxG.width;
+		var gameHeight = flixel_FlxG.height;
+		var source = flixel_FlxG.bitmap.add("flixel/images/transitions/diagonal_gradient.png").bitmap;
+		var key = "flixel/images/transitions/diagonal_gradient.png" + ":" + gameWidth + "x" + gameHeight;
+		var graphic = flixel_FlxG.bitmap._cache.h[key];
+		if(graphic == null) {
+			var gradient = new openfl_display_BitmapData(Math.floor(gameWidth * 2.5),gameHeight,true,0);
+			var matrix = new openfl_geom_Matrix();
+			matrix.scale(gradient.width / source.width,gradient.height / source.height);
+			gradient.draw(source,matrix,null,null,null,true);
+			graphic = flixel_FlxG.bitmap.add(gradient,false,key);
+			graphic.persist = true;
+			graphic.set_destroyOnNoUse(false);
+		}
+		return graphic;
+	}
+	,finishTween: function(f) {
+		this.delayThenFinish();
+	}
+	,__class__: flixel_addons_transition_TransitionFade
+});
+var flixel_addons_transition_TransitionTiles = function(data) {
+	this._isCenter = false;
+	flixel_addons_transition_TransitionEffect.call(this,data);
+	this._grpSprites = new flixel_group_FlxTypedSpriteGroup();
+	var delay = 0;
+	if(data.tileData == null) {
+		data.tileData = { asset : null, width : 32, height : 32};
+	}
+	var region = data.region;
+	var tilesX = Math.ceil(region.width / data.tileData.width);
+	var tilesY = Math.ceil(region.height / data.tileData.height);
+	var maxTiles = tilesX > tilesY ? tilesX : tilesY;
+	var dTime = data.duration / maxTiles;
+	var xDelay = dTime * Math.abs(data.direction.x);
+	var yDelay = dTime * Math.abs(data.direction.y);
+	var addX = data.tileData.width;
+	var addY = data.tileData.height;
+	var tx = 0;
+	var ty = 0;
+	var startX = region.x | 0;
+	var startY = region.y | 0;
+	if(data.direction.x < 0) {
+		addX *= -1;
+		startX += region.width + addX | 0;
+	}
+	if(data.direction.y < 0) {
+		addY *= -1;
+		startY += region.height + addY | 0;
+	}
+	tx = startX;
+	ty = startY;
+	var _g = 0;
+	var _g1 = tilesY;
+	while(_g < _g1) {
+		var iy = _g++;
+		var _g2 = 0;
+		var _g3 = tilesX;
+		while(_g2 < _g3) {
+			var ix = _g2++;
+			var frameRate = 40;
+			if(data.tileData.frameRate != null) {
+				frameRate = data.tileData.frameRate;
+			}
+			var ts = new flixel_addons_transition_FlxTransitionSprite(tx,ty,delay,data.tileData.asset,data.tileData.width,data.tileData.height,frameRate);
+			ts.set_color(data.color);
+			var this1 = ts.scrollFactor;
+			var x = 0;
+			var y = 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			this1.set_x(x);
+			this1.set_y(y);
+			this._grpSprites.add(ts);
+			tx += addX;
+			delay += xDelay;
+		}
+		ty += addY;
+		tx = startX;
+		delay = (iy + 1) * yDelay;
+	}
+	this.add(this._grpSprites);
+	this._isCenter = data.direction.x == 0 && data.direction.y == 0;
+};
+$hxClasses["flixel.addons.transition.TransitionTiles"] = flixel_addons_transition_TransitionTiles;
+flixel_addons_transition_TransitionTiles.__name__ = "flixel.addons.transition.TransitionTiles";
+flixel_addons_transition_TransitionTiles.__super__ = flixel_addons_transition_TransitionEffect;
+flixel_addons_transition_TransitionTiles.prototype = $extend(flixel_addons_transition_TransitionEffect.prototype,{
+	destroy: function() {
+		flixel_addons_transition_TransitionEffect.prototype.destroy.call(this);
+		this._grpSprites = null;
+	}
+	,start: function(NewStatus) {
+		flixel_addons_transition_TransitionEffect.prototype.start.call(this,NewStatus);
+		this._grpSprites.group.forEach(function(t) {
+			t.start(NewStatus);
+		},false);
+	}
+	,setStatus: function(NewStatus) {
+		flixel_addons_transition_TransitionEffect.prototype.setStatus.call(this,NewStatus);
+		this._grpSprites.group.forEach(function(t) {
+			t.setStatus(NewStatus);
+		},false);
+	}
+	,update: function(elapsed) {
+		flixel_addons_transition_TransitionEffect.prototype.update.call(this,elapsed);
+		if(this._started) {
+			var allDone = true;
+			var _g = 0;
+			var _g1 = this._grpSprites.group.members;
+			while(_g < _g1.length) {
+				var sprite = _g1[_g];
+				++_g;
+				if(sprite.status != -1 && sprite.status != this._endStatus) {
+					allDone = false;
+					break;
+				}
+			}
+			if(allDone) {
+				this._started = false;
+				this.delayThenFinish();
+			}
+		}
+	}
+	,__class__: flixel_addons_transition_TransitionTiles
+});
 var flixel_animation_FlxBaseAnimation = function(Parent,Name) {
 	this.curIndex = 0;
 	this.parent = Parent;
@@ -19717,339 +24873,6 @@ flixel_graphics_frames_FlxAtlasFrames.prototype = $extend(flixel_graphics_frames
 	}
 	,__class__: flixel_graphics_frames_FlxAtlasFrames
 });
-var openfl_geom_Rectangle = function(x,y,width,height) {
-	if(height == null) {
-		height = 0;
-	}
-	if(width == null) {
-		width = 0;
-	}
-	if(y == null) {
-		y = 0;
-	}
-	if(x == null) {
-		x = 0;
-	}
-	this.x = x;
-	this.y = y;
-	this.width = width;
-	this.height = height;
-};
-$hxClasses["openfl.geom.Rectangle"] = openfl_geom_Rectangle;
-openfl_geom_Rectangle.__name__ = "openfl.geom.Rectangle";
-openfl_geom_Rectangle.prototype = {
-	clone: function() {
-		return new openfl_geom_Rectangle(this.x,this.y,this.width,this.height);
-	}
-	,contains: function(x,y) {
-		if(x >= this.x && y >= this.y && x < this.get_right()) {
-			return y < this.get_bottom();
-		} else {
-			return false;
-		}
-	}
-	,containsPoint: function(point) {
-		return this.contains(point.x,point.y);
-	}
-	,containsRect: function(rect) {
-		if(rect.width <= 0 || rect.height <= 0) {
-			if(rect.x > this.x && rect.y > this.y && rect.get_right() < this.get_right()) {
-				return rect.get_bottom() < this.get_bottom();
-			} else {
-				return false;
-			}
-		} else if(rect.x >= this.x && rect.y >= this.y && rect.get_right() <= this.get_right()) {
-			return rect.get_bottom() <= this.get_bottom();
-		} else {
-			return false;
-		}
-	}
-	,copyFrom: function(sourceRect) {
-		this.x = sourceRect.x;
-		this.y = sourceRect.y;
-		this.width = sourceRect.width;
-		this.height = sourceRect.height;
-	}
-	,equals: function(toCompare) {
-		if(toCompare == this) {
-			return true;
-		} else if(toCompare != null && this.x == toCompare.x && this.y == toCompare.y && this.width == toCompare.width) {
-			return this.height == toCompare.height;
-		} else {
-			return false;
-		}
-	}
-	,inflate: function(dx,dy) {
-		this.x -= dx;
-		this.width += dx * 2;
-		this.y -= dy;
-		this.height += dy * 2;
-	}
-	,inflatePoint: function(point) {
-		this.inflate(point.x,point.y);
-	}
-	,intersection: function(toIntersect) {
-		var x0 = this.x < toIntersect.x ? toIntersect.x : this.x;
-		var x1 = this.get_right() > toIntersect.get_right() ? toIntersect.get_right() : this.get_right();
-		if(x1 <= x0) {
-			return new openfl_geom_Rectangle();
-		}
-		var y0 = this.y < toIntersect.y ? toIntersect.y : this.y;
-		var y1 = this.get_bottom() > toIntersect.get_bottom() ? toIntersect.get_bottom() : this.get_bottom();
-		if(y1 <= y0) {
-			return new openfl_geom_Rectangle();
-		}
-		return new openfl_geom_Rectangle(x0,y0,x1 - x0,y1 - y0);
-	}
-	,intersectionToOutput: function(toIntersect,output) {
-		if(output == null) {
-			output = new openfl_geom_Rectangle();
-		}
-		var x0 = this.x < toIntersect.x ? toIntersect.x : this.x;
-		var x1 = this.get_right() > toIntersect.get_right() ? toIntersect.get_right() : this.get_right();
-		if(x1 <= x0) {
-			output.setTo(0.0,0.0,0.0,0.0);
-			return output;
-		}
-		var y0 = this.y < toIntersect.y ? toIntersect.y : this.y;
-		var y1 = this.get_bottom() > toIntersect.get_bottom() ? toIntersect.get_bottom() : this.get_bottom();
-		if(y1 <= y0) {
-			output.setTo(0.0,0.0,0.0,0.0);
-			return output;
-		}
-		output.setTo(x0,y0,x1 - x0,y1 - y0);
-		return output;
-	}
-	,intersects: function(toIntersect) {
-		var x0 = this.x < toIntersect.x ? toIntersect.x : this.x;
-		var x1 = this.get_right() > toIntersect.get_right() ? toIntersect.get_right() : this.get_right();
-		if(x1 <= x0) {
-			return false;
-		}
-		var y0 = this.y < toIntersect.y ? toIntersect.y : this.y;
-		var y1 = this.get_bottom() > toIntersect.get_bottom() ? toIntersect.get_bottom() : this.get_bottom();
-		return y1 > y0;
-	}
-	,isEmpty: function() {
-		if(!(this.width <= 0)) {
-			return this.height <= 0;
-		} else {
-			return true;
-		}
-	}
-	,offset: function(dx,dy) {
-		this.x += dx;
-		this.y += dy;
-	}
-	,offsetPoint: function(point) {
-		this.x += point.x;
-		this.y += point.y;
-	}
-	,setEmpty: function() {
-		this.x = this.y = this.width = this.height = 0;
-	}
-	,setTo: function(xa,ya,widtha,heighta) {
-		this.x = xa;
-		this.y = ya;
-		this.width = widtha;
-		this.height = heighta;
-	}
-	,toString: function() {
-		return "(x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";
-	}
-	,union: function(toUnion) {
-		if(this.width == 0 || this.height == 0) {
-			return toUnion.clone();
-		} else if(toUnion.width == 0 || toUnion.height == 0) {
-			return this.clone();
-		}
-		var x0 = this.x > toUnion.x ? toUnion.x : this.x;
-		var x1 = this.get_right() < toUnion.get_right() ? toUnion.get_right() : this.get_right();
-		var y0 = this.y > toUnion.y ? toUnion.y : this.y;
-		var y1 = this.get_bottom() < toUnion.get_bottom() ? toUnion.get_bottom() : this.get_bottom();
-		return new openfl_geom_Rectangle(x0,y0,x1 - x0,y1 - y0);
-	}
-	,unionToOutput: function(toUnion,output) {
-		if(output == null) {
-			output = new openfl_geom_Rectangle();
-		}
-		if(this.width == 0 || this.height == 0) {
-			output.setTo(toUnion.x,toUnion.y,toUnion.width,toUnion.height);
-			return output;
-		} else if(toUnion.width == 0 || toUnion.height == 0) {
-			output.setTo(this.x,this.y,this.width,this.height);
-			return output;
-		}
-		var x0 = this.x > toUnion.x ? toUnion.x : this.x;
-		var x1 = this.get_right() < toUnion.get_right() ? toUnion.get_right() : this.get_right();
-		var y0 = this.y > toUnion.y ? toUnion.y : this.y;
-		var y1 = this.get_bottom() < toUnion.get_bottom() ? toUnion.get_bottom() : this.get_bottom();
-		output.setTo(x0,y0,x1 - x0,y1 - y0);
-		return output;
-	}
-	,__contract: function(x,y,width,height) {
-		if(this.width == 0 && this.height == 0) {
-			return;
-		}
-		var offsetX = 0.0;
-		var offsetY = 0.0;
-		var offsetRight = 0.0;
-		var offsetBottom = 0.0;
-		if(this.x < x) {
-			offsetX = x - this.x;
-		}
-		if(this.y < y) {
-			offsetY = y - this.y;
-		}
-		if(this.get_right() > x + width) {
-			offsetRight = x + width - this.get_right();
-		}
-		if(this.get_bottom() > y + height) {
-			offsetBottom = y + height - this.get_bottom();
-		}
-		this.x += offsetX;
-		this.y += offsetY;
-		this.width += offsetRight - offsetX;
-		this.height += offsetBottom - offsetY;
-	}
-	,__expand: function(x,y,width,height) {
-		if(this.width == 0 && this.height == 0) {
-			this.x = x;
-			this.y = y;
-			this.width = width;
-			this.height = height;
-			return;
-		}
-		var cacheRight = this.get_right();
-		var cacheBottom = this.get_bottom();
-		if(this.x > x) {
-			this.x = x;
-			this.width = cacheRight - x;
-		}
-		if(this.y > y) {
-			this.y = y;
-			this.height = cacheBottom - y;
-		}
-		if(cacheRight < x + width) {
-			this.width = x + width - this.x;
-		}
-		if(cacheBottom < y + height) {
-			this.height = y + height - this.y;
-		}
-	}
-	,__toLimeRectangle: function() {
-		if(openfl_geom_Rectangle.__limeRectangle == null) {
-			openfl_geom_Rectangle.__limeRectangle = new lime_math_Rectangle();
-		}
-		openfl_geom_Rectangle.__limeRectangle.setTo(this.x,this.y,this.width,this.height);
-		return openfl_geom_Rectangle.__limeRectangle;
-	}
-	,__transform: function(rect,m) {
-		var tx0 = m.a * this.x + m.c * this.y;
-		var tx1 = tx0;
-		var ty0 = m.b * this.x + m.d * this.y;
-		var ty1 = ty0;
-		var tx = m.a * (this.x + this.width) + m.c * this.y;
-		var ty = m.b * (this.x + this.width) + m.d * this.y;
-		if(tx < tx0) {
-			tx0 = tx;
-		}
-		if(ty < ty0) {
-			ty0 = ty;
-		}
-		if(tx > tx1) {
-			tx1 = tx;
-		}
-		if(ty > ty1) {
-			ty1 = ty;
-		}
-		tx = m.a * (this.x + this.width) + m.c * (this.y + this.height);
-		ty = m.b * (this.x + this.width) + m.d * (this.y + this.height);
-		if(tx < tx0) {
-			tx0 = tx;
-		}
-		if(ty < ty0) {
-			ty0 = ty;
-		}
-		if(tx > tx1) {
-			tx1 = tx;
-		}
-		if(ty > ty1) {
-			ty1 = ty;
-		}
-		tx = m.a * this.x + m.c * (this.y + this.height);
-		ty = m.b * this.x + m.d * (this.y + this.height);
-		if(tx < tx0) {
-			tx0 = tx;
-		}
-		if(ty < ty0) {
-			ty0 = ty;
-		}
-		if(tx > tx1) {
-			tx1 = tx;
-		}
-		if(ty > ty1) {
-			ty1 = ty;
-		}
-		rect.setTo(tx0 + m.tx,ty0 + m.ty,tx1 - tx0,ty1 - ty0);
-	}
-	,get_bottom: function() {
-		return this.y + this.height;
-	}
-	,set_bottom: function(b) {
-		this.height = b - this.y;
-		return b;
-	}
-	,get_bottomRight: function() {
-		return new openfl_geom_Point(this.x + this.width,this.y + this.height);
-	}
-	,set_bottomRight: function(p) {
-		this.width = p.x - this.x;
-		this.height = p.y - this.y;
-		return p.clone();
-	}
-	,get_left: function() {
-		return this.x;
-	}
-	,set_left: function(l) {
-		this.width -= l - this.x;
-		this.x = l;
-		return l;
-	}
-	,get_right: function() {
-		return this.x + this.width;
-	}
-	,set_right: function(r) {
-		this.width = r - this.x;
-		return r;
-	}
-	,get_size: function() {
-		return new openfl_geom_Point(this.width,this.height);
-	}
-	,set_size: function(p) {
-		this.width = p.x;
-		this.height = p.y;
-		return p.clone();
-	}
-	,get_top: function() {
-		return this.y;
-	}
-	,set_top: function(t) {
-		this.height -= t - this.y;
-		this.y = t;
-		return t;
-	}
-	,get_topLeft: function() {
-		return new openfl_geom_Point(this.x,this.y);
-	}
-	,set_topLeft: function(p) {
-		this.x = p.x;
-		this.y = p.y;
-		return p.clone();
-	}
-	,__class__: openfl_geom_Rectangle
-	,__properties__: {set_topLeft:"set_topLeft",get_topLeft:"get_topLeft",set_top:"set_top",get_top:"get_top",set_size:"set_size",get_size:"get_size",set_right:"set_right",get_right:"get_right",set_left:"set_left",get_left:"get_left",set_bottomRight:"set_bottomRight",get_bottomRight:"get_bottomRight",set_bottom:"set_bottom",get_bottom:"get_bottom"}
-};
 var flixel_graphics_frames_FlxBitmapFont = function(frame,border) {
 	this.spaceWidth = 0;
 	this.minOffsetX = 0;
@@ -26533,1119 +31356,32 @@ flixel_group_FlxTypedGroupIterator.prototype = {
 	}
 	,__class__: flixel_group_FlxTypedGroupIterator
 };
-var flixel_group_FlxTypedSpriteGroup = function(x,y,maxSize) {
-	if(maxSize == null) {
-		maxSize = 0;
-	}
-	if(y == null) {
-		y = 0.0;
-	}
-	if(x == null) {
-		x = 0.0;
-	}
-	this._skipTransformChildren = false;
-	this.directAlpha = false;
-	this.initGroup(maxSize);
-	flixel_FlxSprite.call(this,x,y);
+var flixel_group__$FlxSpriteContainer_SpriteContainer = function(parent,maxSize) {
+	this.parentSprite = parent;
+	flixel_group_FlxTypedContainer.call(this,maxSize);
 };
-$hxClasses["flixel.group.FlxTypedSpriteGroup"] = flixel_group_FlxTypedSpriteGroup;
-flixel_group_FlxTypedSpriteGroup.__name__ = "flixel.group.FlxTypedSpriteGroup";
-flixel_group_FlxTypedSpriteGroup.__super__ = flixel_FlxSprite;
-flixel_group_FlxTypedSpriteGroup.prototype = $extend(flixel_FlxSprite.prototype,{
-	transformChildren_flixel_math_FlxRect: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,transformChildren_openfl_display_BlendMode: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,transformChildren_Int: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,transformChildren_Bool: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,transformChildren_Array_flixel_FlxCamera: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,transformChildren_flixel_FlxCamera: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,multiTransformChildren_Float: function(FunctionArray,ValueArray) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var numProps = FunctionArray.length;
-		if(numProps > ValueArray.length) {
-			return;
-		}
-		var lambda;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null && sprite.exists) {
-				var _g2 = 0;
-				var _g3 = numProps;
-				while(_g2 < _g3) {
-					var i = _g2++;
-					lambda = FunctionArray[i];
-					lambda(sprite,ValueArray[i]);
-				}
-			}
-		}
-	}
-	,transformChildren_Float: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,transformChildren_flixel_math_FlxPoint: function(Function1,Value) {
-		if(this._skipTransformChildren || this.group == null) {
-			return;
-		}
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				Function1(sprite,Value);
-			}
-		}
-	}
-	,initGroup: function(maxSize) {
-		this.set_group(new flixel_group_FlxTypedGroup(maxSize));
-	}
-	,initVars: function() {
-		this.flixelType = 4;
-		this.offset = new flixel_math_FlxCallbackPoint($bind(this,this.offsetCallback));
-		this.origin = new flixel_math_FlxCallbackPoint($bind(this,this.originCallback));
-		this.scale = new flixel_math_FlxCallbackPoint($bind(this,this.scaleCallback));
-		this.scrollFactor = new flixel_math_FlxCallbackPoint($bind(this,this.scrollFactorCallback));
-		var this1 = this.scale;
-		var x = 1;
-		var y = 1;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var this1 = this.scrollFactor;
-		var x = 1;
-		var y = 1;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var x = 0;
-		var y = 0;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
-		point._inPool = false;
-		this.velocity = point;
-		var x = 0;
-		var y = 0;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
-		point._inPool = false;
-		this.acceleration = point;
-		var x = 0;
-		var y = 0;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
-		point._inPool = false;
-		this.drag = point;
-		var x = 10000;
-		var y = 10000;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		var x1 = x;
-		var y1 = y;
-		if(y1 == null) {
-			y1 = 0;
-		}
-		if(x1 == null) {
-			x1 = 0;
-		}
-		var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
-		point._inPool = false;
-		this.maxVelocity = point;
-	}
-	,destroy: function() {
-		this.offset = flixel_util_FlxDestroyUtil.destroy(this.offset);
-		this.origin = flixel_util_FlxDestroyUtil.destroy(this.origin);
-		this.scale = flixel_util_FlxDestroyUtil.destroy(this.scale);
-		this.scrollFactor = flixel_util_FlxDestroyUtil.destroy(this.scrollFactor);
-		this.group = flixel_util_FlxDestroyUtil.destroy(this.group);
-		flixel_FlxSprite.prototype.destroy.call(this);
-	}
-	,clone: function() {
-		var newGroup = new flixel_group_FlxTypedSpriteGroup(this.x,this.y,this.group.maxSize);
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				newGroup.add(sprite.clone());
-			}
-		}
-		return newGroup;
-	}
-	,isOnScreen: function(Camera) {
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null && sprite.exists && sprite.visible && sprite.isOnScreen(Camera)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	,overlapsPoint: function(point,InScreenSpace,Camera) {
-		if(InScreenSpace == null) {
-			InScreenSpace = false;
-		}
-		var result = false;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null && sprite.exists && sprite.visible) {
-				result = result || sprite.overlapsPoint(point,InScreenSpace,Camera);
-			}
-		}
-		return result;
-	}
-	,pixelsOverlapPoint: function(point,Mask,Camera) {
-		if(Mask == null) {
-			Mask = 255;
-		}
-		var result = false;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null && sprite.exists && sprite.visible) {
-				result = result || sprite.pixelsOverlapPoint(point,Mask,Camera);
-			}
-		}
-		return result;
-	}
-	,update: function(elapsed) {
-		this.group.update(elapsed);
-		if(this.path != null && this.path.active) {
-			this.path.update(elapsed);
-		}
-		if(this.moves) {
-			this.updateMotion(elapsed);
-		}
-	}
-	,draw: function() {
-		this.group.draw();
-	}
-	,replaceColor: function(Color,NewColor,FetchPositions) {
-		if(FetchPositions == null) {
-			FetchPositions = false;
-		}
-		var positions = null;
-		if(FetchPositions) {
-			positions = [];
-		}
-		var spritePositions;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				spritePositions = sprite.replaceColor(Color,NewColor,FetchPositions);
-				if(FetchPositions) {
-					positions = positions.concat(spritePositions);
-				}
-			}
-		}
-		return positions;
-	}
-	,add: function(Sprite) {
-		this.preAdd(Sprite);
-		return this.group.add(Sprite);
-	}
-	,insert: function(Position,Sprite) {
-		this.preAdd(Sprite);
-		return this.group.insert(Position,Sprite);
-	}
-	,preAdd: function(sprite) {
-		sprite.set_x(sprite.x + this.x);
-		sprite.set_y(sprite.y + this.y);
-		sprite.set_alpha(sprite.alpha * this.alpha);
-		var this1 = sprite.scrollFactor;
-		var p = this.scrollFactor;
-		var x = p.x;
-		var y = p.y;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var _this = p;
-		if(_this._weak) {
-			_this.put();
-		}
-		sprite.set_cameras(this._cameras);
-		if(this.clipRect != null) {
-			var ClipRect = this.clipRect;
-			if(ClipRect == null) {
-				sprite.set_clipRect(null);
-			} else {
-				var X = ClipRect.x - sprite.x + this.x;
-				var Y = ClipRect.y - sprite.y + this.y;
-				var Width = ClipRect.width;
-				var Height = ClipRect.height;
-				if(Height == null) {
-					Height = 0;
-				}
-				if(Width == null) {
-					Width = 0;
-				}
-				if(Y == null) {
-					Y = 0;
-				}
-				if(X == null) {
-					X = 0;
-				}
-				var _this = flixel_math_FlxRect._pool.get();
-				var X1 = X;
-				var Y1 = Y;
-				var Width1 = Width;
-				var Height1 = Height;
-				if(Height1 == null) {
-					Height1 = 0;
-				}
-				if(Width1 == null) {
-					Width1 = 0;
-				}
-				if(Y1 == null) {
-					Y1 = 0;
-				}
-				if(X1 == null) {
-					X1 = 0;
-				}
-				_this.x = X1;
-				_this.y = Y1;
-				_this.width = Width1;
-				_this.height = Height1;
-				var rect = _this;
-				rect._inPool = false;
-				sprite.set_clipRect(rect);
-			}
-		}
-	}
-	,recycle: function(ObjectClass,ObjectFactory,Force,Revive) {
-		if(Revive == null) {
-			Revive = true;
-		}
-		if(Force == null) {
-			Force = false;
-		}
-		return this.group.recycle(ObjectClass,ObjectFactory,Force,Revive);
-	}
-	,remove: function(sprite,splice) {
-		if(splice == null) {
-			splice = false;
-		}
-		sprite.set_x(sprite.x - this.x);
-		sprite.set_y(sprite.y - this.y);
-		sprite.set_cameras(null);
-		return this.group.remove(sprite,splice);
-	}
-	,replace: function(oldObject,newObject) {
-		this.preAdd(newObject);
-		return this.group.replace(oldObject,newObject);
-	}
-	,sort: function(Function1,Order) {
-		if(Order == null) {
-			Order = -1;
-		}
-		var order = Order;
-		if(order == null) {
-			order = -1;
-		}
-		var _g = Function1;
-		var a1 = order;
-		var tmp = function(a2,a3) {
-			return _g(a1,a2,a3);
-		};
-		this.group.members.sort(tmp);
-	}
-	,getFirstAvailable: function(ObjectClass,Force) {
-		if(Force == null) {
-			Force = false;
-		}
-		return this.group.getFirstAvailable(ObjectClass,Force);
-	}
-	,getFirstNull: function() {
-		return this.group.getFirstNull();
-	}
-	,getFirstExisting: function() {
-		return this.group.getFirstExisting();
-	}
-	,getFirstAlive: function() {
-		return this.group.getFirstAlive();
-	}
-	,getFirstDead: function() {
-		return this.group.getFirstDead();
-	}
-	,countLiving: function() {
-		return this.group.countLiving();
-	}
-	,countDead: function() {
-		return this.group.countDead();
-	}
-	,getRandom: function(StartIndex,Length) {
-		if(Length == null) {
-			Length = 0;
-		}
-		if(StartIndex == null) {
-			StartIndex = 0;
-		}
-		return this.group.getRandom(StartIndex,Length);
-	}
-	,iterator: function(filter) {
-		return new flixel_group_FlxTypedGroupIterator(this.group.members,filter);
-	}
-	,forEach: function(Function1,Recurse) {
-		if(Recurse == null) {
-			Recurse = false;
-		}
-		this.group.forEach(Function1,Recurse);
-	}
-	,forEachAlive: function(Function1,Recurse) {
-		if(Recurse == null) {
-			Recurse = false;
-		}
-		this.group.forEachAlive(Function1,Recurse);
-	}
-	,forEachDead: function(Function1,Recurse) {
-		if(Recurse == null) {
-			Recurse = false;
-		}
-		this.group.forEachDead(Function1,Recurse);
-	}
-	,forEachExists: function(Function1,Recurse) {
-		if(Recurse == null) {
-			Recurse = false;
-		}
-		this.group.forEachExists(Function1,Recurse);
-	}
-	,forEachOfType: function(ObjectClass,Function1,Recurse) {
-		if(Recurse == null) {
-			Recurse = false;
-		}
-		this.group.forEachOfType(ObjectClass,Function1,Recurse);
-	}
-	,clear: function() {
-		this.group.clear();
-	}
-	,kill: function() {
-		this._skipTransformChildren = true;
-		flixel_FlxSprite.prototype.kill.call(this);
-		this._skipTransformChildren = false;
-		this.group.kill();
-	}
-	,revive: function() {
-		this._skipTransformChildren = true;
-		flixel_FlxSprite.prototype.revive.call(this);
-		this._skipTransformChildren = false;
-		this.group.revive();
-	}
-	,reset: function(X,Y) {
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var sprite = _g1[_g];
-			++_g;
-			if(sprite != null) {
-				sprite.reset(sprite.x + X - this.x,sprite.y + Y - this.y);
-			}
-		}
-		this._skipTransformChildren = true;
-		this.touching = 0;
-		this.wasTouching = 0;
-		this.set_x(X);
-		this.set_y(Y);
-		var this1 = this.velocity;
-		this1.set_x(0);
-		this1.set_y(0);
-		flixel_FlxSprite.prototype.revive.call(this);
-		this._skipTransformChildren = false;
-	}
-	,setPosition: function(X,Y) {
-		if(Y == null) {
-			Y = 0;
-		}
-		if(X == null) {
-			X = 0;
-		}
-		var dx = X - this.x;
-		var dy = Y - this.y;
-		this.multiTransformChildren_Float([$bind(this,this.xTransform),$bind(this,this.yTransform)],[dx,dy]);
-		this._skipTransformChildren = true;
-		this.set_x(X);
-		this.set_y(Y);
-		this._skipTransformChildren = false;
-	}
-	,set_camera: function(Value) {
-		if(this.get_camera() != Value) {
-			this.transformChildren_flixel_FlxCamera($bind(this,this.cameraTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_camera.call(this,Value);
-	}
-	,set_cameras: function(Value) {
-		if(this._cameras != Value) {
-			this.transformChildren_Array_flixel_FlxCamera($bind(this,this.camerasTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_cameras.call(this,Value);
-	}
-	,set_exists: function(Value) {
-		if(this.exists != Value) {
-			this.transformChildren_Bool($bind(this,this.existsTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_exists.call(this,Value);
-	}
-	,set_visible: function(Value) {
-		if(this.exists && this.visible != Value) {
-			this.transformChildren_Bool($bind(this,this.visibleTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_visible.call(this,Value);
-	}
-	,set_active: function(Value) {
-		if(this.exists && this.active != Value) {
-			this.transformChildren_Bool($bind(this,this.activeTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_active.call(this,Value);
-	}
-	,set_alive: function(Value) {
-		if(this.alive != Value) {
-			this.transformChildren_Bool($bind(this,this.aliveTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_alive.call(this,Value);
-	}
-	,set_x: function(Value) {
-		if(this.exists && this.x != Value) {
-			this.transformChildren_Float($bind(this,this.xTransform),Value - this.x);
-		}
-		return this.x = Value;
-	}
-	,set_y: function(Value) {
-		if(this.exists && this.y != Value) {
-			this.transformChildren_Float($bind(this,this.yTransform),Value - this.y);
-		}
-		return this.y = Value;
-	}
-	,set_angle: function(Value) {
-		if(this.exists && this.angle != Value) {
-			this.transformChildren_Float($bind(this,this.angleTransform),Value - this.angle);
-		}
-		return this.angle = Value;
-	}
-	,set_alpha: function(Value) {
-		var lowerBound = Value < 0 ? 0 : Value;
-		Value = lowerBound > 1 ? 1 : lowerBound;
-		if(this.exists && this.alpha != Value) {
-			var factor = this.alpha > 0 ? Value / this.alpha : 0;
-			if(!this.directAlpha && this.alpha != 0) {
-				this.transformChildren_Float($bind(this,this.alphaTransform),factor);
-			} else {
-				this.transformChildren_Float($bind(this,this.directAlphaTransform),Value);
-			}
-		}
-		return this.alpha = Value;
-	}
-	,set_facing: function(Value) {
-		if(this.exists && this.facing != Value) {
-			this.transformChildren_Int($bind(this,this.facingTransform),Value);
-		}
-		return this.facing = Value;
-	}
-	,set_flipX: function(Value) {
-		if(this.exists && this.flipX != Value) {
-			this.transformChildren_Bool($bind(this,this.flipXTransform),Value);
-		}
-		return this.flipX = Value;
-	}
-	,set_flipY: function(Value) {
-		if(this.exists && this.flipY != Value) {
-			this.transformChildren_Bool($bind(this,this.flipYTransform),Value);
-		}
-		return this.flipY = Value;
-	}
-	,set_moves: function(Value) {
-		if(this.exists && this.moves != Value) {
-			this.transformChildren_Bool($bind(this,this.movesTransform),Value);
-		}
-		return this.moves = Value;
-	}
-	,set_immovable: function(Value) {
-		if(this.exists && this.immovable != Value) {
-			this.transformChildren_Bool($bind(this,this.immovableTransform),Value);
-		}
-		return this.immovable = Value;
-	}
-	,set_solid: function(Value) {
-		if(this.exists && (this.allowCollisions & 4369) > 0 != Value) {
-			this.transformChildren_Bool($bind(this,this.solidTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_solid.call(this,Value);
-	}
-	,set_color: function(Value) {
-		if(this.exists && this.color != Value) {
-			this.transformChildren_Int($bind(this,this.gColorTransform),Value);
-		}
-		return this.color = Value;
-	}
-	,set_blend: function(Value) {
-		if(this.exists && this.blend != Value) {
-			this.transformChildren_openfl_display_BlendMode($bind(this,this.blendTransform),Value);
-		}
-		return this.blend = Value;
-	}
-	,set_clipRect: function(rect) {
-		if(this.exists) {
-			this.transformChildren_flixel_math_FlxRect($bind(this,this.clipRectTransform),rect);
-		}
-		return flixel_FlxSprite.prototype.set_clipRect.call(this,rect);
-	}
-	,set_pixelPerfectRender: function(Value) {
-		if(this.exists && this.pixelPerfectRender != Value) {
-			this.transformChildren_Bool($bind(this,this.pixelPerfectTransform),Value);
-		}
-		return flixel_FlxSprite.prototype.set_pixelPerfectRender.call(this,Value);
-	}
-	,set_width: function(Value) {
-		return Value;
-	}
-	,get_width: function() {
-		if(this.group.length == 0) {
-			return 0;
-		}
-		return this.findMaxXHelper() - this.findMinXHelper();
-	}
-	,findMinX: function() {
-		if(this.group.length == 0) {
-			return this.x;
+$hxClasses["flixel.group._FlxSpriteContainer.SpriteContainer"] = flixel_group__$FlxSpriteContainer_SpriteContainer;
+flixel_group__$FlxSpriteContainer_SpriteContainer.__name__ = "flixel.group._FlxSpriteContainer.SpriteContainer";
+flixel_group__$FlxSpriteContainer_SpriteContainer.__super__ = flixel_group_FlxTypedContainer;
+flixel_group__$FlxSpriteContainer_SpriteContainer.prototype = $extend(flixel_group_FlxTypedContainer.prototype,{
+	get_container: function() {
+		return this.parentSprite.get_container();
+	}
+	,getCamerasLegacy: function() {
+		if(this._cameras != null) {
+			return this._cameras;
 		} else {
-			return this.findMinXHelper();
+			return this.parentSprite.getCamerasLegacy();
 		}
 	}
-	,findMinXHelper: function() {
-		var value = Infinity;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var member = _g1[_g];
-			++_g;
-			if(member == null) {
-				continue;
-			}
-			var minX;
-			if(member.flixelType == 4) {
-				minX = member.findMinX();
-			} else {
-				minX = member.x;
-			}
-			if(minX < value) {
-				value = minX;
-			}
-		}
-		return value;
-	}
-	,findMaxX: function() {
-		if(this.group.length == 0) {
-			return this.x;
+	,getCameras: function() {
+		if(this._cameras != null) {
+			return this._cameras;
 		} else {
-			return this.findMaxXHelper();
+			return this.parentSprite.getCameras();
 		}
 	}
-	,findMaxXHelper: function() {
-		var value = -Infinity;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var member = _g1[_g];
-			++_g;
-			if(member == null) {
-				continue;
-			}
-			var maxX;
-			if(member.flixelType == 4) {
-				maxX = member.findMaxX();
-			} else {
-				maxX = member.x + member.get_width();
-			}
-			if(maxX > value) {
-				value = maxX;
-			}
-		}
-		return value;
-	}
-	,set_height: function(Value) {
-		return Value;
-	}
-	,get_height: function() {
-		if(this.group.length == 0) {
-			return 0;
-		}
-		return this.findMaxYHelper() - this.findMinYHelper();
-	}
-	,findMinY: function() {
-		if(this.group.length == 0) {
-			return this.y;
-		} else {
-			return this.findMinYHelper();
-		}
-	}
-	,findMinYHelper: function() {
-		var value = Infinity;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var member = _g1[_g];
-			++_g;
-			if(member == null) {
-				continue;
-			}
-			var minY;
-			if(member.flixelType == 4) {
-				minY = member.findMinY();
-			} else {
-				minY = member.y;
-			}
-			if(minY < value) {
-				value = minY;
-			}
-		}
-		return value;
-	}
-	,findMaxY: function() {
-		if(this.group.length == 0) {
-			return this.y;
-		} else {
-			return this.findMaxYHelper();
-		}
-	}
-	,findMaxYHelper: function() {
-		var value = -Infinity;
-		var _g = 0;
-		var _g1 = this.group.members;
-		while(_g < _g1.length) {
-			var member = _g1[_g];
-			++_g;
-			if(member == null) {
-				continue;
-			}
-			var maxY;
-			if(member.flixelType == 4) {
-				maxY = member.findMaxY();
-			} else {
-				maxY = member.y + member.get_height();
-			}
-			if(maxY > value) {
-				value = maxY;
-			}
-		}
-		return value;
-	}
-	,get_length: function() {
-		return this.group.length;
-	}
-	,get_maxSize: function() {
-		return this.group.maxSize;
-	}
-	,set_maxSize: function(Size) {
-		return this.group.set_maxSize(Size);
-	}
-	,get_members: function() {
-		return this.group.members;
-	}
-	,xTransform: function(Sprite,X) {
-		Sprite.set_x(Sprite.x + X);
-	}
-	,yTransform: function(Sprite,Y) {
-		Sprite.set_y(Sprite.y + Y);
-	}
-	,angleTransform: function(Sprite,Angle) {
-		Sprite.set_angle(Sprite.angle + Angle);
-	}
-	,alphaTransform: function(Sprite,Alpha) {
-		if(Sprite.alpha != 0 || Alpha == 0) {
-			Sprite.set_alpha(Sprite.alpha * Alpha);
-		} else {
-			Sprite.set_alpha(1 / Alpha);
-		}
-	}
-	,directAlphaTransform: function(Sprite,Alpha) {
-		Sprite.set_alpha(Alpha);
-	}
-	,facingTransform: function(Sprite,Facing) {
-		Sprite.set_facing(Facing);
-	}
-	,flipXTransform: function(Sprite,FlipX) {
-		Sprite.set_flipX(FlipX);
-	}
-	,flipYTransform: function(Sprite,FlipY) {
-		Sprite.set_flipY(FlipY);
-	}
-	,movesTransform: function(Sprite,Moves) {
-		Sprite.set_moves(Moves);
-	}
-	,pixelPerfectTransform: function(Sprite,PixelPerfect) {
-		Sprite.set_pixelPerfectRender(PixelPerfect);
-	}
-	,gColorTransform: function(Sprite,Color) {
-		Sprite.set_color(Color);
-	}
-	,blendTransform: function(Sprite,Blend) {
-		Sprite.set_blend(Blend);
-	}
-	,immovableTransform: function(Sprite,Immovable) {
-		Sprite.set_immovable(Immovable);
-	}
-	,visibleTransform: function(Sprite,Visible) {
-		Sprite.set_visible(Visible);
-	}
-	,activeTransform: function(Sprite,Active) {
-		Sprite.set_active(Active);
-	}
-	,solidTransform: function(Sprite,Solid) {
-		Sprite.set_solid(Solid);
-	}
-	,aliveTransform: function(Sprite,Alive) {
-		Sprite.set_alive(Alive);
-	}
-	,existsTransform: function(Sprite,Exists) {
-		Sprite.set_exists(Exists);
-	}
-	,cameraTransform: function(Sprite,Camera) {
-		Sprite.set_camera(Camera);
-	}
-	,camerasTransform: function(Sprite,Cameras) {
-		Sprite.set_cameras(Cameras);
-	}
-	,offsetTransform: function(Sprite,Offset) {
-		var this1 = Sprite.offset;
-		var x = Offset.x;
-		var y = Offset.y;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var _this = Offset;
-		if(_this._weak) {
-			_this.put();
-		}
-	}
-	,originTransform: function(Sprite,Origin) {
-		var this1 = Sprite.origin;
-		var x = Origin.x;
-		var y = Origin.y;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var _this = Origin;
-		if(_this._weak) {
-			_this.put();
-		}
-	}
-	,scaleTransform: function(Sprite,Scale) {
-		var this1 = Sprite.scale;
-		var x = Scale.x;
-		var y = Scale.y;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var _this = Scale;
-		if(_this._weak) {
-			_this.put();
-		}
-	}
-	,scrollFactorTransform: function(Sprite,ScrollFactor) {
-		var this1 = Sprite.scrollFactor;
-		var x = ScrollFactor.x;
-		var y = ScrollFactor.y;
-		if(y == null) {
-			y = 0;
-		}
-		if(x == null) {
-			x = 0;
-		}
-		this1.set_x(x);
-		this1.set_y(y);
-		var _this = ScrollFactor;
-		if(_this._weak) {
-			_this.put();
-		}
-	}
-	,clipRectTransform: function(Sprite,ClipRect) {
-		if(ClipRect == null) {
-			Sprite.set_clipRect(null);
-		} else {
-			var X = ClipRect.x - Sprite.x + this.x;
-			var Y = ClipRect.y - Sprite.y + this.y;
-			var Width = ClipRect.width;
-			var Height = ClipRect.height;
-			if(Height == null) {
-				Height = 0;
-			}
-			if(Width == null) {
-				Width = 0;
-			}
-			if(Y == null) {
-				Y = 0;
-			}
-			if(X == null) {
-				X = 0;
-			}
-			var _this = flixel_math_FlxRect._pool.get();
-			var X1 = X;
-			var Y1 = Y;
-			var Width1 = Width;
-			var Height1 = Height;
-			if(Height1 == null) {
-				Height1 = 0;
-			}
-			if(Width1 == null) {
-				Width1 = 0;
-			}
-			if(Y1 == null) {
-				Y1 = 0;
-			}
-			if(X1 == null) {
-				X1 = 0;
-			}
-			_this.x = X1;
-			_this.y = Y1;
-			_this.width = Width1;
-			_this.height = Height1;
-			var rect = _this;
-			rect._inPool = false;
-			Sprite.set_clipRect(rect);
-		}
-	}
-	,offsetCallback: function(Offset) {
-		this.transformChildren_flixel_math_FlxPoint($bind(this,this.offsetTransform),Offset);
-	}
-	,originCallback: function(Origin) {
-		this.transformChildren_flixel_math_FlxPoint($bind(this,this.originTransform),Origin);
-	}
-	,scaleCallback: function(Scale) {
-		this.transformChildren_flixel_math_FlxPoint($bind(this,this.scaleTransform),Scale);
-	}
-	,scrollFactorCallback: function(ScrollFactor) {
-		this.transformChildren_flixel_math_FlxPoint($bind(this,this.scrollFactorTransform),ScrollFactor);
-	}
-	,loadGraphicFromSprite: function(Sprite) {
-		return this;
-	}
-	,loadGraphic: function(Graphic,Animated,Width,Height,Unique,Key) {
-		if(Unique == null) {
-			Unique = false;
-		}
-		if(Height == null) {
-			Height = 0;
-		}
-		if(Width == null) {
-			Width = 0;
-		}
-		if(Animated == null) {
-			Animated = false;
-		}
-		return this;
-	}
-	,loadRotatedGraphic: function(Graphic,Rotations,Frame,AntiAliasing,AutoBuffer,Key) {
-		if(AutoBuffer == null) {
-			AutoBuffer = false;
-		}
-		if(AntiAliasing == null) {
-			AntiAliasing = false;
-		}
-		if(Frame == null) {
-			Frame = -1;
-		}
-		if(Rotations == null) {
-			Rotations = 16;
-		}
-		return this;
-	}
-	,makeGraphic: function(Width,Height,Color,Unique,Key) {
-		if(Unique == null) {
-			Unique = false;
-		}
-		if(Color == null) {
-			Color = -1;
-		}
-		return this;
-	}
-	,set_pixels: function(Value) {
-		return Value;
-	}
-	,set_frame: function(Value) {
-		return Value;
-	}
-	,get_pixels: function() {
-		return null;
-	}
-	,get__sprites: function() {
-		return this.group.members;
-	}
-	,set_group: function(value) {
-		return this.group = value;
-	}
-	,calcFrame: function(RunOnCpp) {
-		if(RunOnCpp == null) {
-			RunOnCpp = false;
-		}
-	}
-	,resetHelpers: function() {
-	}
-	,stamp: function(Brush,X,Y) {
-		if(Y == null) {
-			Y = 0;
-		}
-		if(X == null) {
-			X = 0;
-		}
-	}
-	,set_frames: function(Frames) {
-		return Frames;
-	}
-	,updateColorTransform: function() {
-	}
-	,__class__: flixel_group_FlxTypedSpriteGroup
-	,__properties__: $extend(flixel_FlxSprite.prototype.__properties__,{get__sprites:"get__sprites",set_maxSize:"set_maxSize",get_maxSize:"get_maxSize",get_length:"get_length",get_members:"get_members",set_group:"set_group"})
+	,__class__: flixel_group__$FlxSpriteContainer_SpriteContainer
 });
 var flixel_input_FlxAccelerometer = function() {
 	this.z = 0;
@@ -33624,1523 +37360,6 @@ flixel_input_keyboard_FlxKeyboard.prototype = $extend(flixel_input_FlxKeyManager
 	}
 	,__class__: flixel_input_keyboard_FlxKeyboard
 });
-var lime_math_Vector2 = function(x,y) {
-	if(y == null) {
-		y = 0;
-	}
-	if(x == null) {
-		x = 0;
-	}
-	this.x = x;
-	this.y = y;
-};
-$hxClasses["lime.math.Vector2"] = lime_math_Vector2;
-lime_math_Vector2.__name__ = "lime.math.Vector2";
-lime_math_Vector2.distance = function(pt1,pt2) {
-	var dx = pt1.x - pt2.x;
-	var dy = pt1.y - pt2.y;
-	return Math.sqrt(dx * dx + dy * dy);
-};
-lime_math_Vector2.interpolate = function(pt1,pt2,f,result) {
-	if(result == null) {
-		result = new lime_math_Vector2();
-	}
-	result.x = pt2.x + f * (pt1.x - pt2.x);
-	result.y = pt2.y + f * (pt1.y - pt2.y);
-	return result;
-};
-lime_math_Vector2.polar = function(len,angle,result) {
-	if(result == null) {
-		result = new lime_math_Vector2();
-	}
-	var ya = len * Math.sin(angle);
-	result.x = len * Math.cos(angle);
-	result.y = ya;
-	return result;
-};
-lime_math_Vector2.prototype = {
-	add: function(v,result) {
-		if(result == null) {
-			result = new lime_math_Vector2();
-		}
-		result.x = v.x + this.x;
-		result.y = v.y + this.y;
-		return result;
-	}
-	,clone: function() {
-		return new lime_math_Vector2(this.x,this.y);
-	}
-	,equals: function(toCompare) {
-		if(toCompare != null && toCompare.x == this.x) {
-			return toCompare.y == this.y;
-		} else {
-			return false;
-		}
-	}
-	,normalize: function(thickness) {
-		if(this.x == 0 && this.y == 0) {
-			return;
-		} else {
-			var norm = thickness / Math.sqrt(this.x * this.x + this.y * this.y);
-			this.x *= norm;
-			this.y *= norm;
-		}
-	}
-	,offset: function(dx,dy) {
-		this.x += dx;
-		this.y += dy;
-	}
-	,setTo: function(xa,ya) {
-		this.x = xa;
-		this.y = ya;
-	}
-	,subtract: function(v,result) {
-		if(result == null) {
-			result = new lime_math_Vector2();
-		}
-		result.x = this.x - v.x;
-		result.y = this.y - v.y;
-		return result;
-	}
-	,__toFlashPoint: function() {
-		return null;
-	}
-	,get_length: function() {
-		return Math.sqrt(this.x * this.x + this.y * this.y);
-	}
-	,get_lengthSquared: function() {
-		return this.x * this.x + this.y * this.y;
-	}
-	,__class__: lime_math_Vector2
-	,__properties__: {get_lengthSquared:"get_lengthSquared",get_length:"get_length"}
-};
-var openfl_display_BitmapData = function(width,height,transparent,fillColor) {
-	if(fillColor == null) {
-		fillColor = -1;
-	}
-	if(transparent == null) {
-		transparent = true;
-	}
-	this.__drawableType = 0;
-	this.transparent = transparent;
-	if(width == null) {
-		width = 0;
-	}
-	if(height == null) {
-		height = 0;
-	}
-	if(width < 0) {
-		width = 0;
-	}
-	if(height < 0) {
-		height = 0;
-	}
-	this.width = width;
-	this.height = height;
-	this.rect = new openfl_geom_Rectangle(0,0,width,height);
-	this.__textureWidth = width;
-	this.__textureHeight = height;
-	if(width > 0 && height > 0) {
-		if(transparent) {
-			if((fillColor & -16777216) == 0) {
-				fillColor = 0;
-			}
-		} else {
-			fillColor = -16777216 | fillColor & 16777215;
-		}
-		fillColor = fillColor << 8 | fillColor >>> 24 & 255;
-		this.image = new lime_graphics_Image(null,0,0,width,height,fillColor);
-		this.image.set_transparent(transparent);
-		this.__isValid = true;
-		this.readable = true;
-	}
-	this.__renderTransform = new openfl_geom_Matrix();
-	this.__worldAlpha = 1;
-	this.__worldTransform = new openfl_geom_Matrix();
-	this.__worldColorTransform = new openfl_geom_ColorTransform();
-	this.__renderable = true;
-	this.__asset = false;
-};
-$hxClasses["openfl.display.BitmapData"] = openfl_display_BitmapData;
-openfl_display_BitmapData.__name__ = "openfl.display.BitmapData";
-openfl_display_BitmapData.__interfaces__ = [openfl_display_IBitmapDrawable];
-openfl_display_BitmapData.fromBase64 = function(base64,type) {
-	return null;
-};
-openfl_display_BitmapData.fromBytes = function(bytes,rawAlpha) {
-	return null;
-};
-openfl_display_BitmapData.fromCanvas = function(canvas,transparent) {
-	if(transparent == null) {
-		transparent = true;
-	}
-	if(canvas == null) {
-		return null;
-	}
-	var bitmapData = new openfl_display_BitmapData(0,0,transparent,0);
-	bitmapData.__fromImage(lime_graphics_Image.fromCanvas(canvas));
-	bitmapData.image.set_transparent(transparent);
-	return bitmapData;
-};
-openfl_display_BitmapData.fromFile = function(path) {
-	return null;
-};
-openfl_display_BitmapData.fromImage = function(image,transparent) {
-	if(transparent == null) {
-		transparent = true;
-	}
-	if(image == null || image.buffer == null) {
-		return null;
-	}
-	var bitmapData = new openfl_display_BitmapData(0,0,transparent,0);
-	bitmapData.__fromImage(image);
-	bitmapData.image.set_transparent(transparent);
-	if(bitmapData.image != null) {
-		return bitmapData;
-	} else {
-		return null;
-	}
-};
-openfl_display_BitmapData.fromTexture = function(texture) {
-	if(texture == null) {
-		return null;
-	}
-	var bitmapData = new openfl_display_BitmapData(texture.__width,texture.__height,true,0);
-	bitmapData.readable = false;
-	bitmapData.__texture = texture;
-	bitmapData.__textureContext = texture.__textureContext;
-	bitmapData.image = null;
-	return bitmapData;
-};
-openfl_display_BitmapData.loadFromBase64 = function(base64,type) {
-	return lime_graphics_Image.loadFromBase64(base64,type).then(function(image) {
-		return lime_app_Future.withValue(openfl_display_BitmapData.fromImage(image));
-	});
-};
-openfl_display_BitmapData.loadFromBytes = function(bytes,rawAlpha) {
-	return lime_graphics_Image.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(image) {
-		var bitmapData = openfl_display_BitmapData.fromImage(image);
-		if(rawAlpha != null) {
-			bitmapData.__applyAlpha(rawAlpha);
-		}
-		return lime_app_Future.withValue(bitmapData);
-	});
-};
-openfl_display_BitmapData.loadFromFile = function(path) {
-	return lime_graphics_Image.loadFromFile(path).then(function(image) {
-		return lime_app_Future.withValue(openfl_display_BitmapData.fromImage(image));
-	});
-};
-openfl_display_BitmapData.prototype = {
-	applyFilter: function(sourceBitmapData,sourceRect,destPoint,filter) {
-		if(!this.readable || sourceBitmapData == null || !sourceBitmapData.readable) {
-			return;
-		}
-		var needSecondBitmapData = filter.__needSecondBitmapData;
-		var needCopyOfOriginal = filter.__preserveObject;
-		var bitmapData2 = null;
-		var bitmapData3 = null;
-		if(needSecondBitmapData) {
-			bitmapData2 = new openfl_display_BitmapData(this.width,this.height,true,0);
-		} else {
-			bitmapData2 = this;
-		}
-		if(needCopyOfOriginal) {
-			bitmapData3 = new openfl_display_BitmapData(this.width,this.height,true,0);
-		}
-		if(filter.__preserveObject) {
-			bitmapData3.copyPixels(this,this.rect,destPoint);
-		}
-		var lastBitmap = filter.__applyFilter(bitmapData2,this,sourceRect,destPoint);
-		if(filter.__preserveObject) {
-			lastBitmap.draw(bitmapData3,null,null);
-		}
-		if(needSecondBitmapData && lastBitmap == bitmapData2) {
-			bitmapData2.image.version = this.image.version;
-			this.image = bitmapData2.image;
-		}
-		this.image.dirty = true;
-		this.image.version++;
-	}
-	,clone: function() {
-		var bitmapData;
-		if(!this.__isValid) {
-			bitmapData = new openfl_display_BitmapData(this.width,this.height,this.transparent,0);
-		} else if(!this.readable && this.image == null) {
-			bitmapData = new openfl_display_BitmapData(0,0,this.transparent,0);
-			bitmapData.width = this.width;
-			bitmapData.height = this.height;
-			bitmapData.__textureWidth = this.__textureWidth;
-			bitmapData.__textureHeight = this.__textureHeight;
-			bitmapData.rect.copyFrom(this.rect);
-			bitmapData.__framebuffer = this.__framebuffer;
-			bitmapData.__framebufferContext = this.__framebufferContext;
-			bitmapData.__texture = this.__texture;
-			bitmapData.__textureContext = this.__textureContext;
-			bitmapData.__isValid = true;
-		} else {
-			bitmapData = openfl_display_BitmapData.fromImage(this.image.clone(),this.transparent);
-		}
-		bitmapData.__worldTransform.copyFrom(this.__worldTransform);
-		bitmapData.__renderTransform.copyFrom(this.__renderTransform);
-		return bitmapData;
-	}
-	,colorTransform: function(rect,colorTransform) {
-		if(!this.readable) {
-			return;
-		}
-		this.image.colorTransform(rect.__toLimeRectangle(),colorTransform.__toLimeColorMatrix());
-	}
-	,compare: function(otherBitmapData) {
-		if(otherBitmapData == this) {
-			return 0;
-		} else if(otherBitmapData == null) {
-			return -1;
-		} else if(this.readable == false || otherBitmapData.readable == false) {
-			return -2;
-		} else if(this.width != otherBitmapData.width) {
-			return -3;
-		} else if(this.height != otherBitmapData.height) {
-			return -4;
-		}
-		if(this.image != null && otherBitmapData.image != null && this.image.get_format() == otherBitmapData.image.get_format()) {
-			var bytes = this.image.get_data();
-			var otherBytes = otherBitmapData.image.get_data();
-			var equal = true;
-			var _g = 0;
-			var _g1 = bytes.length;
-			while(_g < _g1) {
-				var i = _g++;
-				if(bytes[i] != otherBytes[i]) {
-					equal = false;
-					break;
-				}
-			}
-			if(equal) {
-				return 0;
-			}
-		}
-		var bitmapData = null;
-		var foundDifference = false;
-		var pixel;
-		var otherPixel;
-		var comparePixel;
-		var _g = 0;
-		var _g1 = this.height;
-		while(_g < _g1) {
-			var y = _g++;
-			var _g2 = 0;
-			var _g3 = this.width;
-			while(_g2 < _g3) {
-				var x = _g2++;
-				foundDifference = false;
-				pixel = this.getPixel32(x,y);
-				otherPixel = otherBitmapData.getPixel32(x,y);
-				comparePixel = 0;
-				if(pixel != otherPixel) {
-					var r = (pixel >>> 16 & 255) - (otherPixel >>> 16 & 255);
-					var g = (pixel >>> 8 & 255) - (otherPixel >>> 8 & 255);
-					var b = (pixel & 255) - (otherPixel & 255);
-					if(r < 0) {
-						r *= -1;
-					}
-					if(g < 0) {
-						g *= -1;
-					}
-					if(b < 0) {
-						b *= -1;
-					}
-					if(r == 0 && g == 0 && b == 0) {
-						var a = (pixel >>> 24 & 255) - (otherPixel >>> 24 & 255);
-						if(a != 0) {
-							comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | 16711680 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
-							comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | 65280 | comparePixel & 255 & 255;
-							comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | 255;
-							comparePixel = (a & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
-							foundDifference = true;
-						}
-					} else {
-						comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (r & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
-						comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (g & 255) << 8 | comparePixel & 255 & 255;
-						comparePixel = (comparePixel >>> 24 & 255 & 255) << 24 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | b & 255;
-						comparePixel = -16777216 | (comparePixel >>> 16 & 255 & 255) << 16 | (comparePixel >>> 8 & 255 & 255) << 8 | comparePixel & 255 & 255;
-						foundDifference = true;
-					}
-				}
-				if(foundDifference) {
-					if(bitmapData == null) {
-						bitmapData = new openfl_display_BitmapData(this.width,this.height,this.transparent || otherBitmapData.transparent,0);
-					}
-					bitmapData.setPixel32(x,y,comparePixel);
-				}
-			}
-		}
-		if(bitmapData == null) {
-			return 0;
-		}
-		return bitmapData;
-	}
-	,copyChannel: function(sourceBitmapData,sourceRect,destPoint,sourceChannel,destChannel) {
-		if(!this.readable) {
-			return;
-		}
-		var sourceChannel1;
-		switch(sourceChannel) {
-		case 1:
-			sourceChannel1 = lime_graphics_ImageChannel.RED;
-			break;
-		case 2:
-			sourceChannel1 = lime_graphics_ImageChannel.GREEN;
-			break;
-		case 4:
-			sourceChannel1 = lime_graphics_ImageChannel.BLUE;
-			break;
-		case 8:
-			sourceChannel1 = lime_graphics_ImageChannel.ALPHA;
-			break;
-		default:
-			return;
-		}
-		var destChannel1;
-		switch(destChannel) {
-		case 1:
-			destChannel1 = lime_graphics_ImageChannel.RED;
-			break;
-		case 2:
-			destChannel1 = lime_graphics_ImageChannel.GREEN;
-			break;
-		case 4:
-			destChannel1 = lime_graphics_ImageChannel.BLUE;
-			break;
-		case 8:
-			destChannel1 = lime_graphics_ImageChannel.ALPHA;
-			break;
-		default:
-			return;
-		}
-		this.image.copyChannel(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),sourceChannel1,destChannel1);
-	}
-	,copyPixels: function(sourceBitmapData,sourceRect,destPoint,alphaBitmapData,alphaPoint,mergeAlpha) {
-		if(mergeAlpha == null) {
-			mergeAlpha = false;
-		}
-		if(!this.readable || sourceBitmapData == null) {
-			return;
-		}
-		if(alphaPoint != null) {
-			openfl_display_BitmapData.__tempVector.x = alphaPoint.x;
-			openfl_display_BitmapData.__tempVector.y = alphaPoint.y;
-		}
-		this.image.copyPixels(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),alphaBitmapData != null ? alphaBitmapData.image : null,alphaPoint != null ? openfl_display_BitmapData.__tempVector : null,mergeAlpha);
-	}
-	,dispose: function() {
-		if(this.image != null && this.image.type == lime_graphics_ImageType.CANVAS && !this.__asset) {
-			var canvas = this.image.buffer.__srcCanvas;
-			var context = this.image.buffer.__srcContext;
-			if(canvas != null) {
-				canvas.width = 0;
-				canvas.height = 0;
-				canvas = null;
-			}
-			if(context != null) {
-				context.clearRect(0,0,0,0);
-				context = null;
-			}
-		}
-		this.image = null;
-		this.width = 0;
-		this.height = 0;
-		this.rect = null;
-		this.__isValid = false;
-		this.readable = false;
-		this.__surface = null;
-		this.__vertexBuffer = null;
-		this.__framebuffer = null;
-		this.__framebufferContext = null;
-		this.__texture = null;
-		this.__textureContext = null;
-	}
-	,disposeImage: function() {
-		this.readable = false;
-	}
-	,draw: function(source,matrix,colorTransform,blendMode,clipRect,smoothing) {
-		if(smoothing == null) {
-			smoothing = false;
-		}
-		if(source == null) {
-			return;
-		}
-		var wasVisible = true;
-		var sourceAsDisplayObject = null;
-		if(((source) instanceof openfl_display_DisplayObject)) {
-			sourceAsDisplayObject = js_Boot.__cast(source , openfl_display_DisplayObject);
-			if(!sourceAsDisplayObject.get_visible()) {
-				wasVisible = false;
-				sourceAsDisplayObject.set_visible(true);
-			}
-		}
-		source.__update(false,true);
-		var transform = openfl_geom_Matrix.__pool.get();
-		transform.copyFrom(source.__renderTransform);
-		transform.invert();
-		if(matrix != null) {
-			transform.concat(matrix);
-		}
-		var clipMatrix = null;
-		if(clipRect != null) {
-			clipMatrix = openfl_geom_Matrix.__pool.get();
-			clipMatrix.copyFrom(transform);
-			clipMatrix.invert();
-		}
-		var _colorTransform = new openfl_geom_ColorTransform();
-		_colorTransform.__copyFrom(source.__worldColorTransform);
-		_colorTransform.__invert();
-		if(!this.readable && openfl_Lib.get_current().stage.context3D != null) {
-			if(this.__textureContext == null) {
-				this.__textureContext = lime_app_Application.current.__window.context;
-			}
-			if(colorTransform != null) {
-				_colorTransform.__combine(colorTransform);
-			}
-			var renderer = new openfl_display_OpenGLRenderer(openfl_Lib.get_current().stage.context3D,this);
-			renderer.__allowSmoothing = smoothing;
-			renderer.__pixelRatio = openfl_Lib.get_current().stage.window.__scale;
-			renderer.__overrideBlendMode = blendMode;
-			renderer.__worldTransform = transform;
-			renderer.__worldAlpha = 1 / source.__worldAlpha;
-			renderer.__worldColorTransform = _colorTransform;
-			renderer.__resize(this.width,this.height);
-			if(clipRect != null) {
-				renderer.__pushMaskRect(clipRect,clipMatrix);
-			}
-			this.__drawGL(source,renderer);
-			if(clipRect != null) {
-				renderer.__popMaskRect();
-				openfl_geom_Matrix.__pool.release(clipMatrix);
-			}
-		} else {
-			if(colorTransform != null) {
-				var bounds = openfl_geom_Rectangle.__pool.get();
-				var boundsMatrix = openfl_geom_Matrix.__pool.get();
-				source.__getBounds(bounds,boundsMatrix);
-				var width = Math.ceil(bounds.width);
-				var height = Math.ceil(bounds.height);
-				boundsMatrix.tx = -bounds.x;
-				boundsMatrix.ty = -bounds.y;
-				var copy = new openfl_display_BitmapData(width,height,true,0);
-				copy.draw(source,boundsMatrix);
-				copy.colorTransform(copy.rect,colorTransform);
-				copy.__renderTransform.identity();
-				copy.__renderTransform.tx = bounds.x;
-				copy.__renderTransform.ty = bounds.y;
-				copy.__renderTransform.concat(source.__renderTransform);
-				copy.__worldAlpha = source.__worldAlpha;
-				copy.__worldColorTransform.__copyFrom(source.__worldColorTransform);
-				source = copy;
-				openfl_geom_Rectangle.__pool.release(bounds);
-				openfl_geom_Matrix.__pool.release(boundsMatrix);
-			}
-			lime__$internal_graphics_ImageCanvasUtil.convertToCanvas(this.image);
-			var renderer = new openfl_display_CanvasRenderer(this.image.buffer.__srcContext);
-			renderer.__allowSmoothing = smoothing;
-			renderer.__overrideBlendMode = blendMode;
-			renderer.__worldTransform = transform;
-			renderer.__worldAlpha = 1 / source.__worldAlpha;
-			renderer.__worldColorTransform = _colorTransform;
-			if(clipRect != null) {
-				renderer.__pushMaskRect(clipRect,clipMatrix);
-			}
-			this.__drawCanvas(source,renderer);
-			if(clipRect != null) {
-				renderer.__popMaskRect();
-				openfl_geom_Matrix.__pool.release(clipMatrix);
-			}
-		}
-		openfl_geom_Matrix.__pool.release(transform);
-		if(sourceAsDisplayObject != null && !wasVisible) {
-			sourceAsDisplayObject.set_visible(false);
-		}
-	}
-	,drawWithQuality: function(source,matrix,colorTransform,blendMode,clipRect,smoothing,quality) {
-		if(smoothing == null) {
-			smoothing = false;
-		}
-		this.draw(source,matrix,colorTransform,blendMode,clipRect,quality != 2 && smoothing);
-	}
-	,encode: function(rect,compressor,byteArray) {
-		if(!this.readable || rect == null) {
-			byteArray = null;
-			return byteArray;
-		}
-		if(byteArray == null) {
-			byteArray = new openfl_utils_ByteArrayData(0);
-		}
-		var image = this.image;
-		if(!rect.equals(this.rect)) {
-			var matrix = openfl_geom_Matrix.__pool.get();
-			matrix.tx = Math.round(-rect.x);
-			matrix.ty = Math.round(-rect.y);
-			var bitmapData = new openfl_display_BitmapData(Math.ceil(rect.width),Math.ceil(rect.height),true,0);
-			bitmapData.draw(this,matrix);
-			image = bitmapData.image;
-			openfl_geom_Matrix.__pool.release(matrix);
-		}
-		if(((compressor) instanceof openfl_display_PNGEncoderOptions)) {
-			byteArray.writeBytes(openfl_utils_ByteArray.fromBytes(image.encode(lime_graphics_ImageFileFormat.PNG)),0,0);
-			return byteArray;
-		} else if(((compressor) instanceof openfl_display_JPEGEncoderOptions)) {
-			byteArray.writeBytes(openfl_utils_ByteArray.fromBytes(image.encode(lime_graphics_ImageFileFormat.JPEG,(js_Boot.__cast(compressor , openfl_display_JPEGEncoderOptions)).quality)),0,0);
-			return byteArray;
-		}
-		byteArray = null;
-		return byteArray;
-	}
-	,fillRect: function(rect,color) {
-		this.__fillRect(rect,color,true);
-	}
-	,floodFill: function(x,y,color) {
-		if(!this.readable) {
-			return;
-		}
-		this.image.floodFill(x,y,color,1);
-	}
-	,generateFilterRect: function(sourceRect,filter) {
-		return sourceRect.clone();
-	}
-	,getIndexBuffer: function(context,scale9Grid) {
-		var gl = context.gl;
-		if(this.__indexBuffer == null || this.__indexBufferContext != context.__context || scale9Grid != null && this.__indexBufferGrid == null || this.__indexBufferGrid != null && !this.__indexBufferGrid.equals(scale9Grid)) {
-			this.__indexBufferContext = context.__context;
-			this.__indexBuffer = null;
-			if(scale9Grid != null) {
-				if(this.__indexBufferGrid == null) {
-					this.__indexBufferGrid = new openfl_geom_Rectangle();
-				}
-				this.__indexBufferGrid.copyFrom(scale9Grid);
-				var centerX = scale9Grid.width;
-				var centerY = scale9Grid.height;
-				if(centerX != 0 && centerY != 0) {
-					var array = null;
-					var vector = null;
-					var view = null;
-					var buffer = null;
-					var len = null;
-					this.__indexBufferData = new Uint16Array(54);
-					this.__indexBufferData[0] = 0;
-					this.__indexBufferData[1] = 1;
-					this.__indexBufferData[2] = 2;
-					this.__indexBufferData[3] = 2;
-					this.__indexBufferData[4] = 1;
-					this.__indexBufferData[5] = 3;
-					this.__indexBufferData[6] = 4;
-					this.__indexBufferData[7] = 0;
-					this.__indexBufferData[8] = 5;
-					this.__indexBufferData[9] = 5;
-					this.__indexBufferData[10] = 0;
-					this.__indexBufferData[11] = 2;
-					this.__indexBufferData[12] = 6;
-					this.__indexBufferData[13] = 4;
-					this.__indexBufferData[14] = 7;
-					this.__indexBufferData[15] = 7;
-					this.__indexBufferData[16] = 4;
-					this.__indexBufferData[17] = 5;
-					this.__indexBufferData[18] = 8;
-					this.__indexBufferData[19] = 9;
-					this.__indexBufferData[20] = 0;
-					this.__indexBufferData[21] = 0;
-					this.__indexBufferData[22] = 9;
-					this.__indexBufferData[23] = 1;
-					this.__indexBufferData[24] = 10;
-					this.__indexBufferData[25] = 8;
-					this.__indexBufferData[26] = 4;
-					this.__indexBufferData[27] = 4;
-					this.__indexBufferData[28] = 8;
-					this.__indexBufferData[29] = 0;
-					this.__indexBufferData[30] = 11;
-					this.__indexBufferData[31] = 10;
-					this.__indexBufferData[32] = 6;
-					this.__indexBufferData[33] = 6;
-					this.__indexBufferData[34] = 10;
-					this.__indexBufferData[35] = 4;
-					this.__indexBufferData[36] = 12;
-					this.__indexBufferData[37] = 13;
-					this.__indexBufferData[38] = 8;
-					this.__indexBufferData[39] = 8;
-					this.__indexBufferData[40] = 13;
-					this.__indexBufferData[41] = 9;
-					this.__indexBufferData[42] = 14;
-					this.__indexBufferData[43] = 12;
-					this.__indexBufferData[44] = 10;
-					this.__indexBufferData[45] = 10;
-					this.__indexBufferData[46] = 12;
-					this.__indexBufferData[47] = 8;
-					this.__indexBufferData[48] = 15;
-					this.__indexBufferData[49] = 14;
-					this.__indexBufferData[50] = 11;
-					this.__indexBufferData[51] = 11;
-					this.__indexBufferData[52] = 14;
-					this.__indexBufferData[53] = 10;
-					this.__indexBuffer = context.createIndexBuffer(54);
-				} else if(centerX == 0 && centerY != 0) {
-					var array = null;
-					var vector = null;
-					var view = null;
-					var buffer = null;
-					var len = null;
-					this.__indexBufferData = new Uint16Array(18);
-					this.__indexBufferData[0] = 0;
-					this.__indexBufferData[1] = 1;
-					this.__indexBufferData[2] = 2;
-					this.__indexBufferData[3] = 2;
-					this.__indexBufferData[4] = 1;
-					this.__indexBufferData[5] = 3;
-					this.__indexBufferData[6] = 4;
-					this.__indexBufferData[7] = 5;
-					this.__indexBufferData[8] = 0;
-					this.__indexBufferData[9] = 0;
-					this.__indexBufferData[10] = 5;
-					this.__indexBufferData[11] = 1;
-					this.__indexBufferData[12] = 6;
-					this.__indexBufferData[13] = 7;
-					this.__indexBufferData[14] = 4;
-					this.__indexBufferData[15] = 4;
-					this.__indexBufferData[16] = 7;
-					this.__indexBufferData[17] = 5;
-					this.__indexBuffer = context.createIndexBuffer(18);
-				} else if(centerX != 0 && centerY == 0) {
-					var array = null;
-					var vector = null;
-					var view = null;
-					var buffer = null;
-					var len = null;
-					this.__indexBufferData = new Uint16Array(18);
-					this.__indexBufferData[0] = 0;
-					this.__indexBufferData[1] = 1;
-					this.__indexBufferData[2] = 2;
-					this.__indexBufferData[3] = 2;
-					this.__indexBufferData[4] = 1;
-					this.__indexBufferData[5] = 3;
-					this.__indexBufferData[6] = 4;
-					this.__indexBufferData[7] = 0;
-					this.__indexBufferData[8] = 5;
-					this.__indexBufferData[9] = 5;
-					this.__indexBufferData[10] = 0;
-					this.__indexBufferData[11] = 2;
-					this.__indexBufferData[12] = 6;
-					this.__indexBufferData[13] = 4;
-					this.__indexBufferData[14] = 7;
-					this.__indexBufferData[15] = 7;
-					this.__indexBufferData[16] = 4;
-					this.__indexBufferData[17] = 5;
-					this.__indexBuffer = context.createIndexBuffer(18);
-				}
-			} else {
-				this.__indexBufferGrid = null;
-			}
-			if(this.__indexBuffer == null) {
-				var array = null;
-				var vector = null;
-				var view = null;
-				var buffer = null;
-				var len = null;
-				this.__indexBufferData = new Uint16Array(6);
-				this.__indexBufferData[0] = 0;
-				this.__indexBufferData[1] = 1;
-				this.__indexBufferData[2] = 2;
-				this.__indexBufferData[3] = 2;
-				this.__indexBufferData[4] = 1;
-				this.__indexBufferData[5] = 3;
-				this.__indexBuffer = context.createIndexBuffer(6);
-			}
-			this.__indexBuffer.uploadFromTypedArray(this.__indexBufferData);
-		}
-		return this.__indexBuffer;
-	}
-	,getVertexBuffer: function(context,scale9Grid,targetObject) {
-		var gl = context.gl;
-		if(this.__vertexBuffer == null || this.__vertexBufferContext != context.__context || scale9Grid != null && this.__vertexBufferGrid == null || this.__vertexBufferGrid != null && !this.__vertexBufferGrid.equals(scale9Grid) || targetObject != null && (this.__vertexBufferWidth != targetObject.get_width() || this.__vertexBufferHeight != targetObject.get_height() || this.__vertexBufferScaleX != targetObject.get_scaleX() || this.__vertexBufferScaleY != targetObject.get_scaleY())) {
-			this.__uvRect = new openfl_geom_Rectangle(0,0,this.width,this.height);
-			var uvWidth = 1;
-			var uvHeight = 1;
-			this.__vertexBufferContext = context.__context;
-			this.__vertexBuffer = null;
-			if(targetObject != null) {
-				this.__vertexBufferWidth = targetObject.get_width();
-				this.__vertexBufferHeight = targetObject.get_height();
-				this.__vertexBufferScaleX = targetObject.get_scaleX();
-				this.__vertexBufferScaleY = targetObject.get_scaleY();
-			}
-			if(scale9Grid != null && targetObject != null) {
-				if(this.__vertexBufferGrid == null) {
-					this.__vertexBufferGrid = new openfl_geom_Rectangle();
-				}
-				this.__vertexBufferGrid.copyFrom(scale9Grid);
-				this.__vertexBufferWidth = targetObject.get_width();
-				this.__vertexBufferHeight = targetObject.get_height();
-				this.__vertexBufferScaleX = targetObject.get_scaleX();
-				this.__vertexBufferScaleY = targetObject.get_scaleY();
-				var centerX = scale9Grid.width;
-				var centerY = scale9Grid.height;
-				if(centerX != 0 && centerY != 0) {
-					var array = null;
-					var vector = null;
-					var view = null;
-					var buffer = null;
-					var len = null;
-					this.__vertexBufferData = new Float32Array(224);
-					var left = scale9Grid.x;
-					var top = scale9Grid.y;
-					var right = this.width - centerX - left;
-					var bottom = this.height - centerY - top;
-					var uvLeft = left / this.width;
-					var uvTop = top / this.height;
-					var uvCenterX = centerX / this.width;
-					var uvCenterY = centerY / this.height;
-					var uvRight = right / this.width;
-					var uvBottom = bottom / this.height;
-					var renderedLeft = left / targetObject.get_scaleX();
-					var renderedTop = top / targetObject.get_scaleY();
-					var renderedRight = right / targetObject.get_scaleX();
-					var renderedBottom = bottom / targetObject.get_scaleY();
-					var renderedCenterX = targetObject.get_width() / targetObject.get_scaleX() - renderedLeft - renderedRight;
-					var renderedCenterY = targetObject.get_height() / targetObject.get_scaleY() - renderedTop - renderedBottom;
-					this.__vertexBufferData[0] = renderedLeft;
-					this.__vertexBufferData[1] = renderedTop;
-					this.__vertexBufferData[3] = uvWidth * uvLeft;
-					this.__vertexBufferData[4] = uvHeight * uvTop;
-					this.__vertexBufferData[15] = renderedTop;
-					this.__vertexBufferData[18] = uvHeight * uvTop;
-					this.__vertexBufferData[28] = renderedLeft;
-					this.__vertexBufferData[31] = uvWidth * uvLeft;
-					this.__vertexBufferData[56] = renderedLeft + renderedCenterX;
-					this.__vertexBufferData[57] = renderedTop;
-					this.__vertexBufferData[59] = uvWidth * (uvLeft + uvCenterX);
-					this.__vertexBufferData[60] = uvHeight * uvTop;
-					this.__vertexBufferData[70] = renderedLeft + renderedCenterX;
-					this.__vertexBufferData[73] = uvWidth * (uvLeft + uvCenterX);
-					this.__vertexBufferData[84] = this.width;
-					this.__vertexBufferData[85] = renderedTop;
-					this.__vertexBufferData[87] = uvWidth;
-					this.__vertexBufferData[88] = uvHeight * uvTop;
-					this.__vertexBufferData[98] = this.width;
-					this.__vertexBufferData[101] = uvWidth;
-					this.__vertexBufferData[112] = renderedLeft;
-					this.__vertexBufferData[113] = renderedTop + renderedCenterY;
-					this.__vertexBufferData[115] = uvWidth * uvLeft;
-					this.__vertexBufferData[116] = uvHeight * (uvTop + uvCenterY);
-					this.__vertexBufferData[127] = renderedTop + renderedCenterY;
-					this.__vertexBufferData[130] = uvHeight * (uvTop + uvCenterY);
-					this.__vertexBufferData[140] = renderedLeft + renderedCenterX;
-					this.__vertexBufferData[141] = renderedTop + renderedCenterY;
-					this.__vertexBufferData[143] = uvWidth * (uvLeft + uvCenterX);
-					this.__vertexBufferData[144] = uvHeight * (uvTop + uvCenterY);
-					this.__vertexBufferData[154] = this.width;
-					this.__vertexBufferData[155] = renderedTop + renderedCenterY;
-					this.__vertexBufferData[157] = uvWidth;
-					this.__vertexBufferData[158] = uvHeight * (uvTop + uvCenterY);
-					this.__vertexBufferData[168] = renderedLeft;
-					this.__vertexBufferData[169] = this.height;
-					this.__vertexBufferData[171] = uvWidth * uvLeft;
-					this.__vertexBufferData[172] = uvHeight;
-					this.__vertexBufferData[183] = this.height;
-					this.__vertexBufferData[186] = uvHeight;
-					this.__vertexBufferData[196] = renderedLeft + renderedCenterX;
-					this.__vertexBufferData[197] = this.height;
-					this.__vertexBufferData[199] = uvWidth * (uvLeft + uvCenterX);
-					this.__vertexBufferData[200] = uvHeight;
-					this.__vertexBufferData[210] = this.width;
-					this.__vertexBufferData[211] = this.height;
-					this.__vertexBufferData[213] = uvWidth;
-					this.__vertexBufferData[214] = uvHeight;
-					this.__vertexBuffer = context.createVertexBuffer(16,14);
-				} else if(centerX == 0 && centerY != 0) {
-					var array = null;
-					var vector = null;
-					var view = null;
-					var buffer = null;
-					var len = null;
-					this.__vertexBufferData = new Float32Array(112);
-					var top = scale9Grid.y;
-					var bottom = this.height - centerY - top;
-					var uvTop = top / this.height;
-					var uvCenterY = centerY / this.height;
-					var uvBottom = bottom / this.height;
-					var renderedTop = top / targetObject.get_scaleY();
-					var renderedBottom = bottom / targetObject.get_scaleY();
-					var renderedCenterY = targetObject.get_height() / targetObject.get_scaleY() - renderedTop - renderedBottom;
-					var renderedWidth = targetObject.get_width() / targetObject.get_scaleX();
-					this.__vertexBufferData[0] = renderedWidth;
-					this.__vertexBufferData[1] = renderedTop;
-					this.__vertexBufferData[3] = uvWidth;
-					this.__vertexBufferData[4] = uvHeight * uvTop;
-					this.__vertexBufferData[15] = renderedTop;
-					this.__vertexBufferData[18] = uvHeight * uvTop;
-					this.__vertexBufferData[28] = renderedWidth;
-					this.__vertexBufferData[31] = uvWidth;
-					this.__vertexBufferData[56] = renderedWidth;
-					this.__vertexBufferData[57] = renderedTop + renderedCenterY;
-					this.__vertexBufferData[59] = uvWidth;
-					this.__vertexBufferData[60] = uvHeight * (uvTop + uvCenterY);
-					this.__vertexBufferData[71] = renderedTop + renderedCenterY;
-					this.__vertexBufferData[74] = uvHeight * (uvTop + uvCenterY);
-					this.__vertexBufferData[84] = renderedWidth;
-					this.__vertexBufferData[85] = this.height;
-					this.__vertexBufferData[87] = uvWidth;
-					this.__vertexBufferData[88] = uvHeight;
-					this.__vertexBufferData[99] = this.height;
-					this.__vertexBufferData[102] = uvHeight;
-					this.__vertexBuffer = context.createVertexBuffer(8,14);
-				} else if(centerY == 0 && centerX != 0) {
-					var array = null;
-					var vector = null;
-					var view = null;
-					var buffer = null;
-					var len = null;
-					this.__vertexBufferData = new Float32Array(112);
-					var left = scale9Grid.x;
-					var right = this.width - centerX - left;
-					var uvLeft = left / this.width;
-					var uvCenterX = centerX / this.width;
-					var uvRight = right / this.width;
-					var renderedLeft = left / targetObject.get_scaleX();
-					var renderedRight = right / targetObject.get_scaleX();
-					var renderedCenterX = targetObject.get_width() / targetObject.get_scaleX() - renderedLeft - renderedRight;
-					var renderedHeight = targetObject.get_height() / targetObject.get_scaleY();
-					this.__vertexBufferData[0] = renderedLeft;
-					this.__vertexBufferData[1] = renderedHeight;
-					this.__vertexBufferData[3] = uvWidth * uvLeft;
-					this.__vertexBufferData[4] = uvHeight;
-					this.__vertexBufferData[15] = renderedHeight;
-					this.__vertexBufferData[18] = uvHeight;
-					this.__vertexBufferData[28] = renderedLeft;
-					this.__vertexBufferData[31] = uvWidth * uvLeft;
-					this.__vertexBufferData[56] = renderedLeft + renderedCenterX;
-					this.__vertexBufferData[57] = renderedHeight;
-					this.__vertexBufferData[59] = uvWidth * (uvLeft + uvCenterX);
-					this.__vertexBufferData[60] = uvHeight;
-					this.__vertexBufferData[70] = renderedLeft + renderedCenterX;
-					this.__vertexBufferData[73] = uvWidth * (uvLeft + uvCenterX);
-					this.__vertexBufferData[84] = this.width;
-					this.__vertexBufferData[85] = renderedHeight;
-					this.__vertexBufferData[87] = uvWidth;
-					this.__vertexBufferData[88] = uvHeight;
-					this.__vertexBufferData[98] = this.width;
-					this.__vertexBufferData[101] = uvWidth;
-					this.__vertexBuffer = context.createVertexBuffer(8,14);
-				}
-			} else {
-				this.__vertexBufferGrid = null;
-			}
-			if(this.__vertexBuffer == null) {
-				var array = null;
-				var vector = null;
-				var view = null;
-				var buffer = null;
-				var len = null;
-				this.__vertexBufferData = new Float32Array(56);
-				this.__vertexBufferData[0] = this.width;
-				this.__vertexBufferData[1] = this.height;
-				this.__vertexBufferData[3] = uvWidth;
-				this.__vertexBufferData[4] = uvHeight;
-				this.__vertexBufferData[15] = this.height;
-				this.__vertexBufferData[18] = uvHeight;
-				this.__vertexBufferData[28] = this.width;
-				this.__vertexBufferData[31] = uvWidth;
-				this.__vertexBuffer = context.createVertexBuffer(3,14);
-			}
-			this.__vertexBuffer.uploadFromTypedArray(lime_utils_Float32Array.toArrayBufferView(this.__vertexBufferData));
-		}
-		return this.__vertexBuffer;
-	}
-	,getColorBoundsRect: function(mask,color,findColor) {
-		if(findColor == null) {
-			findColor = true;
-		}
-		if(!this.readable) {
-			return new openfl_geom_Rectangle(0,0,this.width,this.height);
-		}
-		if(!this.transparent || (mask >> 24 & 255) > 0) {
-			var color1 = color;
-			if((color1 >>> 24 & 255) == 0) {
-				color1 = 0;
-			}
-		}
-		var rect = this.image.getColorBoundsRect(mask,color,findColor,1);
-		return new openfl_geom_Rectangle(rect.x,rect.y,rect.width,rect.height);
-	}
-	,getPixel: function(x,y) {
-		if(!this.readable) {
-			return 0;
-		}
-		return this.image.getPixel(x,y,1);
-	}
-	,getPixel32: function(x,y) {
-		if(!this.readable) {
-			return 0;
-		}
-		return this.image.getPixel32(x,y,1);
-	}
-	,getPixels: function(rect) {
-		if(!this.readable) {
-			return null;
-		}
-		if(rect == null) {
-			rect = this.rect;
-		}
-		var byteArray = openfl_utils_ByteArray.fromBytes(this.image.getPixels(rect.__toLimeRectangle(),1));
-		byteArray.__endian = 0;
-		return byteArray;
-	}
-	,getSurface: function() {
-		if(!this.readable) {
-			return null;
-		}
-		if(this.__surface == null) {
-			this.__surface = lime_graphics_cairo_CairoImageSurface.fromImage(this.image);
-		}
-		return this.__surface;
-	}
-	,getTexture: function(context) {
-		if(!this.__isValid) {
-			return null;
-		}
-		if(this.__texture == null || this.__textureContext != context.__context) {
-			this.__textureContext = context.__context;
-			this.__texture = context.createRectangleTexture(this.width,this.height,1,false);
-			this.__textureVersion = -1;
-		}
-		lime__$internal_graphics_ImageCanvasUtil.sync(this.image,false);
-		if(this.image != null && this.image.version > this.__textureVersion) {
-			if(this.__surface != null) {
-				lime_graphics_cairo_CairoSurface.flush(this.__surface);
-			}
-			var textureImage = this.image;
-			if(!openfl_display3D_textures_TextureBase.__supportsBGRA && textureImage.get_format() != 0) {
-				textureImage = textureImage.clone();
-				textureImage.set_format(0);
-			}
-			this.__texture.__uploadFromImage(textureImage);
-			this.__textureVersion = this.image.version;
-			this.__textureWidth = textureImage.buffer.width;
-			this.__textureHeight = textureImage.buffer.height;
-		}
-		if(!this.readable && this.image != null) {
-			this.__surface = null;
-			this.image = null;
-		}
-		return this.__texture;
-	}
-	,getVector: function(rect) {
-		var pixels = this.getPixels(rect);
-		var length = UInt.toFloat(openfl_utils_ByteArray.get_length(pixels)) / UInt.toFloat(4) | 0;
-		var result = openfl_Vector.toIntVector(null,length,true);
-		var _g = 0;
-		var _g1 = length;
-		while(_g < _g1) {
-			var i = _g++;
-			result.set(i,pixels.readUnsignedInt());
-		}
-		return result;
-	}
-	,histogram: function(hRect) {
-		var rect = hRect != null ? hRect : new openfl_geom_Rectangle(0,0,this.width,this.height);
-		var pixels = this.getPixels(rect);
-		var _g = [];
-		var _g1 = [];
-		var _g2 = 0;
-		while(_g2 < 256) {
-			var j = _g2++;
-			_g1.push(0);
-		}
-		_g.push(_g1);
-		var _g1 = [];
-		var _g2 = 0;
-		while(_g2 < 256) {
-			var j = _g2++;
-			_g1.push(0);
-		}
-		_g.push(_g1);
-		var _g1 = [];
-		var _g2 = 0;
-		while(_g2 < 256) {
-			var j = _g2++;
-			_g1.push(0);
-		}
-		_g.push(_g1);
-		var _g1 = [];
-		var _g2 = 0;
-		while(_g2 < 256) {
-			var j = _g2++;
-			_g1.push(0);
-		}
-		_g.push(_g1);
-		var result = _g;
-		var _g = 0;
-		var _g1 = openfl_utils_ByteArray.get_length(pixels);
-		while(_g < _g1) {
-			var i = _g++;
-			var result1 = result[i % 4];
-			++result1[pixels.readUnsignedByte()];
-		}
-		return result;
-	}
-	,hitTest: function(firstPoint,firstAlphaThreshold,secondObject,secondBitmapDataPoint,secondAlphaThreshold) {
-		if(secondAlphaThreshold == null) {
-			secondAlphaThreshold = 1;
-		}
-		if(!this.readable) {
-			return false;
-		}
-		if(((secondObject) instanceof openfl_display_Bitmap)) {
-			secondObject = (js_Boot.__cast(secondObject , openfl_display_Bitmap)).__bitmapData;
-		}
-		if(((secondObject) instanceof openfl_geom_Point)) {
-			var secondPoint = secondObject;
-			var x = secondPoint.x - firstPoint.x | 0;
-			var y = secondPoint.y - firstPoint.y | 0;
-			if(this.rect.contains(x,y)) {
-				var pixel = this.getPixel32(x,y);
-				if((pixel >> 24 & 255) > firstAlphaThreshold) {
-					return true;
-				}
-			}
-		} else if(((secondObject) instanceof openfl_display_BitmapData)) {
-			var secondBitmapData = secondObject;
-			var x;
-			var y;
-			if(secondBitmapDataPoint == null) {
-				x = 0;
-				y = 0;
-			} else {
-				x = Math.round(secondBitmapDataPoint.x - firstPoint.x);
-				y = Math.round(secondBitmapDataPoint.y - firstPoint.y);
-			}
-			var hitRect = openfl_geom_Rectangle.__pool.get();
-			hitRect.setTo(x,y,secondBitmapData.width,secondBitmapData.height);
-			if(this.rect.intersects(hitRect)) {
-				if(x < 0) {
-					hitRect.x = 0;
-					hitRect.width = Math.min(secondBitmapData.width + x,this.width);
-				} else {
-					hitRect.width = Math.min(secondBitmapData.width,this.width - x);
-				}
-				if(y < 0) {
-					hitRect.y = 0;
-					hitRect.height = Math.min(secondBitmapData.height + y,this.height);
-				} else {
-					hitRect.height = Math.min(secondBitmapData.height,this.height - y);
-				}
-				var pixels = this.getPixels(hitRect);
-				hitRect.x = x < 0 ? -x : 0;
-				hitRect.y = y < 0 ? -y : 0;
-				var testPixels = secondBitmapData.getPixels(hitRect);
-				var length = hitRect.width * hitRect.height | 0;
-				var pixel;
-				var testPixel;
-				var _g = 0;
-				var _g1 = length;
-				while(_g < _g1) {
-					var i = _g++;
-					pixel = pixels.readUnsignedInt();
-					testPixel = testPixels.readUnsignedInt();
-					if(UInt.gt(pixel >>> 24 & 255,firstAlphaThreshold) && UInt.gt(testPixel >>> 24 & 255,secondAlphaThreshold)) {
-						openfl_geom_Rectangle.__pool.release(hitRect);
-						return true;
-					}
-				}
-			}
-			openfl_geom_Rectangle.__pool.release(hitRect);
-		} else if(((secondObject) instanceof openfl_geom_Rectangle)) {
-			var secondRectangle = openfl_geom_Rectangle.__pool.get();
-			secondRectangle.copyFrom(secondObject);
-			secondRectangle.offset(-firstPoint.x,-firstPoint.y);
-			secondRectangle.__contract(0,0,this.width,this.height);
-			if(secondRectangle.width > 0 && secondRectangle.height > 0) {
-				var pixels = this.getPixels(secondRectangle);
-				var length = UInt.toFloat(openfl_utils_ByteArray.get_length(pixels)) / UInt.toFloat(4) | 0;
-				var pixel;
-				var _g = 0;
-				var _g1 = length;
-				while(_g < _g1) {
-					var i = _g++;
-					pixel = pixels.readUnsignedInt();
-					if(UInt.gt(pixel >>> 24 & 255,firstAlphaThreshold)) {
-						openfl_geom_Rectangle.__pool.release(secondRectangle);
-						return true;
-					}
-				}
-			}
-			openfl_geom_Rectangle.__pool.release(secondRectangle);
-		}
-		return false;
-	}
-	,lock: function() {
-	}
-	,merge: function(sourceBitmapData,sourceRect,destPoint,redMultiplier,greenMultiplier,blueMultiplier,alphaMultiplier) {
-		if(!this.readable || sourceBitmapData == null || !sourceBitmapData.readable || sourceRect == null || destPoint == null) {
-			return;
-		}
-		this.image.merge(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),redMultiplier,greenMultiplier,blueMultiplier,alphaMultiplier);
-	}
-	,noise: function(randomSeed,low,high,channelOptions,grayScale) {
-		if(grayScale == null) {
-			grayScale = false;
-		}
-		if(channelOptions == null) {
-			channelOptions = 7;
-		}
-		if(high == null) {
-			high = 255;
-		}
-		if(low == null) {
-			low = 0;
-		}
-		if(!this.readable) {
-			return;
-		}
-		var func = function() {
-			randomSeed = randomSeed * 1103515245 + 12345;
-			return (Math.abs(randomSeed / 65536) | 0) % 32768;
-		};
-		var rand = func;
-		rand();
-		var range = high - low;
-		var redChannel = (channelOptions & 1) == 1;
-		var greenChannel = (channelOptions & 2) >> 1 == 1;
-		var blueChannel = (channelOptions & 4) >> 2 == 1;
-		var alphaChannel = (channelOptions & 8) >> 3 == 1;
-		var _g = 0;
-		var _g1 = this.height;
-		while(_g < _g1) {
-			var y = _g++;
-			var _g2 = 0;
-			var _g3 = this.width;
-			while(_g2 < _g3) {
-				var x = _g2++;
-				var red = 0;
-				var blue = 0;
-				var green = 0;
-				var alpha = 255;
-				if(grayScale) {
-					blue = low + rand() % range;
-					green = blue;
-					red = green;
-					alpha = 255;
-				} else {
-					if(redChannel) {
-						red = low + rand() % range;
-					}
-					if(greenChannel) {
-						green = low + rand() % range;
-					}
-					if(blueChannel) {
-						blue = low + rand() % range;
-					}
-					if(alphaChannel) {
-						alpha = low + rand() % range;
-					}
-				}
-				var rgb = alpha;
-				rgb = (rgb << 8) + red;
-				rgb = (rgb << 8) + green;
-				rgb = (rgb << 8) + blue;
-				this.setPixel32(x,y,rgb);
-			}
-		}
-	}
-	,paletteMap: function(sourceBitmapData,sourceRect,destPoint,redArray,greenArray,blueArray,alphaArray) {
-		var sw = sourceRect.width | 0;
-		var sh = sourceRect.height | 0;
-		var pixels = sourceBitmapData.getPixels(sourceRect);
-		var pixelValue;
-		var r;
-		var g;
-		var b;
-		var a;
-		var color;
-		var _g = 0;
-		var _g1 = sh * sw;
-		while(_g < _g1) {
-			var i = _g++;
-			pixelValue = pixels.readUnsignedInt();
-			a = alphaArray == null ? pixelValue & -16777216 : alphaArray[pixelValue >> 24 & 255];
-			r = redArray == null ? pixelValue & 16711680 : redArray[pixelValue >> 16 & 255];
-			g = greenArray == null ? pixelValue & 65280 : greenArray[pixelValue >> 8 & 255];
-			b = blueArray == null ? pixelValue & 255 : blueArray[pixelValue & 255];
-			color = a + r + g + b;
-			pixels.position = i * 4;
-			pixels.writeUnsignedInt(color);
-		}
-		pixels.position = 0;
-		var destRect = openfl_geom_Rectangle.__pool.get();
-		destRect.setTo(destPoint.x,destPoint.y,sw,sh);
-		this.setPixels(destRect,pixels);
-		openfl_geom_Rectangle.__pool.release(destRect);
-	}
-	,perlinNoise: function(baseX,baseY,numOctaves,randomSeed,stitch,fractalNoise,channelOptions,grayScale,offsets) {
-		if(grayScale == null) {
-			grayScale = false;
-		}
-		if(channelOptions == null) {
-			channelOptions = 7;
-		}
-		if(!this.readable) {
-			return;
-		}
-		var noise = new openfl_display__$internal_PerlinNoise(randomSeed,numOctaves,channelOptions,grayScale,0.5,stitch,0.15);
-		noise.fill(this,baseX,baseY,0);
-	}
-	,scroll: function(x,y) {
-		if(!this.readable) {
-			return;
-		}
-		this.image.scroll(x,y);
-	}
-	,setPixel: function(x,y,color) {
-		if(!this.readable) {
-			return;
-		}
-		this.image.setPixel(x,y,color,1);
-	}
-	,setPixel32: function(x,y,color) {
-		if(!this.readable) {
-			return;
-		}
-		this.image.setPixel32(x,y,color,1);
-	}
-	,setPixels: function(rect,byteArray) {
-		if(!this.readable || rect == null) {
-			return;
-		}
-		var length = rect.width * rect.height * 4;
-		if(UInt.toFloat(byteArray.length - byteArray.position) < length) {
-			throw new openfl_errors_Error("End of file was encountered.",2030);
-		}
-		this.image.setPixels(rect.__toLimeRectangle(),openfl_utils_ByteArray.toBytePointer(byteArray),1,openfl_utils_Endian.toLimeEndian(byteArray.__endian));
-	}
-	,setVector: function(rect,inputVector) {
-		var byteArray = new openfl_utils_ByteArrayData(0);
-		openfl_utils_ByteArray.set_length(byteArray,inputVector.get_length() * 4);
-		var color = inputVector.iterator();
-		while(color.hasNext()) {
-			var color1 = color.next();
-			byteArray.writeUnsignedInt(color1);
-		}
-		byteArray.position = 0;
-		this.setPixels(rect,byteArray);
-	}
-	,threshold: function(sourceBitmapData,sourceRect,destPoint,operation,threshold,color,mask,copySource) {
-		if(copySource == null) {
-			copySource = false;
-		}
-		if(mask == null) {
-			mask = -1;
-		}
-		if(color == null) {
-			color = 0;
-		}
-		if(sourceBitmapData == null || sourceRect == null || destPoint == null || sourceRect.x > sourceBitmapData.width || sourceRect.y > sourceBitmapData.height || destPoint.x > this.width || destPoint.y > this.height) {
-			return 0;
-		}
-		return this.image.threshold(sourceBitmapData.image,sourceRect.__toLimeRectangle(),destPoint.__toLimeVector2(),operation,threshold,color,mask,copySource,1);
-	}
-	,unlock: function(changeRect) {
-	}
-	,__applyAlpha: function(alpha) {
-		lime__$internal_graphics_ImageCanvasUtil.convertToCanvas(this.image);
-		lime__$internal_graphics_ImageCanvasUtil.createImageData(this.image);
-		var data = this.image.buffer.data;
-		var _g = 0;
-		var _g1 = openfl_utils_ByteArray.get_length(alpha);
-		while(_g < _g1) {
-			var i = _g++;
-			data[i * 4 + 3] = alpha.readUnsignedByte();
-		}
-		this.image.version++;
-	}
-	,__drawCairo: function(source,renderer) {
-	}
-	,__drawCanvas: function(source,renderer) {
-		var buffer = this.image.buffer;
-		if(!renderer.__allowSmoothing) {
-			renderer.applySmoothing(buffer.__srcContext,false);
-		}
-		renderer.__render(source);
-		if(!renderer.__allowSmoothing) {
-			renderer.applySmoothing(buffer.__srcContext,true);
-		}
-		buffer.__srcContext.setTransform(1,0,0,1,0,0);
-		buffer.__srcImageData = null;
-		buffer.data = null;
-		this.image.dirty = true;
-		this.image.version++;
-	}
-	,__drawGL: function(source,renderer) {
-		var context = renderer.__context3D;
-		var cacheRTT = context.__state.renderToTexture;
-		var cacheRTTDepthStencil = context.__state.renderToTextureDepthStencil;
-		var cacheRTTAntiAlias = context.__state.renderToTextureAntiAlias;
-		var cacheRTTSurfaceSelector = context.__state.renderToTextureSurfaceSelector;
-		context.setRenderToTexture(this.getTexture(context),true);
-		renderer.__render(source);
-		if(cacheRTT != null) {
-			context.setRenderToTexture(cacheRTT,cacheRTTDepthStencil,cacheRTTAntiAlias,cacheRTTSurfaceSelector);
-		} else {
-			context.setRenderToBackBuffer();
-		}
-	}
-	,__fillRect: function(rect,color,allowFramebuffer) {
-		if(rect == null) {
-			return;
-		}
-		if(this.transparent && (color & -16777216) == 0) {
-			color = 0;
-		}
-		if(allowFramebuffer && this.__texture != null && this.__texture.__glFramebuffer != null && openfl_Lib.get_current().stage.__renderer.__type == "opengl") {
-			var renderer = openfl_Lib.get_current().stage.__renderer;
-			var context = renderer.__context3D;
-			var color1 = color;
-			var useScissor = !this.rect.equals(rect);
-			var cacheRTT = context.__state.renderToTexture;
-			var cacheRTTDepthStencil = context.__state.renderToTextureDepthStencil;
-			var cacheRTTAntiAlias = context.__state.renderToTextureAntiAlias;
-			var cacheRTTSurfaceSelector = context.__state.renderToTextureSurfaceSelector;
-			context.setRenderToTexture(this.__texture);
-			if(useScissor) {
-				var x = Math.floor(rect.x);
-				var y = Math.floor(rect.y);
-				var width = rect.width > 0 ? Math.ceil(rect.get_right()) - x : 0;
-				var height = rect.height > 0 ? Math.ceil(rect.get_bottom()) - y : 0;
-				if(context.__backBufferWantsBestResolution) {
-					x = Math.floor(rect.x / context.__stage.window.__scale);
-					y = Math.floor(rect.y / context.__stage.window.__scale);
-					width = rect.width > 0 ? Math.ceil(rect.get_right() / context.__stage.window.__scale) - x : 0;
-					height = rect.height > 0 ? Math.ceil(rect.get_bottom() / context.__stage.window.__scale) - y : 0;
-				}
-				openfl_display_BitmapData.__fillRectRectangle.setTo(x,y,width,height);
-				context.setScissorRectangle(openfl_display_BitmapData.__fillRectRectangle);
-			}
-			context.__clear(useScissor,(color1 >>> 16 & 255) / 255,(color1 >>> 8 & 255) / 255,(color1 & 255) / 255,this.transparent ? (color1 >>> 24 & 255) / 255 : 1,0,0,1);
-			if(useScissor) {
-				context.setScissorRectangle(null);
-			}
-			if(cacheRTT != null) {
-				context.setRenderToTexture(cacheRTT,cacheRTTDepthStencil,cacheRTTAntiAlias,cacheRTTSurfaceSelector);
-			} else {
-				context.setRenderToBackBuffer();
-			}
-		} else if(this.readable) {
-			this.image.fillRect(rect.__toLimeRectangle(),color,1);
-		}
-	}
-	,__fromBase64: function(base64,type) {
-		var image = lime_graphics_Image.fromBase64(base64,type);
-		this.__fromImage(image);
-	}
-	,__fromBytes: function(bytes,rawAlpha) {
-		var image = lime_graphics_Image.fromBytes(openfl_utils_ByteArray.toBytes(bytes));
-		this.__fromImage(image);
-		if(rawAlpha != null) {
-			this.__applyAlpha(rawAlpha);
-		}
-	}
-	,__fromFile: function(path) {
-		var image = lime_graphics_Image.fromFile(path);
-		this.__fromImage(image);
-	}
-	,__fromImage: function(image) {
-		if(image != null && image.buffer != null) {
-			this.image = image;
-			this.width = image.width;
-			this.height = image.height;
-			this.rect = new openfl_geom_Rectangle(0,0,image.width,image.height);
-			this.__textureWidth = this.width;
-			this.__textureHeight = this.height;
-			this.readable = true;
-			this.__isValid = true;
-		}
-	}
-	,__getBounds: function(rect,matrix) {
-		var bounds = openfl_geom_Rectangle.__pool.get();
-		this.rect.__transform(bounds,matrix);
-		rect.__expand(bounds.x,bounds.y,bounds.width,bounds.height);
-		openfl_geom_Rectangle.__pool.release(bounds);
-	}
-	,__loadFromBase64: function(base64,type) {
-		var _gthis = this;
-		return lime_graphics_Image.loadFromBase64(base64,type).then(function(image) {
-			_gthis.__fromImage(image);
-			return lime_app_Future.withValue(_gthis);
-		});
-	}
-	,__loadFromBytes: function(bytes,rawAlpha) {
-		var _gthis = this;
-		return lime_graphics_Image.loadFromBytes(openfl_utils_ByteArray.toBytes(bytes)).then(function(image) {
-			_gthis.__fromImage(image);
-			if(rawAlpha != null) {
-				_gthis.__applyAlpha(rawAlpha);
-			}
-			return lime_app_Future.withValue(_gthis);
-		});
-	}
-	,__loadFromFile: function(path) {
-		var _gthis = this;
-		return lime_graphics_Image.loadFromFile(path).then(function(image) {
-			_gthis.__fromImage(image);
-			return lime_app_Future.withValue(_gthis);
-		});
-	}
-	,__resize: function(width,height) {
-		this.width = width;
-		this.height = height;
-		this.rect.width = width;
-		this.rect.height = height;
-		this.__textureWidth = width;
-		this.__textureHeight = height;
-	}
-	,__setUVRect: function(context,x,y,width,height) {
-		var buffer = this.getVertexBuffer(context);
-		if(buffer != null && (width != this.__uvRect.width || height != this.__uvRect.height || x != this.__uvRect.x || y != this.__uvRect.y)) {
-			var gl = context.gl;
-			if(this.__uvRect == null) {
-				this.__uvRect = new openfl_geom_Rectangle();
-			}
-			this.__uvRect.setTo(x,y,width,height);
-			var uvX = this.__textureWidth > 0 ? x / this.__textureWidth : 0;
-			var uvY = this.__textureHeight > 0 ? y / this.__textureHeight : 0;
-			var uvWidth = this.__textureWidth > 0 ? width / this.__textureWidth : 0;
-			var uvHeight = this.__textureHeight > 0 ? height / this.__textureHeight : 0;
-			this.__vertexBufferData[0] = width;
-			this.__vertexBufferData[1] = height;
-			this.__vertexBufferData[3] = uvX + uvWidth;
-			this.__vertexBufferData[4] = uvY + uvHeight;
-			this.__vertexBufferData[15] = height;
-			this.__vertexBufferData[17] = uvX;
-			this.__vertexBufferData[18] = uvY + uvHeight;
-			this.__vertexBufferData[28] = width;
-			this.__vertexBufferData[31] = uvX + uvWidth;
-			this.__vertexBufferData[32] = uvY;
-			this.__vertexBufferData[45] = uvX;
-			this.__vertexBufferData[46] = uvY;
-			this.__vertexBuffer.uploadFromTypedArray(lime_utils_Float32Array.toArrayBufferView(this.__vertexBufferData));
-		}
-	}
-	,__sync: function() {
-		lime__$internal_graphics_ImageCanvasUtil.sync(this.image,false);
-	}
-	,__update: function(transformOnly,updateChildren) {
-		this.__updateTransforms();
-	}
-	,__updateTransforms: function(overrideTransform) {
-		if(overrideTransform == null) {
-			this.__worldTransform.identity();
-		} else {
-			this.__worldTransform.copyFrom(overrideTransform);
-		}
-		this.__renderTransform.copyFrom(this.__worldTransform);
-	}
-	,__class__: openfl_display_BitmapData
-};
 var flixel_input_mouse__$FlxMouse_GraphicCursor = function(width,height,transparent,fillRGBA,onload) {
 	if(fillRGBA == null) {
 		fillRGBA = -1;
@@ -35194,13 +37413,6 @@ var flixel_input_mouse_FlxMouse = function(cursorContainer) {
 	this._stage = openfl_Lib.get_current().stage;
 	this._stage.addEventListener("mouseDown",($_=this._leftButton,$bind($_,$_.onDown)));
 	this._stage.addEventListener("mouseUp",($_=this._leftButton,$bind($_,$_.onUp)));
-	this._middleButton = new flixel_input_mouse_FlxMouseButton(-2);
-	this._rightButton = new flixel_input_mouse_FlxMouseButton(-3);
-	this._stage.addEventListener("middleMouseDown",($_=this._middleButton,$bind($_,$_.onDown)));
-	this._stage.addEventListener("middleMouseUp",($_=this._middleButton,$bind($_,$_.onUp)));
-	this._stage.addEventListener("rightMouseDown",($_=this._rightButton,$bind($_,$_.onDown)));
-	this._stage.addEventListener("rightMouseUp",($_=this._rightButton,$bind($_,$_.onUp)));
-	this._stage.addEventListener("mouseLeave",$bind(this,this.onMouseLeave));
 	this._stage.addEventListener("mouseWheel",$bind(this,this.onMouseWheel));
 	flixel_FlxG.signals.postGameStart.add($bind(this,this.onGameStart));
 	openfl_ui_Mouse.hide();
@@ -35258,25 +37470,16 @@ flixel_input_mouse_FlxMouse.prototype = $extend(flixel_input_FlxPointer.prototyp
 		if(this._stage != null) {
 			this._stage.removeEventListener("mouseDown",($_=this._leftButton,$bind($_,$_.onDown)));
 			this._stage.removeEventListener("mouseUp",($_=this._leftButton,$bind($_,$_.onUp)));
-			this._stage.removeEventListener("middleMouseDown",($_=this._middleButton,$bind($_,$_.onDown)));
-			this._stage.removeEventListener("middleMouseUp",($_=this._middleButton,$bind($_,$_.onUp)));
-			this._stage.removeEventListener("rightMouseDown",($_=this._rightButton,$bind($_,$_.onDown)));
-			this._stage.removeEventListener("rightMouseUp",($_=this._rightButton,$bind($_,$_.onUp)));
-			this._stage.removeEventListener("mouseLeave",$bind(this,this.onMouseLeave));
 			this._stage.removeEventListener("mouseWheel",$bind(this,this.onMouseWheel));
 		}
 		this.cursorContainer = null;
 		this.cursor = null;
 		this._leftButton = flixel_util_FlxDestroyUtil.destroy(this._leftButton);
-		this._middleButton = flixel_util_FlxDestroyUtil.destroy(this._middleButton);
-		this._rightButton = flixel_util_FlxDestroyUtil.destroy(this._rightButton);
 		this._cursorBitmapData = flixel_util_FlxDestroyUtil.dispose(this._cursorBitmapData);
 		flixel_FlxG.signals.postGameStart.remove($bind(this,this.onGameStart));
 	}
 	,reset: function() {
 		this._leftButton.reset();
-		this._middleButton.reset();
-		this._rightButton.reset();
 	}
 	,update: function() {
 		this._prevX = this.x;
@@ -35289,8 +37492,6 @@ flixel_input_mouse_FlxMouse.prototype = $extend(flixel_input_FlxPointer.prototyp
 			this.cursorContainer.set_y(flixel_FlxG.game.get_mouseY());
 		}
 		this._leftButton.update();
-		this._middleButton.update();
-		this._rightButton.update();
 		if(!this._wheelUsed) {
 			this.wheel = 0;
 		}
@@ -35316,10 +37517,6 @@ flixel_input_mouse_FlxMouse.prototype = $extend(flixel_input_FlxPointer.prototyp
 			this._wheelUsed = true;
 			this.wheel = flashEvent.delta;
 		}
-	}
-	,onMouseLeave: function(_) {
-		this._rightButton.onUp();
-		this._middleButton.onUp();
 	}
 	,get_justMoved: function() {
 		if(this._prevX == this.x) {
@@ -35376,56 +37573,6 @@ flixel_input_mouse_FlxMouse.prototype = $extend(flixel_input_FlxPointer.prototyp
 	}
 	,get_justPressedTimeInTicks: function() {
 		return this._leftButton.justPressedTimeInTicks;
-	}
-	,get_pressedRight: function() {
-		var _this = this._rightButton;
-		if(_this.current != 1) {
-			return _this.current == 2;
-		} else {
-			return true;
-		}
-	}
-	,get_justPressedRight: function() {
-		return this._rightButton.current == 2;
-	}
-	,get_releasedRight: function() {
-		var _this = this._rightButton;
-		if(_this.current != 0) {
-			return _this.current == -1;
-		} else {
-			return true;
-		}
-	}
-	,get_justReleasedRight: function() {
-		return this._rightButton.current == -1;
-	}
-	,get_justPressedTimeInTicksRight: function() {
-		return this._rightButton.justPressedTimeInTicks;
-	}
-	,get_pressedMiddle: function() {
-		var _this = this._middleButton;
-		if(_this.current != 1) {
-			return _this.current == 2;
-		} else {
-			return true;
-		}
-	}
-	,get_justPressedMiddle: function() {
-		return this._middleButton.current == 2;
-	}
-	,get_releasedMiddle: function() {
-		var _this = this._middleButton;
-		if(_this.current != 0) {
-			return _this.current == -1;
-		} else {
-			return true;
-		}
-	}
-	,get_justReleasedMiddle: function() {
-		return this._middleButton.current == -1;
-	}
-	,get_justPressedTimeInTicksMiddle: function() {
-		return this._middleButton.justPressedTimeInTicks;
 	}
 	,showSystemCursor: function() {
 		this.cursorContainer.set_visible(false);
@@ -35495,7 +37642,7 @@ flixel_input_mouse_FlxMouse.prototype = $extend(flixel_input_FlxPointer.prototyp
 		return this.cursor = value;
 	}
 	,__class__: flixel_input_mouse_FlxMouse
-	,__properties__: $extend(flixel_input_FlxPointer.prototype.__properties__,{get__prevScreenY:"get__prevScreenY",get__prevScreenX:"get__prevScreenX",set__cursor:"set__cursor",get__cursor:"get__cursor",get_justPressedTimeInTicksMiddle:"get_justPressedTimeInTicksMiddle",get_justReleasedMiddle:"get_justReleasedMiddle",get_releasedMiddle:"get_releasedMiddle",get_justPressedMiddle:"get_justPressedMiddle",get_pressedMiddle:"get_pressedMiddle",get_justPressedTimeInTicksRight:"get_justPressedTimeInTicksRight",get_justReleasedRight:"get_justReleasedRight",get_releasedRight:"get_releasedRight",get_justPressedRight:"get_justPressedRight",get_pressedRight:"get_pressedRight",get_justPressedTimeInTicks:"get_justPressedTimeInTicks",get_justReleased:"get_justReleased",get_released:"get_released",get_justPressed:"get_justPressed",get_pressed:"get_pressed",get_deltaViewY:"get_deltaViewY",get_deltaViewX:"get_deltaViewX",get_deltaScreenY:"get_deltaScreenY",get_deltaScreenX:"get_deltaScreenX",get_deltaY:"get_deltaY",get_deltaX:"get_deltaX",get_justMoved:"get_justMoved",set_useSystemCursor:"set_useSystemCursor",set_visible:"set_visible"})
+	,__properties__: $extend(flixel_input_FlxPointer.prototype.__properties__,{get__prevScreenY:"get__prevScreenY",get__prevScreenX:"get__prevScreenX",set__cursor:"set__cursor",get__cursor:"get__cursor",get_justPressedTimeInTicks:"get_justPressedTimeInTicks",get_justReleased:"get_justReleased",get_released:"get_released",get_justPressed:"get_justPressed",get_pressed:"get_pressed",get_deltaViewY:"get_deltaViewY",get_deltaViewX:"get_deltaViewX",get_deltaScreenY:"get_deltaScreenY",get_deltaScreenX:"get_deltaScreenX",get_deltaY:"get_deltaY",get_deltaX:"get_deltaX",get_justMoved:"get_justMoved",set_useSystemCursor:"set_useSystemCursor",set_visible:"set_visible"})
 });
 var flixel_input_mouse_FlxMouseButton = function(ID) {
 	this.justPressedTimeInTicks = -1;
@@ -35516,13 +37663,10 @@ $hxClasses["flixel.input.mouse.FlxMouseButton"] = flixel_input_mouse_FlxMouseBut
 flixel_input_mouse_FlxMouseButton.__name__ = "flixel.input.mouse.FlxMouseButton";
 flixel_input_mouse_FlxMouseButton.__interfaces__ = [flixel_util_IFlxDestroyable];
 flixel_input_mouse_FlxMouseButton.getByID = function(id) {
-	switch(id) {
-	case -3:
-		return flixel_FlxG.mouse._rightButton;
-	case -2:
-		return flixel_FlxG.mouse._middleButton;
-	case -1:
+	if(id == -1) {
 		return flixel_FlxG.mouse._leftButton;
+	} else {
+		return null;
 	}
 };
 flixel_input_mouse_FlxMouseButton.__super__ = flixel_input_FlxInput;
@@ -48583,7 +50727,7 @@ flixel_tweens_FlxTweenManager.prototype = $extend(flixel_FlxBasic.prototype,{
 		}
 		return Tween;
 	}
-	,add_flixel_tweens_FlxTween: function(Tween,Start) {
+	,add_flixel_tweens_misc_VarTween: function(Tween,Start) {
 		if(Start == null) {
 			Start = false;
 		}
@@ -48596,7 +50740,7 @@ flixel_tweens_FlxTweenManager.prototype = $extend(flixel_FlxBasic.prototype,{
 		}
 		return Tween;
 	}
-	,add_flixel_tweens_misc_VarTween: function(Tween,Start) {
+	,add_flixel_tweens_FlxTween: function(Tween,Start) {
 		if(Start == null) {
 			Start = false;
 		}
@@ -49982,6 +52126,1611 @@ flixel_tweens_motion_QuadPath.prototype = $extend(flixel_tweens_motion_Motion.pr
 	}
 	,__class__: flixel_tweens_motion_QuadPath
 });
+var flixel_ui_FlxBar = function(x,y,direction,width,height,parentRef,variable,min,max,showBorder) {
+	if(showBorder == null) {
+		showBorder = false;
+	}
+	if(max == null) {
+		max = 100;
+	}
+	if(min == null) {
+		min = 0;
+	}
+	if(variable == null) {
+		variable = "";
+	}
+	if(height == null) {
+		height = 10;
+	}
+	if(width == null) {
+		width = 100;
+	}
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	this._maxPercent = 100;
+	this.numDivisions = 100;
+	this.killOnEmpty = false;
+	this.fixedPosition = true;
+	flixel_FlxSprite.call(this,x,y);
+	if(direction == null) {
+		direction = flixel_ui_FlxBarFillDirection.LEFT_TO_RIGHT;
+	}
+	this.barWidth = width;
+	this.barHeight = height;
+	this._filledBarPoint = new openfl_geom_Point();
+	this._filledBarRect = new openfl_geom_Rectangle();
+	if(flixel_FlxG.renderBlit) {
+		this._zeroOffset = new openfl_geom_Point();
+		this._emptyBarRect = new openfl_geom_Rectangle();
+		this.makeGraphic(width,height,0,true);
+	} else {
+		var _this = flixel_math_FlxRect._pool.get();
+		var X = 0;
+		var Y = 0;
+		var Width = 0;
+		var Height = 0;
+		if(Height == null) {
+			Height = 0;
+		}
+		if(Width == null) {
+			Width = 0;
+		}
+		if(Y == null) {
+			Y = 0;
+		}
+		if(X == null) {
+			X = 0;
+		}
+		_this.x = X;
+		_this.y = Y;
+		_this.width = Width;
+		_this.height = Height;
+		var rect = _this;
+		rect._inPool = false;
+		this._filledFlxRect = rect;
+	}
+	if(parentRef != null) {
+		this.parent = parentRef;
+		this.parentVariable = variable;
+	}
+	this.set_fillDirection(direction);
+	this.createFilledBar(-16756480,-16714752,showBorder);
+	this.setRange(min,max);
+};
+$hxClasses["flixel.ui.FlxBar"] = flixel_ui_FlxBar;
+flixel_ui_FlxBar.__name__ = "flixel.ui.FlxBar";
+flixel_ui_FlxBar.__super__ = flixel_FlxSprite;
+flixel_ui_FlxBar.prototype = $extend(flixel_FlxSprite.prototype,{
+	destroy: function() {
+		this.positionOffset = flixel_util_FlxDestroyUtil.put(this.positionOffset);
+		if(flixel_FlxG.renderTile) {
+			this.set_frontFrames(null);
+			this._filledFlxRect = flixel_util_FlxDestroyUtil.put(this._filledFlxRect);
+		} else {
+			this._emptyBarRect = null;
+			this._zeroOffset = null;
+			this._emptyBar = flixel_util_FlxDestroyUtil.dispose(this._emptyBar);
+			this._filledBar = flixel_util_FlxDestroyUtil.dispose(this._filledBar);
+		}
+		this._filledBarRect = null;
+		this._filledBarPoint = null;
+		this.parent = null;
+		this.emptyCallback = null;
+		this.filledCallback = null;
+		flixel_FlxSprite.prototype.destroy.call(this);
+	}
+	,trackParent: function(offsetX,offsetY) {
+		this.fixedPosition = false;
+		var x = offsetX;
+		var y = offsetY;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		var x1 = x;
+		var y1 = y;
+		if(y1 == null) {
+			y1 = 0;
+		}
+		if(x1 == null) {
+			x1 = 0;
+		}
+		var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+		point._inPool = false;
+		this.positionOffset = point;
+		if(Object.prototype.hasOwnProperty.call(this.parent,"scrollFactor")) {
+			this.scrollFactor.set_x(this.parent.scrollFactor.x);
+			this.scrollFactor.set_y(this.parent.scrollFactor.y);
+		}
+	}
+	,setParent: function(parentRef,variable,track,offsetX,offsetY) {
+		if(offsetY == null) {
+			offsetY = 0;
+		}
+		if(offsetX == null) {
+			offsetX = 0;
+		}
+		if(track == null) {
+			track = false;
+		}
+		this.parent = parentRef;
+		this.parentVariable = variable;
+		if(track) {
+			this.trackParent(offsetX,offsetY);
+		}
+		this.updateValueFromParent();
+	}
+	,stopTrackingParent: function(posX,posY) {
+		this.fixedPosition = true;
+		this.set_x(posX);
+		this.set_y(posY);
+	}
+	,setCallbacks: function(onEmpty,onFilled,killOnEmpty) {
+		if(killOnEmpty == null) {
+			killOnEmpty = false;
+		}
+		this.emptyCallback = onEmpty != null ? onEmpty : this.emptyCallback;
+		this.filledCallback = onFilled != null ? onFilled : this.filledCallback;
+		this.killOnEmpty = killOnEmpty;
+	}
+	,setRange: function(min,max) {
+		if(max <= min) {
+			throw haxe_Exception.thrown("FlxBar: max cannot be less than or equal to min");
+		}
+		this.min = min;
+		this.max = max;
+		this.range = max - min;
+		this.pct = this.range / this._maxPercent;
+		this.pxPerPercent = this._fillHorizontal ? this.barWidth / this._maxPercent : this.barHeight / this._maxPercent;
+		var f = this.get_value();
+		if(!isNaN(f)) {
+			this.set_value(Math.max(min,Math.min(this.get_value(),max)));
+		} else {
+			this.set_value(min);
+		}
+	}
+	,createFilledBar: function(empty,fill,showBorder,border,borderSize) {
+		if(borderSize == null) {
+			borderSize = 1;
+		}
+		if(border == null) {
+			border = -1;
+		}
+		if(showBorder == null) {
+			showBorder = false;
+		}
+		this.createColoredEmptyBar(empty,showBorder,border,borderSize);
+		this.createColoredFilledBar(fill,showBorder,border,borderSize);
+		return this;
+	}
+	,createColoredEmptyBar: function(empty,showBorder,border,borderSize) {
+		if(borderSize == null) {
+			borderSize = 1;
+		}
+		if(border == null) {
+			border = -1;
+		}
+		if(showBorder == null) {
+			showBorder = false;
+		}
+		if(flixel_FlxG.renderTile) {
+			var emptyKey = "empty: " + this.barWidth + "x" + this.barHeight + ":" + ("0x" + StringTools.hex(empty >> 24 & 255,2) + StringTools.hex(empty >> 16 & 255,2) + StringTools.hex(empty >> 8 & 255,2) + StringTools.hex(empty & 255,2));
+			if(showBorder) {
+				emptyKey += ",border: " + ("0x" + StringTools.hex(border >> 24 & 255,2) + StringTools.hex(border >> 16 & 255,2) + StringTools.hex(border >> 8 & 255,2) + StringTools.hex(border & 255,2)) + "borderSize: " + borderSize;
+			}
+			if(flixel_FlxG.bitmap._cache.h[emptyKey] == null) {
+				var emptyBar = null;
+				if(showBorder) {
+					emptyBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+					emptyBar.fillRect(new openfl_geom_Rectangle(borderSize,borderSize,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2),empty);
+				} else {
+					emptyBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,empty);
+				}
+				flixel_FlxG.bitmap.add(emptyBar,false,emptyKey);
+			}
+			this.set_frames(flixel_FlxG.bitmap._cache.h[emptyKey].get_imageFrame());
+		} else {
+			if(showBorder) {
+				this._emptyBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+				this._emptyBar.fillRect(new openfl_geom_Rectangle(borderSize,borderSize,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2),empty);
+			} else {
+				this._emptyBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,empty);
+			}
+			this._emptyBarRect.setTo(0,0,this.barWidth,this.barHeight);
+			this.updateEmptyBar();
+		}
+		return this;
+	}
+	,createColoredFilledBar: function(fill,showBorder,border,borderSize) {
+		if(borderSize == null) {
+			borderSize = 1;
+		}
+		if(border == null) {
+			border = -1;
+		}
+		if(showBorder == null) {
+			showBorder = false;
+		}
+		if(flixel_FlxG.renderTile) {
+			var filledKey = "filled: " + this.barWidth + "x" + this.barHeight + ":" + ("0x" + StringTools.hex(fill >> 24 & 255,2) + StringTools.hex(fill >> 16 & 255,2) + StringTools.hex(fill >> 8 & 255,2) + StringTools.hex(fill & 255,2));
+			if(showBorder) {
+				filledKey += ",border: " + ("0x" + StringTools.hex(border >> 24 & 255,2) + StringTools.hex(border >> 16 & 255,2) + StringTools.hex(border >> 8 & 255,2) + StringTools.hex(border & 255,2)) + "borderSize: " + borderSize;
+			}
+			if(flixel_FlxG.bitmap._cache.h[filledKey] == null) {
+				var filledBar = null;
+				if(showBorder) {
+					filledBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+					filledBar.fillRect(new openfl_geom_Rectangle(borderSize,borderSize,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2),fill);
+				} else {
+					filledBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,fill);
+				}
+				flixel_FlxG.bitmap.add(filledBar,false,filledKey);
+			}
+			this.set_frontFrames(flixel_FlxG.bitmap._cache.h[filledKey].get_imageFrame());
+		} else {
+			if(showBorder) {
+				this._filledBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+				this._filledBar.fillRect(new openfl_geom_Rectangle(borderSize,borderSize,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2),fill);
+			} else {
+				this._filledBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,fill);
+			}
+			this._filledBarRect.setTo(0,0,this.barWidth,this.barHeight);
+			this.updateFilledBar();
+		}
+		return this;
+	}
+	,createGradientBar: function(empty,fill,chunkSize,rotation,showBorder,border,borderSize) {
+		if(borderSize == null) {
+			borderSize = 1;
+		}
+		if(border == null) {
+			border = -1;
+		}
+		if(showBorder == null) {
+			showBorder = false;
+		}
+		if(rotation == null) {
+			rotation = 180;
+		}
+		if(chunkSize == null) {
+			chunkSize = 1;
+		}
+		this.createGradientEmptyBar(empty,chunkSize,rotation,showBorder,border,borderSize);
+		this.createGradientFilledBar(fill,chunkSize,rotation,showBorder,border,borderSize);
+		return this;
+	}
+	,createGradientEmptyBar: function(empty,chunkSize,rotation,showBorder,border,borderSize) {
+		if(borderSize == null) {
+			borderSize = 1;
+		}
+		if(border == null) {
+			border = -1;
+		}
+		if(showBorder == null) {
+			showBorder = false;
+		}
+		if(rotation == null) {
+			rotation = 180;
+		}
+		if(chunkSize == null) {
+			chunkSize = 1;
+		}
+		if(flixel_FlxG.renderTile) {
+			var emptyKey = "Gradient:" + this.barWidth + "x" + this.barHeight + ",colors:[";
+			var _g = 0;
+			while(_g < empty.length) {
+				var col = empty[_g];
+				++_g;
+				emptyKey += "0x" + StringTools.hex(col >> 24 & 255,2) + StringTools.hex(col >> 16 & 255,2) + StringTools.hex(col >> 8 & 255,2) + StringTools.hex(col & 255,2) + ",";
+			}
+			emptyKey += "],chunkSize: " + chunkSize + ",rotation: " + rotation;
+			if(showBorder) {
+				emptyKey += ",border: " + ("0x" + StringTools.hex(border >> 24 & 255,2) + StringTools.hex(border >> 16 & 255,2) + StringTools.hex(border >> 8 & 255,2) + StringTools.hex(border & 255,2)) + "borderSize: " + borderSize;
+			}
+			if(flixel_FlxG.bitmap._cache.h[emptyKey] == null) {
+				var emptyBar = null;
+				if(showBorder) {
+					emptyBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+					flixel_util_FlxGradient.overlayGradientOnBitmapData(emptyBar,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2,empty,borderSize,borderSize,chunkSize,rotation);
+				} else {
+					emptyBar = flixel_util_FlxGradient.createGradientBitmapData(this.barWidth,this.barHeight,empty,chunkSize,rotation);
+				}
+				flixel_FlxG.bitmap.add(emptyBar,false,emptyKey);
+			}
+			this.set_frames(flixel_FlxG.bitmap._cache.h[emptyKey].get_imageFrame());
+		} else {
+			if(showBorder) {
+				this._emptyBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+				flixel_util_FlxGradient.overlayGradientOnBitmapData(this._emptyBar,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2,empty,borderSize,borderSize,chunkSize,rotation);
+			} else {
+				this._emptyBar = flixel_util_FlxGradient.createGradientBitmapData(this.barWidth,this.barHeight,empty,chunkSize,rotation);
+			}
+			this._emptyBarRect.setTo(0,0,this.barWidth,this.barHeight);
+			this.updateEmptyBar();
+		}
+		return this;
+	}
+	,createGradientFilledBar: function(fill,chunkSize,rotation,showBorder,border,borderSize) {
+		if(borderSize == null) {
+			borderSize = 1;
+		}
+		if(border == null) {
+			border = -1;
+		}
+		if(showBorder == null) {
+			showBorder = false;
+		}
+		if(rotation == null) {
+			rotation = 180;
+		}
+		if(chunkSize == null) {
+			chunkSize = 1;
+		}
+		if(flixel_FlxG.renderTile) {
+			var filledKey = "Gradient:" + this.barWidth + "x" + this.barHeight + ",colors:[";
+			var _g = 0;
+			while(_g < fill.length) {
+				var col = fill[_g];
+				++_g;
+				filledKey += "0x" + StringTools.hex(col >> 24 & 255,2) + StringTools.hex(col >> 16 & 255,2) + StringTools.hex(col >> 8 & 255,2) + StringTools.hex(col & 255,2) + ",";
+			}
+			filledKey += "],chunkSize: " + chunkSize + ",rotation: " + rotation;
+			if(showBorder) {
+				filledKey += ",border: " + ("0x" + StringTools.hex(border >> 24 & 255,2) + StringTools.hex(border >> 16 & 255,2) + StringTools.hex(border >> 8 & 255,2) + StringTools.hex(border & 255,2)) + "borderSize: " + borderSize;
+			}
+			if(flixel_FlxG.bitmap._cache.h[filledKey] == null) {
+				var filledBar = null;
+				if(showBorder) {
+					filledBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+					flixel_util_FlxGradient.overlayGradientOnBitmapData(filledBar,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2,fill,borderSize,borderSize,chunkSize,rotation);
+				} else {
+					filledBar = flixel_util_FlxGradient.createGradientBitmapData(this.barWidth,this.barHeight,fill,chunkSize,rotation);
+				}
+				flixel_FlxG.bitmap.add(filledBar,false,filledKey);
+			}
+			this.set_frontFrames(flixel_FlxG.bitmap._cache.h[filledKey].get_imageFrame());
+		} else {
+			if(showBorder) {
+				this._filledBar = new openfl_display_BitmapData(this.barWidth,this.barHeight,true,border);
+				flixel_util_FlxGradient.overlayGradientOnBitmapData(this._filledBar,this.barWidth - borderSize * 2,this.barHeight - borderSize * 2,fill,borderSize,borderSize,chunkSize,rotation);
+			} else {
+				this._filledBar = flixel_util_FlxGradient.createGradientBitmapData(this.barWidth,this.barHeight,fill,chunkSize,rotation);
+			}
+			this._filledBarRect.setTo(0,0,this.barWidth,this.barHeight);
+			this.updateFilledBar();
+		}
+		return this;
+	}
+	,createImageBar: function(empty,fill,emptyBackground,fillBackground) {
+		if(fillBackground == null) {
+			fillBackground = -16711936;
+		}
+		if(emptyBackground == null) {
+			emptyBackground = -16777216;
+		}
+		this.createImageEmptyBar(empty,emptyBackground);
+		this.createImageFilledBar(fill,fillBackground);
+		return this;
+	}
+	,createImageEmptyBar: function(empty,emptyBackground) {
+		if(emptyBackground == null) {
+			emptyBackground = -16777216;
+		}
+		if(empty != null) {
+			var emptyGraphic = flixel_FlxG.bitmap.add(empty);
+			if(flixel_FlxG.renderTile) {
+				this.set_frames(emptyGraphic.get_imageFrame());
+			} else {
+				this._emptyBar = emptyGraphic.bitmap.clone();
+				this.barWidth = this._emptyBar.width;
+				this.barHeight = this._emptyBar.height;
+				this._emptyBarRect.setTo(0,0,this.barWidth,this.barHeight);
+				if(this.graphic == null || (this.frame.sourceSize.x != this.barWidth || this.frame.sourceSize.y != this.barHeight)) {
+					this.makeGraphic(this.barWidth,this.barHeight,0,true);
+				}
+				this.updateEmptyBar();
+			}
+		} else {
+			this.createColoredEmptyBar(emptyBackground);
+		}
+		return this;
+	}
+	,createImageFilledBar: function(fill,fillBackground) {
+		if(fillBackground == null) {
+			fillBackground = -16711936;
+		}
+		if(fill != null) {
+			var filledGraphic = flixel_FlxG.bitmap.add(fill);
+			if(flixel_FlxG.renderTile) {
+				this.set_frontFrames(filledGraphic.get_imageFrame());
+			} else {
+				this._filledBar = filledGraphic.bitmap.clone();
+				this._filledBarRect.setTo(0,0,this.barWidth,this.barHeight);
+				if(this.graphic == null || (this.frame.sourceSize.x != this.barWidth || this.frame.sourceSize.y != this.barHeight)) {
+					this.makeGraphic(this.barWidth,this.barHeight,0,true);
+				}
+				this.pxPerPercent = this._fillHorizontal ? this.barWidth / this._maxPercent : this.barHeight / this._maxPercent;
+				this.updateFilledBar();
+			}
+		} else {
+			this.createColoredFilledBar(fillBackground);
+		}
+		return this;
+	}
+	,set_fillDirection: function(direction) {
+		this.fillDirection = direction;
+		switch(direction._hx_index) {
+		case 0:case 1:case 4:case 5:
+			this._fillHorizontal = true;
+			break;
+		case 2:case 3:case 6:case 7:
+			this._fillHorizontal = false;
+			break;
+		}
+		return this.fillDirection;
+	}
+	,updateValueFromParent: function() {
+		this.set_value(Reflect.getProperty(this.parent,this.parentVariable));
+	}
+	,updateBar: function() {
+		this.updateEmptyBar();
+		this.updateFilledBar();
+	}
+	,updateEmptyBar: function() {
+		if(flixel_FlxG.renderBlit) {
+			this.get_pixels().copyPixels(this._emptyBar,this._emptyBarRect,this._zeroOffset);
+			this.dirty = true;
+		}
+	}
+	,updateFilledBar: function() {
+		this._filledBarRect.width = this.barWidth;
+		this._filledBarRect.height = this.barHeight;
+		var fraction = (this.get_value() - this.min) / this.range;
+		var percent = fraction * this._maxPercent;
+		var maxScale = this._fillHorizontal ? this.barWidth : this.barHeight;
+		var scaleInterval = maxScale / this.numDivisions;
+		var interval = Math.round((fraction * maxScale / scaleInterval | 0) * scaleInterval);
+		if(this._fillHorizontal) {
+			this._filledBarRect.width = interval | 0;
+		} else {
+			this._filledBarRect.height = interval | 0;
+		}
+		if(percent > 0) {
+			switch(this.fillDirection._hx_index) {
+			case 1:
+				this._filledBarRect.x = this.barWidth - this._filledBarRect.width;
+				this._filledBarPoint.x = this.barWidth - this._filledBarRect.width;
+				break;
+			case 0:case 2:
+				break;
+			case 3:
+				this._filledBarRect.y = this.barHeight - this._filledBarRect.height;
+				this._filledBarPoint.y = this.barHeight - this._filledBarRect.height;
+				break;
+			case 4:
+				this._filledBarRect.x = this.barWidth / 2 - this._filledBarRect.width / 2 | 0;
+				this._filledBarPoint.x = this.barWidth / 2 - this._filledBarRect.width / 2 | 0;
+				break;
+			case 5:
+				this._filledBarRect.width = maxScale - interval | 0;
+				this._filledBarPoint.x = (this.barWidth - this._filledBarRect.width) / 2 | 0;
+				break;
+			case 6:
+				this._filledBarRect.y = this.barHeight / 2 - this._filledBarRect.height / 2 | 0;
+				this._filledBarPoint.y = this.barHeight / 2 - this._filledBarRect.height / 2 | 0;
+				break;
+			case 7:
+				this._filledBarRect.height = maxScale - interval | 0;
+				this._filledBarPoint.y = (this.barHeight - this._filledBarRect.height) / 2 | 0;
+				break;
+			}
+			if(flixel_FlxG.renderBlit) {
+				this.get_pixels().copyPixels(this._filledBar,this._filledBarRect,this._filledBarPoint,null,null,true);
+			} else if(this.get_frontFrames() != null) {
+				var _this = this._filledFlxRect;
+				var FlashRect = this._filledBarRect;
+				_this.x = FlashRect.x;
+				_this.y = FlashRect.y;
+				_this.width = FlashRect.width;
+				_this.height = FlashRect.height;
+				var _this1 = _this;
+				_this1.x = Math.round(_this1.x);
+				_this1.y = Math.round(_this1.y);
+				_this1.width = Math.round(_this1.width);
+				_this1.height = Math.round(_this1.height);
+				if((percent | 0) > 0) {
+					this._frontFrame = this.get_frontFrames().get_frame().clipTo(this._filledFlxRect,this._frontFrame);
+				}
+			}
+		}
+		if(flixel_FlxG.renderBlit) {
+			this.dirty = true;
+		}
+	}
+	,update: function(elapsed) {
+		if(this.parent != null) {
+			if(Reflect.getProperty(this.parent,this.parentVariable) != this.get_value()) {
+				this.updateValueFromParent();
+			}
+			if(!this.fixedPosition) {
+				this.set_x(this.parent.x + this.positionOffset.x);
+				this.set_y(this.parent.y + this.positionOffset.y);
+			}
+		}
+		flixel_FlxSprite.prototype.update.call(this,elapsed);
+	}
+	,draw: function() {
+		flixel_FlxSprite.prototype.draw.call(this);
+		if(!flixel_FlxG.renderTile) {
+			return;
+		}
+		if(this.alpha == 0) {
+			return;
+		}
+		if(this.get_percent() > 0 && this._frontFrame.type != 2) {
+			var _g = 0;
+			var _g1 = this.getCamerasLegacy();
+			while(_g < _g1.length) {
+				var camera = _g1[_g];
+				++_g;
+				if(!camera.visible || !camera.exists || !this.isOnScreen(camera)) {
+					continue;
+				}
+				var doFlipX = this.flipX != this._frame.flipX;
+				var doFlipY = this.flipY != this._frame.flipY;
+				this._frontFrame.prepareMatrix(this._matrix,0,this.animation._curAnim != null ? doFlipX != this.animation._curAnim.flipX : doFlipX,this.animation._curAnim != null ? doFlipY != this.animation._curAnim.flipY : doFlipY);
+				this._matrix.translate(-this.origin.x,-this.origin.y);
+				this._matrix.scale(this.scale.x,this.scale.y);
+				if(this.bakedRotationAngle <= 0) {
+					if(this._angleChanged) {
+						var radians = this.angle * (Math.PI / 180);
+						this._sinAngle = Math.sin(radians);
+						this._cosAngle = Math.cos(radians);
+						this._angleChanged = false;
+					}
+					if(this.angle != 0) {
+						var _this = this._matrix;
+						var cos = this._cosAngle;
+						var sin = this._sinAngle;
+						var a1 = _this.a * cos - _this.b * sin;
+						_this.b = _this.a * sin + _this.b * cos;
+						_this.a = a1;
+						var c1 = _this.c * cos - _this.d * sin;
+						_this.d = _this.c * sin + _this.d * cos;
+						_this.c = c1;
+						var tx1 = _this.tx * cos - _this.ty * sin;
+						_this.ty = _this.tx * sin + _this.ty * cos;
+						_this.tx = tx1;
+					}
+				}
+				var this1 = this.getScreenPosition(this._point,camera);
+				var point = this.offset;
+				var x = point.x;
+				var y = point.y;
+				if(y == null) {
+					y = 0;
+				}
+				if(x == null) {
+					x = 0;
+				}
+				this1.set_x(this1.x - x);
+				this1.set_y(this1.y - y);
+				var _this1 = point;
+				if(_this1._weak) {
+					_this1.put();
+				}
+				var this2 = this._point;
+				var x1 = this.origin.x;
+				var y1 = this.origin.y;
+				if(y1 == null) {
+					y1 = 0;
+				}
+				if(x1 == null) {
+					x1 = 0;
+				}
+				this2.set_x(this2.x + x1);
+				this2.set_y(this2.y + y1);
+				this._matrix.translate(this._point.x,this._point.y);
+				if(this.isPixelPerfectRender(camera)) {
+					this._matrix.tx = Math.floor(this._matrix.tx);
+					this._matrix.ty = Math.floor(this._matrix.ty);
+				}
+				camera.drawPixels(this._frontFrame,null,this._matrix,this.colorTransform,this.blend,this.antialiasing,this.shader);
+			}
+		}
+	}
+	,set_pixels: function(pixels) {
+		if(flixel_FlxG.renderTile) {
+			return pixels;
+		} else {
+			return flixel_FlxSprite.prototype.set_pixels.call(this,pixels);
+		}
+	}
+	,toString: function() {
+		var value = this.min;
+		var _this = flixel_util_LabelValuePair._pool.get();
+		_this.label = "min";
+		_this.value = value;
+		var value = this.max;
+		var _this1 = flixel_util_LabelValuePair._pool.get();
+		_this1.label = "max";
+		_this1.value = value;
+		var value = this.range;
+		var _this2 = flixel_util_LabelValuePair._pool.get();
+		_this2.label = "range";
+		_this2.value = value;
+		var value = this.pct;
+		var _this3 = flixel_util_LabelValuePair._pool.get();
+		_this3.label = "%";
+		_this3.value = value;
+		var value = this.pxPerPercent;
+		var _this4 = flixel_util_LabelValuePair._pool.get();
+		_this4.label = "px/%";
+		_this4.value = value;
+		var value = this.get_value();
+		var _this5 = flixel_util_LabelValuePair._pool.get();
+		_this5.label = "value";
+		_this5.value = value;
+		return flixel_util_FlxStringUtil.getDebugString([_this,_this1,_this2,_this3,_this4,_this5]);
+	}
+	,get_percent: function() {
+		if(this.get_value() > this.max) {
+			return this._maxPercent;
+		}
+		return Math.floor((this.get_value() - this.min) / this.range * this._maxPercent);
+	}
+	,set_percent: function(newPct) {
+		if(newPct >= 0 && newPct <= this._maxPercent) {
+			this.set_value(this.pct * newPct);
+		}
+		return newPct;
+	}
+	,set_value: function(newValue) {
+		this.value = Math.max(this.min,Math.min(newValue,this.max));
+		if(this.get_value() == this.min && this.emptyCallback != null) {
+			this.emptyCallback();
+		}
+		if(this.get_value() == this.max && this.filledCallback != null) {
+			this.filledCallback();
+		}
+		if(this.get_value() == this.min && this.killOnEmpty) {
+			this.kill();
+		}
+		this.updateBar();
+		return newValue;
+	}
+	,get_value: function() {
+		return this.value;
+	}
+	,set_numDivisions: function(newValue) {
+		this.numDivisions = newValue > 0 ? newValue : 100;
+		this.updateFilledBar();
+		return newValue;
+	}
+	,get_frontFrames: function() {
+		if(flixel_FlxG.renderTile) {
+			return this.frontFrames;
+		}
+		return null;
+	}
+	,set_frontFrames: function(value) {
+		if(flixel_FlxG.renderTile) {
+			if(value != null) {
+				value.parent.incrementUseCount();
+			}
+			if(this.get_frontFrames() != null) {
+				this.get_frontFrames().parent.decrementUseCount();
+			}
+			this.frontFrames = value;
+			this._frontFrame = value != null ? value.get_frame().copyTo(this._frontFrame) : flixel_util_FlxDestroyUtil.destroy(this._frontFrame);
+		} else {
+			this.createImageFilledBar(value.get_frame().paint());
+		}
+		return value;
+	}
+	,get_backFrames: function() {
+		if(flixel_FlxG.renderTile) {
+			return this.frames;
+		}
+		return null;
+	}
+	,set_backFrames: function(value) {
+		if(flixel_FlxG.renderTile) {
+			this.set_frames(value);
+		} else {
+			this.createImageEmptyBar(value.get_frame().paint());
+		}
+		return value;
+	}
+	,__class__: flixel_ui_FlxBar
+	,__properties__: $extend(flixel_FlxSprite.prototype.__properties__,{set_fillDirection:"set_fillDirection",set_backFrames:"set_backFrames",get_backFrames:"get_backFrames",set_frontFrames:"set_frontFrames",get_frontFrames:"get_frontFrames",set_numDivisions:"set_numDivisions",set_value:"set_value",get_value:"get_value",set_percent:"set_percent",get_percent:"get_percent"})
+});
+var flixel_ui_FlxBarFillDirection = $hxEnums["flixel.ui.FlxBarFillDirection"] = { __ename__:"flixel.ui.FlxBarFillDirection",__constructs__:null
+	,LEFT_TO_RIGHT: {_hx_name:"LEFT_TO_RIGHT",_hx_index:0,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,RIGHT_TO_LEFT: {_hx_name:"RIGHT_TO_LEFT",_hx_index:1,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,TOP_TO_BOTTOM: {_hx_name:"TOP_TO_BOTTOM",_hx_index:2,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,BOTTOM_TO_TOP: {_hx_name:"BOTTOM_TO_TOP",_hx_index:3,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,HORIZONTAL_INSIDE_OUT: {_hx_name:"HORIZONTAL_INSIDE_OUT",_hx_index:4,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,HORIZONTAL_OUTSIDE_IN: {_hx_name:"HORIZONTAL_OUTSIDE_IN",_hx_index:5,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,VERTICAL_INSIDE_OUT: {_hx_name:"VERTICAL_INSIDE_OUT",_hx_index:6,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+	,VERTICAL_OUTSIDE_IN: {_hx_name:"VERTICAL_OUTSIDE_IN",_hx_index:7,__enum__:"flixel.ui.FlxBarFillDirection",toString:$estr}
+};
+flixel_ui_FlxBarFillDirection.__constructs__ = [flixel_ui_FlxBarFillDirection.LEFT_TO_RIGHT,flixel_ui_FlxBarFillDirection.RIGHT_TO_LEFT,flixel_ui_FlxBarFillDirection.TOP_TO_BOTTOM,flixel_ui_FlxBarFillDirection.BOTTOM_TO_TOP,flixel_ui_FlxBarFillDirection.HORIZONTAL_INSIDE_OUT,flixel_ui_FlxBarFillDirection.HORIZONTAL_OUTSIDE_IN,flixel_ui_FlxBarFillDirection.VERTICAL_INSIDE_OUT,flixel_ui_FlxBarFillDirection.VERTICAL_OUTSIDE_IN];
+var flixel_ui_FlxTypedButton_$flixel_$text_$FlxText = function(X,Y,OnClick) {
+	if(Y == null) {
+		Y = 0;
+	}
+	if(X == null) {
+		X = 0;
+	}
+	this.lastStatus = -1;
+	this.maxInputMovement = Infinity;
+	this.mouseButtons = [-1];
+	this.allowSwiping = true;
+	this.statusAnimations = ["normal","highlight","pressed","disabled"];
+	this.labelAlphas = [0.8,1.0,0.5,0.3];
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+	point._inPool = false;
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var point1 = flixel_math_FlxBasePoint.pool.get().set(x,y);
+	point1._inPool = false;
+	var x = 0;
+	var y = 1;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var x1 = x;
+	var y1 = y;
+	if(y1 == null) {
+		y1 = 0;
+	}
+	if(x1 == null) {
+		x1 = 0;
+	}
+	var point2 = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+	point2._inPool = false;
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var point3 = flixel_math_FlxBasePoint.pool.get().set(x,y);
+	point3._inPool = false;
+	this.labelOffsets = [point,point1,point2,point3];
+	flixel_FlxSprite.call(this,X,Y);
+	this.loadDefaultGraphic();
+	this.onUp = new flixel_ui__$FlxButton_FlxButtonEvent(OnClick);
+	this.onDown = new flixel_ui__$FlxButton_FlxButtonEvent();
+	this.onOver = new flixel_ui__$FlxButton_FlxButtonEvent();
+	this.onOut = new flixel_ui__$FlxButton_FlxButtonEvent();
+	this.set_status(0);
+	var this1 = this.scrollFactor;
+	this1.set_x(0);
+	this1.set_y(0);
+	openfl_Lib.get_current().stage.addEventListener("mouseUp",$bind(this,this.onUpEventListener));
+	this.input = new flixel_input_FlxInput(0);
+};
+$hxClasses["flixel.ui.FlxTypedButton_flixel_text_FlxText"] = flixel_ui_FlxTypedButton_$flixel_$text_$FlxText;
+flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.__name__ = "flixel.ui.FlxTypedButton_flixel_text_FlxText";
+flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.__interfaces__ = [flixel_input_IFlxInput];
+flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.__super__ = flixel_FlxSprite;
+flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.prototype = $extend(flixel_FlxSprite.prototype,{
+	graphicLoaded: function() {
+		flixel_FlxSprite.prototype.graphicLoaded.call(this);
+		this.setupAnimation("normal",0);
+		this.setupAnimation("highlight",1);
+		this.setupAnimation("pressed",2);
+		this.setupAnimation("disabled",3);
+	}
+	,loadDefaultGraphic: function() {
+		this.loadGraphic("flixel/images/ui/button.png",true,80,20);
+	}
+	,setupAnimation: function(animationName,frameIndex) {
+		frameIndex = Math.min(frameIndex,this.animation._sprite.get_numFrames() - 1) | 0;
+		this.animation.add(animationName,[frameIndex]);
+	}
+	,destroy: function() {
+		this.set_label(flixel_util_FlxDestroyUtil.destroy(this.label));
+		this._spriteLabel = null;
+		this.onUp = flixel_util_FlxDestroyUtil.destroy(this.onUp);
+		this.onDown = flixel_util_FlxDestroyUtil.destroy(this.onDown);
+		this.onOver = flixel_util_FlxDestroyUtil.destroy(this.onOver);
+		this.onOut = flixel_util_FlxDestroyUtil.destroy(this.onOut);
+		this.labelOffsets = flixel_util_FlxDestroyUtil.putArray(this.labelOffsets);
+		this.labelAlphas = null;
+		this.currentInput = null;
+		this.input = null;
+		openfl_Lib.get_current().stage.removeEventListener("mouseUp",$bind(this,this.onUpEventListener));
+		flixel_FlxSprite.prototype.destroy.call(this);
+	}
+	,update: function(elapsed) {
+		flixel_FlxSprite.prototype.update.call(this,elapsed);
+		if(this.visible) {
+			this.updateButton();
+			if(this.lastStatus != this.status) {
+				this.updateStatusAnimation();
+				this.lastStatus = this.status;
+			}
+		}
+		this.input.update();
+	}
+	,updateStatusAnimation: function() {
+		this.animation.play(this.statusAnimations[this.status]);
+	}
+	,draw: function() {
+		flixel_FlxSprite.prototype.draw.call(this);
+		if(this._spriteLabel != null && this._spriteLabel.visible) {
+			this._spriteLabel.set_cameras(this._cameras);
+			this._spriteLabel.draw();
+		}
+	}
+	,stampOnAtlas: function(atlas) {
+		var buttonNode = atlas.addNode(this.graphic.bitmap,this.graphic.key);
+		var result = buttonNode != null;
+		if(buttonNode != null) {
+			var buttonFrames = this.frames;
+			var x = buttonFrames.tileSize.x;
+			var y = buttonFrames.tileSize.y;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var x1 = x;
+			var y1 = y;
+			if(y1 == null) {
+				y1 = 0;
+			}
+			if(x1 == null) {
+				x1 = 0;
+			}
+			var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+			point._inPool = false;
+			var tileSize = point;
+			var tileFrames = buttonNode.getTileFrames(tileSize);
+			this.set_frames(tileFrames);
+		}
+		if(result && this.label != null) {
+			var labelNode = atlas.addNode(this.label.graphic.bitmap,this.label.graphic.key);
+			result = result && labelNode != null;
+			if(labelNode != null) {
+				this.label.set_frames(labelNode.getImageFrame());
+			}
+		}
+		return result;
+	}
+	,updateButton: function() {
+		if(this.status == 3) {
+			return;
+		}
+		var overlapFound = this.checkMouseOverlap();
+		if(!overlapFound) {
+			overlapFound = this.checkTouchOverlap();
+		}
+		if(this.currentInput != null && this.currentInput.get_justReleased() && overlapFound) {
+			this.onUpHandler();
+		}
+		if(this.status != 0 && (!overlapFound || this.currentInput != null && this.currentInput.get_justReleased())) {
+			this.onOutHandler();
+		}
+	}
+	,checkMouseOverlap: function() {
+		var overlap = false;
+		var _g = 0;
+		var _g1 = this.getCameras();
+		while(_g < _g1.length) {
+			var camera = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			var _g3 = this.mouseButtons;
+			while(_g2 < _g3.length) {
+				var buttonID = _g3[_g2];
+				++_g2;
+				var button = flixel_input_mouse_FlxMouseButton.getByID(buttonID);
+				if(button != null && this.checkInput(flixel_FlxG.mouse,button,button.justPressedPosition,camera)) {
+					overlap = true;
+				}
+			}
+		}
+		return overlap;
+	}
+	,checkTouchOverlap: function() {
+		var overlap = false;
+		var _g = 0;
+		var _g1 = this.getCameras();
+		while(_g < _g1.length) {
+			var camera = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			var _g3 = flixel_FlxG.touches.list;
+			while(_g2 < _g3.length) {
+				var touch = _g3[_g2];
+				++_g2;
+				if(this.checkInput(touch,touch,touch.justPressedPosition,camera)) {
+					overlap = true;
+				}
+			}
+		}
+		return overlap;
+	}
+	,checkInput: function(pointer,input,justPressedPosition,camera) {
+		var tmp;
+		if(this.maxInputMovement != Infinity) {
+			var x = 0;
+			var y = 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var x1 = x;
+			var y1 = y;
+			if(y1 == null) {
+				y1 = 0;
+			}
+			if(x1 == null) {
+				x1 = 0;
+			}
+			var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+			point._inPool = false;
+			var point1 = point;
+			point1._weak = true;
+			tmp = flixel_math_FlxPoint.distanceTo(justPressedPosition,pointer.getViewPosition(null,point1)) > this.maxInputMovement;
+		} else {
+			tmp = false;
+		}
+		if(tmp && input == this.currentInput) {
+			this.currentInput = null;
+		} else if(this.overlapsPoint(pointer.getWorldPosition(camera,this._point),true,camera)) {
+			this.updateStatus(input);
+			return true;
+		}
+		return false;
+	}
+	,updateStatus: function(input) {
+		if(input.get_justPressed()) {
+			this.currentInput = input;
+			this.onDownHandler();
+		} else if(this.status == 0) {
+			if(this.allowSwiping && input.get_pressed()) {
+				this.onDownHandler();
+			} else {
+				this.onOverHandler();
+			}
+		}
+	}
+	,updateLabelPosition: function() {
+		if(this._spriteLabel != null) {
+			this._spriteLabel.set_x((this.pixelPerfectPosition ? Math.floor(this.x) : this.x) + this.labelOffsets[this.status].x);
+			this._spriteLabel.set_y((this.pixelPerfectPosition ? Math.floor(this.y) : this.y) + this.labelOffsets[this.status].y);
+		}
+	}
+	,updateLabelAlpha: function() {
+		if(this._spriteLabel != null && this.labelAlphas.length > this.status) {
+			this._spriteLabel.set_alpha(this.alpha * this.labelAlphas[this.status]);
+		}
+	}
+	,onUpEventListener: function(_) {
+		if(this.visible && this.exists && this.active && this.status == 2) {
+			this.onUpHandler();
+		}
+	}
+	,onUpHandler: function() {
+		this.set_status(1);
+		this.input.release();
+		this.currentInput = null;
+		var _this = this.onUp;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,onDownHandler: function() {
+		this.set_status(2);
+		this.input.press();
+		var _this = this.onDown;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,onOverHandler: function() {
+		if(!flixel_FlxG.mouse.enabled) {
+			this.set_status(0);
+			return;
+		}
+		this.set_status(1);
+		var _this = this.onOver;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,onOutHandler: function() {
+		this.set_status(0);
+		this.input.release();
+		var _this = this.onOut;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,set_label: function(Value) {
+		if(Value != null) {
+			Value.scrollFactor.put();
+			Value.scrollFactor = this.scrollFactor;
+		}
+		this.label = Value;
+		this._spriteLabel = this.label;
+		this.updateLabelPosition();
+		return Value;
+	}
+	,set_status: function(value) {
+		this.status = value;
+		this.updateLabelAlpha();
+		this.updateLabelPosition();
+		return this.status;
+	}
+	,set_alpha: function(Value) {
+		flixel_FlxSprite.prototype.set_alpha.call(this,Value);
+		this.updateLabelAlpha();
+		return this.alpha;
+	}
+	,set_x: function(Value) {
+		flixel_FlxSprite.prototype.set_x.call(this,Value);
+		this.updateLabelPosition();
+		return this.x;
+	}
+	,set_y: function(Value) {
+		flixel_FlxSprite.prototype.set_y.call(this,Value);
+		this.updateLabelPosition();
+		return this.y;
+	}
+	,get_justReleased: function() {
+		return this.input.current == -1;
+	}
+	,get_released: function() {
+		var _this = this.input;
+		if(_this.current != 0) {
+			return _this.current == -1;
+		} else {
+			return true;
+		}
+	}
+	,get_pressed: function() {
+		var _this = this.input;
+		if(_this.current != 1) {
+			return _this.current == 2;
+		} else {
+			return true;
+		}
+	}
+	,get_justPressed: function() {
+		return this.input.current == 2;
+	}
+	,__class__: flixel_ui_FlxTypedButton_$flixel_$text_$FlxText
+	,__properties__: $extend(flixel_FlxSprite.prototype.__properties__,{get_justPressed:"get_justPressed",get_pressed:"get_pressed",get_released:"get_released",get_justReleased:"get_justReleased",set_status:"set_status",set_label:"set_label"})
+});
+var flixel_ui_FlxButton = function(X,Y,Text1,OnClick) {
+	if(Y == null) {
+		Y = 0;
+	}
+	if(X == null) {
+		X = 0;
+	}
+	flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.call(this,X,Y,OnClick);
+	var _g = 0;
+	var _g1 = this.labelOffsets;
+	while(_g < _g1.length) {
+		var point = _g1[_g];
+		++_g;
+		var x = point.x;
+		var y = point.y + 3;
+		if(y == null) {
+			y = 0;
+		}
+		if(x == null) {
+			x = 0;
+		}
+		point.set_x(x);
+		point.set_y(y);
+	}
+	if(Text1 != null) {
+		this.set_label(new flixel_text_FlxText(this.x + this.labelOffsets[0].x,this.y + this.labelOffsets[0].y,80,Text1));
+		this.label.setFormat(null,8,3355443,"center");
+		this.label.set_alpha(this.labelAlphas[this.status]);
+		this.label.drawFrame(true);
+	}
+};
+$hxClasses["flixel.ui.FlxButton"] = flixel_ui_FlxButton;
+flixel_ui_FlxButton.__name__ = "flixel.ui.FlxButton";
+flixel_ui_FlxButton.__super__ = flixel_ui_FlxTypedButton_$flixel_$text_$FlxText;
+flixel_ui_FlxButton.prototype = $extend(flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.prototype,{
+	resetHelpers: function() {
+		flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.prototype.resetHelpers.call(this);
+		if(this.label != null) {
+			var tmp = this.label;
+			var tmp1 = this.get_width() | 0;
+			tmp.set_fieldWidth(this.label.frameWidth = tmp1);
+			this.label.set_size(this.label._defaultFormat.size | 0);
+		}
+	}
+	,initLabel: function(Text1) {
+		if(Text1 != null) {
+			this.set_label(new flixel_text_FlxText(this.x + this.labelOffsets[0].x,this.y + this.labelOffsets[0].y,80,Text1));
+			this.label.setFormat(null,8,3355443,"center");
+			this.label.set_alpha(this.labelAlphas[this.status]);
+			this.label.drawFrame(true);
+		}
+	}
+	,get_text: function() {
+		if(this.label != null) {
+			return this.label.text;
+		} else {
+			return null;
+		}
+	}
+	,set_text: function(Text1) {
+		if(this.label == null) {
+			if(Text1 != null) {
+				this.set_label(new flixel_text_FlxText(this.x + this.labelOffsets[0].x,this.y + this.labelOffsets[0].y,80,Text1));
+				this.label.setFormat(null,8,3355443,"center");
+				this.label.set_alpha(this.labelAlphas[this.status]);
+				this.label.drawFrame(true);
+			}
+		} else {
+			this.label.set_text(Text1);
+		}
+		return Text1;
+	}
+	,__class__: flixel_ui_FlxButton
+	,__properties__: $extend(flixel_ui_FlxTypedButton_$flixel_$text_$FlxText.prototype.__properties__,{set_text:"set_text",get_text:"get_text"})
+});
+var flixel_ui_FlxTypedButton = function(X,Y,OnClick) {
+	if(Y == null) {
+		Y = 0;
+	}
+	if(X == null) {
+		X = 0;
+	}
+	this.lastStatus = -1;
+	this.maxInputMovement = Infinity;
+	this.mouseButtons = [-1];
+	this.allowSwiping = true;
+	this.statusAnimations = ["normal","highlight","pressed","disabled"];
+	this.labelAlphas = [0.8,1.0,0.5,0.3];
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var point = flixel_math_FlxBasePoint.pool.get().set(x,y);
+	point._inPool = false;
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var point1 = flixel_math_FlxBasePoint.pool.get().set(x,y);
+	point1._inPool = false;
+	var x = 0;
+	var y = 1;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var x1 = x;
+	var y1 = y;
+	if(y1 == null) {
+		y1 = 0;
+	}
+	if(x1 == null) {
+		x1 = 0;
+	}
+	var point2 = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+	point2._inPool = false;
+	var x = 0;
+	var y = 0;
+	if(y == null) {
+		y = 0;
+	}
+	if(x == null) {
+		x = 0;
+	}
+	var point3 = flixel_math_FlxBasePoint.pool.get().set(x,y);
+	point3._inPool = false;
+	this.labelOffsets = [point,point1,point2,point3];
+	flixel_FlxSprite.call(this,X,Y);
+	this.loadDefaultGraphic();
+	this.onUp = new flixel_ui__$FlxButton_FlxButtonEvent(OnClick);
+	this.onDown = new flixel_ui__$FlxButton_FlxButtonEvent();
+	this.onOver = new flixel_ui__$FlxButton_FlxButtonEvent();
+	this.onOut = new flixel_ui__$FlxButton_FlxButtonEvent();
+	this.set_status(0);
+	var this1 = this.scrollFactor;
+	this1.set_x(0);
+	this1.set_y(0);
+	openfl_Lib.get_current().stage.addEventListener("mouseUp",$bind(this,this.onUpEventListener));
+	this.input = new flixel_input_FlxInput(0);
+};
+$hxClasses["flixel.ui.FlxTypedButton"] = flixel_ui_FlxTypedButton;
+flixel_ui_FlxTypedButton.__name__ = "flixel.ui.FlxTypedButton";
+flixel_ui_FlxTypedButton.__interfaces__ = [flixel_input_IFlxInput];
+flixel_ui_FlxTypedButton.__super__ = flixel_FlxSprite;
+flixel_ui_FlxTypedButton.prototype = $extend(flixel_FlxSprite.prototype,{
+	graphicLoaded: function() {
+		flixel_FlxSprite.prototype.graphicLoaded.call(this);
+		this.setupAnimation("normal",0);
+		this.setupAnimation("highlight",1);
+		this.setupAnimation("pressed",2);
+		this.setupAnimation("disabled",3);
+	}
+	,loadDefaultGraphic: function() {
+		this.loadGraphic("flixel/images/ui/button.png",true,80,20);
+	}
+	,setupAnimation: function(animationName,frameIndex) {
+		frameIndex = Math.min(frameIndex,this.animation._sprite.get_numFrames() - 1) | 0;
+		this.animation.add(animationName,[frameIndex]);
+	}
+	,destroy: function() {
+		this.set_label(flixel_util_FlxDestroyUtil.destroy(this.label));
+		this._spriteLabel = null;
+		this.onUp = flixel_util_FlxDestroyUtil.destroy(this.onUp);
+		this.onDown = flixel_util_FlxDestroyUtil.destroy(this.onDown);
+		this.onOver = flixel_util_FlxDestroyUtil.destroy(this.onOver);
+		this.onOut = flixel_util_FlxDestroyUtil.destroy(this.onOut);
+		this.labelOffsets = flixel_util_FlxDestroyUtil.putArray(this.labelOffsets);
+		this.labelAlphas = null;
+		this.currentInput = null;
+		this.input = null;
+		openfl_Lib.get_current().stage.removeEventListener("mouseUp",$bind(this,this.onUpEventListener));
+		flixel_FlxSprite.prototype.destroy.call(this);
+	}
+	,update: function(elapsed) {
+		flixel_FlxSprite.prototype.update.call(this,elapsed);
+		if(this.visible) {
+			this.updateButton();
+			if(this.lastStatus != this.status) {
+				this.updateStatusAnimation();
+				this.lastStatus = this.status;
+			}
+		}
+		this.input.update();
+	}
+	,updateStatusAnimation: function() {
+		this.animation.play(this.statusAnimations[this.status]);
+	}
+	,draw: function() {
+		flixel_FlxSprite.prototype.draw.call(this);
+		if(this._spriteLabel != null && this._spriteLabel.visible) {
+			this._spriteLabel.set_cameras(this._cameras);
+			this._spriteLabel.draw();
+		}
+	}
+	,stampOnAtlas: function(atlas) {
+		var buttonNode = atlas.addNode(this.graphic.bitmap,this.graphic.key);
+		var result = buttonNode != null;
+		if(buttonNode != null) {
+			var buttonFrames = this.frames;
+			var x = buttonFrames.tileSize.x;
+			var y = buttonFrames.tileSize.y;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var x1 = x;
+			var y1 = y;
+			if(y1 == null) {
+				y1 = 0;
+			}
+			if(x1 == null) {
+				x1 = 0;
+			}
+			var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+			point._inPool = false;
+			var tileSize = point;
+			var tileFrames = buttonNode.getTileFrames(tileSize);
+			this.set_frames(tileFrames);
+		}
+		if(result && this.label != null) {
+			var labelNode = atlas.addNode(this.label.graphic.bitmap,this.label.graphic.key);
+			result = result && labelNode != null;
+			if(labelNode != null) {
+				this.label.set_frames(labelNode.getImageFrame());
+			}
+		}
+		return result;
+	}
+	,updateButton: function() {
+		if(this.status == 3) {
+			return;
+		}
+		var overlapFound = this.checkMouseOverlap();
+		if(!overlapFound) {
+			overlapFound = this.checkTouchOverlap();
+		}
+		if(this.currentInput != null && this.currentInput.get_justReleased() && overlapFound) {
+			this.onUpHandler();
+		}
+		if(this.status != 0 && (!overlapFound || this.currentInput != null && this.currentInput.get_justReleased())) {
+			this.onOutHandler();
+		}
+	}
+	,checkMouseOverlap: function() {
+		var overlap = false;
+		var _g = 0;
+		var _g1 = this.getCameras();
+		while(_g < _g1.length) {
+			var camera = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			var _g3 = this.mouseButtons;
+			while(_g2 < _g3.length) {
+				var buttonID = _g3[_g2];
+				++_g2;
+				var button = flixel_input_mouse_FlxMouseButton.getByID(buttonID);
+				if(button != null && this.checkInput(flixel_FlxG.mouse,button,button.justPressedPosition,camera)) {
+					overlap = true;
+				}
+			}
+		}
+		return overlap;
+	}
+	,checkTouchOverlap: function() {
+		var overlap = false;
+		var _g = 0;
+		var _g1 = this.getCameras();
+		while(_g < _g1.length) {
+			var camera = _g1[_g];
+			++_g;
+			var _g2 = 0;
+			var _g3 = flixel_FlxG.touches.list;
+			while(_g2 < _g3.length) {
+				var touch = _g3[_g2];
+				++_g2;
+				if(this.checkInput(touch,touch,touch.justPressedPosition,camera)) {
+					overlap = true;
+				}
+			}
+		}
+		return overlap;
+	}
+	,checkInput: function(pointer,input,justPressedPosition,camera) {
+		var tmp;
+		if(this.maxInputMovement != Infinity) {
+			var x = 0;
+			var y = 0;
+			if(y == null) {
+				y = 0;
+			}
+			if(x == null) {
+				x = 0;
+			}
+			var x1 = x;
+			var y1 = y;
+			if(y1 == null) {
+				y1 = 0;
+			}
+			if(x1 == null) {
+				x1 = 0;
+			}
+			var point = flixel_math_FlxBasePoint.pool.get().set(x1,y1);
+			point._inPool = false;
+			var point1 = point;
+			point1._weak = true;
+			tmp = flixel_math_FlxPoint.distanceTo(justPressedPosition,pointer.getViewPosition(null,point1)) > this.maxInputMovement;
+		} else {
+			tmp = false;
+		}
+		if(tmp && input == this.currentInput) {
+			this.currentInput = null;
+		} else if(this.overlapsPoint(pointer.getWorldPosition(camera,this._point),true,camera)) {
+			this.updateStatus(input);
+			return true;
+		}
+		return false;
+	}
+	,updateStatus: function(input) {
+		if(input.get_justPressed()) {
+			this.currentInput = input;
+			this.onDownHandler();
+		} else if(this.status == 0) {
+			if(this.allowSwiping && input.get_pressed()) {
+				this.onDownHandler();
+			} else {
+				this.onOverHandler();
+			}
+		}
+	}
+	,updateLabelPosition: function() {
+		if(this._spriteLabel != null) {
+			this._spriteLabel.set_x((this.pixelPerfectPosition ? Math.floor(this.x) : this.x) + this.labelOffsets[this.status].x);
+			this._spriteLabel.set_y((this.pixelPerfectPosition ? Math.floor(this.y) : this.y) + this.labelOffsets[this.status].y);
+		}
+	}
+	,updateLabelAlpha: function() {
+		if(this._spriteLabel != null && this.labelAlphas.length > this.status) {
+			this._spriteLabel.set_alpha(this.alpha * this.labelAlphas[this.status]);
+		}
+	}
+	,onUpEventListener: function(_) {
+		if(this.visible && this.exists && this.active && this.status == 2) {
+			this.onUpHandler();
+		}
+	}
+	,onUpHandler: function() {
+		this.set_status(1);
+		this.input.release();
+		this.currentInput = null;
+		var _this = this.onUp;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,onDownHandler: function() {
+		this.set_status(2);
+		this.input.press();
+		var _this = this.onDown;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,onOverHandler: function() {
+		if(!flixel_FlxG.mouse.enabled) {
+			this.set_status(0);
+			return;
+		}
+		this.set_status(1);
+		var _this = this.onOver;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,onOutHandler: function() {
+		this.set_status(0);
+		this.input.release();
+		var _this = this.onOut;
+		if(_this.callback != null) {
+			_this.callback();
+		}
+		if(_this.sound != null) {
+			_this.sound.play(true);
+		}
+	}
+	,set_label: function(Value) {
+		if(Value != null) {
+			Value.scrollFactor.put();
+			Value.scrollFactor = this.scrollFactor;
+		}
+		this.label = Value;
+		this._spriteLabel = this.label;
+		this.updateLabelPosition();
+		return Value;
+	}
+	,set_status: function(value) {
+		this.status = value;
+		this.updateLabelAlpha();
+		this.updateLabelPosition();
+		return this.status;
+	}
+	,set_alpha: function(Value) {
+		flixel_FlxSprite.prototype.set_alpha.call(this,Value);
+		this.updateLabelAlpha();
+		return this.alpha;
+	}
+	,set_x: function(Value) {
+		flixel_FlxSprite.prototype.set_x.call(this,Value);
+		this.updateLabelPosition();
+		return this.x;
+	}
+	,set_y: function(Value) {
+		flixel_FlxSprite.prototype.set_y.call(this,Value);
+		this.updateLabelPosition();
+		return this.y;
+	}
+	,get_justReleased: function() {
+		return this.input.current == -1;
+	}
+	,get_released: function() {
+		var _this = this.input;
+		if(_this.current != 0) {
+			return _this.current == -1;
+		} else {
+			return true;
+		}
+	}
+	,get_pressed: function() {
+		var _this = this.input;
+		if(_this.current != 1) {
+			return _this.current == 2;
+		} else {
+			return true;
+		}
+	}
+	,get_justPressed: function() {
+		return this.input.current == 2;
+	}
+	,__class__: flixel_ui_FlxTypedButton
+	,__properties__: $extend(flixel_FlxSprite.prototype.__properties__,{get_justPressed:"get_justPressed",get_pressed:"get_pressed",get_released:"get_released",get_justReleased:"get_justReleased",set_status:"set_status",set_label:"set_label"})
+});
+var flixel_ui__$FlxButton_FlxButtonEvent = function(Callback,sound) {
+	this.callback = Callback;
+	this.sound = sound;
+};
+$hxClasses["flixel.ui._FlxButton.FlxButtonEvent"] = flixel_ui__$FlxButton_FlxButtonEvent;
+flixel_ui__$FlxButton_FlxButtonEvent.__name__ = "flixel.ui._FlxButton.FlxButtonEvent";
+flixel_ui__$FlxButton_FlxButtonEvent.__interfaces__ = [flixel_util_IFlxDestroyable];
+flixel_ui__$FlxButton_FlxButtonEvent.prototype = {
+	destroy: function() {
+		this.callback = null;
+		this.sound = flixel_util_FlxDestroyUtil.destroy(this.sound);
+	}
+	,fire: function() {
+		if(this.callback != null) {
+			this.callback();
+		}
+		if(this.sound != null) {
+			this.sound.play(true);
+		}
+	}
+	,__class__: flixel_ui__$FlxButton_FlxButtonEvent
+};
 var flixel_util_FlxArrayUtil = function() { };
 $hxClasses["flixel.util.FlxArrayUtil"] = flixel_util_FlxArrayUtil;
 flixel_util_FlxArrayUtil.__name__ = "flixel.util.FlxArrayUtil";
@@ -53242,6 +56991,171 @@ flixel_util_FlxDirectionFlags.toString = function(this1) {
 };
 flixel_util_FlxDirectionFlags.fromBools = function(left,right,up,down) {
 	return (left ? 1 : 0) | (right ? 16 : 0) | (up ? 256 : 0) | (down ? 4096 : 0);
+};
+var flixel_util_FlxGradient = function() { };
+$hxClasses["flixel.util.FlxGradient"] = flixel_util_FlxGradient;
+flixel_util_FlxGradient.__name__ = "flixel.util.FlxGradient";
+flixel_util_FlxGradient.createGradientMatrix = function(width,height,colors,chunkSize,rotation) {
+	if(rotation == null) {
+		rotation = 90;
+	}
+	if(chunkSize == null) {
+		chunkSize = 1;
+	}
+	var gradientMatrix = new openfl_geom_Matrix();
+	var rot = rotation * (Math.PI / 180);
+	gradientMatrix.createGradientBox(width,UInt.toFloat(height) / UInt.toFloat(chunkSize),rot,0,0);
+	var alpha = [];
+	var _g = 0;
+	var _g1 = colors.length;
+	while(_g < _g1) {
+		var ai = _g++;
+		alpha.push((colors[ai] >> 24 & 255) / 255);
+	}
+	var ratio = [];
+	if(colors.length == 2) {
+		ratio[0] = 0;
+		ratio[1] = 255;
+	} else {
+		var spread = 255 / (colors.length - 1) | 0;
+		ratio.push(0);
+		var _g = 1;
+		var _g1 = colors.length - 1;
+		while(_g < _g1) {
+			var ri = _g++;
+			ratio.push(ri * spread);
+		}
+		ratio.push(255);
+	}
+	return { matrix : gradientMatrix, alpha : alpha, ratio : ratio};
+};
+flixel_util_FlxGradient.createGradientArray = function(width,height,colors,chunkSize,rotation,interpolate) {
+	if(interpolate == null) {
+		interpolate = true;
+	}
+	if(rotation == null) {
+		rotation = 90;
+	}
+	if(chunkSize == null) {
+		chunkSize = 1;
+	}
+	var data = flixel_util_FlxGradient.createGradientBitmapData(width,height,colors,chunkSize,rotation,interpolate);
+	var result = [];
+	var _g = 0;
+	var _g1 = data.height;
+	while(_g < _g1) {
+		var y = _g++;
+		result.push(data.getPixel32(0,y));
+	}
+	return result;
+};
+flixel_util_FlxGradient.createGradientFlxSprite = function(width,height,colors,chunkSize,rotation,interpolate) {
+	if(interpolate == null) {
+		interpolate = true;
+	}
+	if(rotation == null) {
+		rotation = 90;
+	}
+	if(chunkSize == null) {
+		chunkSize = 1;
+	}
+	var data = flixel_util_FlxGradient.createGradientBitmapData(width,height,colors,chunkSize,rotation,interpolate);
+	var dest = new flixel_FlxSprite();
+	dest.set_pixels(data);
+	return dest;
+};
+flixel_util_FlxGradient.createGradientBitmapData = function(width,height,colors,chunkSize,rotation,interpolate) {
+	if(interpolate == null) {
+		interpolate = true;
+	}
+	if(rotation == null) {
+		rotation = 90;
+	}
+	if(chunkSize == null) {
+		chunkSize = 1;
+	}
+	if(UInt.gt(1,width)) {
+		width = 1;
+	}
+	if(UInt.gt(1,height)) {
+		height = 1;
+	}
+	var gradient = flixel_util_FlxGradient.createGradientMatrix(width,height,colors,chunkSize,rotation);
+	var shape = new openfl_display_Shape();
+	var interpolationMethod = interpolate ? 1 : 0;
+	shape.get_graphics().beginGradientFill(0,colors,gradient.alpha,gradient.ratio,gradient.matrix,0,interpolationMethod,0);
+	shape.get_graphics().drawRect(0,0,UInt.toFloat(width),UInt.toFloat(height) / UInt.toFloat(chunkSize));
+	var data = new openfl_display_BitmapData(width,height,true,0);
+	if(chunkSize == 1) {
+		data.draw(shape);
+	} else {
+		var tempBitmap = new openfl_display_Bitmap(new openfl_display_BitmapData(width,UInt.toFloat(height) / UInt.toFloat(chunkSize) | 0,true,0));
+		tempBitmap.get_bitmapData().draw(shape);
+		tempBitmap.set_scaleY(UInt.toFloat(chunkSize));
+		var sM = new openfl_geom_Matrix();
+		sM.scale(tempBitmap.get_scaleX(),tempBitmap.get_scaleY());
+		data.draw(tempBitmap,sM);
+		var remainingRect = tempBitmap.get_height();
+		var remainingRect1 = UInt.toFloat(width);
+		var b = tempBitmap.get_height();
+		var remainingRect2 = new openfl_geom_Rectangle(0,remainingRect,remainingRect1,UInt.toFloat(height) - b);
+		data.fillRect(remainingRect2,colors[colors.length - 1]);
+	}
+	return data;
+};
+flixel_util_FlxGradient.overlayGradientOnFlxSprite = function(dest,width,height,colors,destX,destY,chunkSize,rotation,interpolate) {
+	if(interpolate == null) {
+		interpolate = true;
+	}
+	if(rotation == null) {
+		rotation = 90;
+	}
+	if(chunkSize == null) {
+		chunkSize = 1;
+	}
+	if(destY == null) {
+		destY = 0;
+	}
+	if(destX == null) {
+		destX = 0;
+	}
+	if(width > dest.get_width()) {
+		width = dest.get_width() | 0;
+	}
+	if(height > dest.get_height()) {
+		height = dest.get_height() | 0;
+	}
+	var source = flixel_util_FlxGradient.createGradientFlxSprite(width,height,colors,chunkSize,rotation,interpolate);
+	dest.stamp(source,destX,destY);
+	source.destroy();
+	return dest;
+};
+flixel_util_FlxGradient.overlayGradientOnBitmapData = function(dest,width,height,colors,destX,destY,chunkSize,rotation,interpolate) {
+	if(interpolate == null) {
+		interpolate = true;
+	}
+	if(rotation == null) {
+		rotation = 90;
+	}
+	if(chunkSize == null) {
+		chunkSize = 1;
+	}
+	if(destY == null) {
+		destY = 0;
+	}
+	if(destX == null) {
+		destX = 0;
+	}
+	if(width > dest.width) {
+		width = dest.width;
+	}
+	if(height > dest.height) {
+		height = dest.height;
+	}
+	var source = flixel_util_FlxGradient.createGradientBitmapData(width,height,colors,chunkSize,rotation,interpolate);
+	dest.copyPixels(source,new openfl_geom_Rectangle(0,0,source.width,source.height),new openfl_geom_Point(destX,destY),null,null,true);
+	source.dispose();
+	return dest;
 };
 var flixel_util_FlxHorizontalAlign = $hxEnums["flixel.util.FlxHorizontalAlign"] = { __ename__:"flixel.util.FlxHorizontalAlign",__constructs__:null
 	,LEFT: {_hx_name:"LEFT",_hx_index:0,__enum__:"flixel.util.FlxHorizontalAlign",toString:$estr}
@@ -75557,7 +79471,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 427243;
+	this.version = 41028;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -79502,7 +83416,7 @@ openfl_display_DisplayObjectRenderer.prototype = $extend(openfl_events_EventDisp
 		var updated = false;
 		if(displayObject.get_cacheAsBitmap() || renderer.__type != "opengl" && !colorTransform.__isDefault(true)) {
 			var rect = null;
-			var needRender = displayObject.__cacheBitmap == null || displayObject.__renderDirty && (force || displayObject.__children != null && displayObject.__children.length > 0) || displayObject.opaqueBackground != displayObject.__cacheBitmapBackground;
+			var needRender = displayObject.__cacheBitmap == null || displayObject.__renderDirty && (force || displayObject.__cacheBitmap != null || displayObject.__children != null && displayObject.__children.length > 0) || displayObject.opaqueBackground != displayObject.__cacheBitmapBackground;
 			var softwareDirty = needRender || displayObject.__graphics != null && displayObject.__graphics.__softwareDirty || !displayObject.__cacheBitmapColorTransform.__equals(colorTransform,true);
 			var hardwareDirty = needRender || displayObject.__graphics != null && displayObject.__graphics.__hardwareDirty;
 			var renderType = renderer.__type;
@@ -82559,7 +86473,7 @@ openfl_display_FPS.prototype = $extend(openfl_text_TextField.prototype,{
 		this.times.push(this.currentTime);
 		while(this.times[0] < this.currentTime - 1000) this.times.shift();
 		var currentCount = this.times.length;
-		this.currentFPS = Math.round((currentCount + this.cacheCount) / 2);
+		this.currentFPS = (currentCount + this.cacheCount) / 2 | 0;
 		if(currentCount != this.cacheCount) {
 			var newText = "FPS: " + this.currentFPS;
 			if(newText != this.lastText) {
@@ -84731,8 +88645,6 @@ openfl_display_Graphics.prototype = {
 			height = openfl_display_Graphics.maxTextureHeight;
 			scaleY = openfl_display_Graphics.maxTextureHeight / this.__bounds.height;
 		}
-		var newWidth = Math.ceil(width + 1.0);
-		var newHeight = Math.ceil(height + 1.0);
 		var inverseA;
 		var inverseD;
 		if(this.__owner.__worldScale9Grid != null) {
@@ -84741,8 +88653,8 @@ openfl_display_Graphics.prototype = {
 			inverseA = 1 / pixelRatio;
 			inverseD = 1 / pixelRatio;
 		} else {
-			this.__renderTransform.a = newWidth / this.__bounds.width;
-			this.__renderTransform.d = newHeight / this.__bounds.height;
+			this.__renderTransform.a = width / this.__bounds.width;
+			this.__renderTransform.d = height / this.__bounds.height;
 			inverseA = 1 / this.__renderTransform.a;
 			inverseD = 1 / this.__renderTransform.d;
 		}
@@ -84768,6 +88680,8 @@ openfl_display_Graphics.prototype = {
 		var _this = this.__worldTransform;
 		var norm = _this.a * _this.d - _this.b * _this.c;
 		this.__renderTransform.ty = norm == 0 ? -_this.ty : 1.0 / norm * (_this.a * (ty - _this.ty) + _this.b * (_this.tx - tx));
+		var newWidth = Math.ceil(width + 1.0);
+		var newHeight = Math.ceil(height + 1.0);
 		if(newWidth != this.__width || newHeight != this.__height) {
 			this.set___dirty(true);
 		}
@@ -86477,40 +90391,10 @@ openfl_display_OpenGLRenderer.prototype = $extend(openfl_display_DisplayObjectRe
 	,__resize: function(width,height) {
 		this.__width = width;
 		this.__height = height;
-		var w = this.__defaultRenderTarget == null ? this.__stage.stageWidth : this.__defaultRenderTarget.width;
-		var h = this.__defaultRenderTarget == null ? this.__stage.stageHeight : this.__defaultRenderTarget.height;
-		var tmp;
-		if(this.__defaultRenderTarget == null) {
-			var _this = this.__worldTransform;
-			tmp = Math.round(0 * _this.a + 0 * _this.c + _this.tx);
-		} else {
-			tmp = 0;
-		}
-		this.__offsetX = tmp;
-		var tmp;
-		if(this.__defaultRenderTarget == null) {
-			var _this = this.__worldTransform;
-			tmp = Math.round(0 * _this.b + 0 * _this.d + _this.ty);
-		} else {
-			tmp = 0;
-		}
-		this.__offsetY = tmp;
-		var tmp;
-		if(this.__defaultRenderTarget == null) {
-			var _this = this.__worldTransform;
-			tmp = Math.round(w * _this.a + 0 * _this.c + _this.tx - this.__offsetX);
-		} else {
-			tmp = w;
-		}
-		this.__displayWidth = tmp;
-		var tmp;
-		if(this.__defaultRenderTarget == null) {
-			var _this = this.__worldTransform;
-			tmp = Math.round(0 * _this.b + h * _this.d + _this.ty - this.__offsetY);
-		} else {
-			tmp = h;
-		}
-		this.__displayHeight = tmp;
+		this.__offsetX = 0;
+		this.__offsetY = 0;
+		this.__displayWidth = this.__defaultRenderTarget == null ? width : this.__defaultRenderTarget.width;
+		this.__displayHeight = this.__defaultRenderTarget == null ? height : this.__defaultRenderTarget.height;
 		lime_math_Matrix4.createOrtho(this.__projection,0,this.__displayWidth + this.__offsetX * 2,0,this.__displayHeight + this.__offsetY * 2,-1000,1000);
 		lime_math_Matrix4.createOrtho(this.__projectionFlipped,0,this.__displayWidth + this.__offsetX * 2,this.__displayHeight + this.__offsetY * 2,0,-1000,1000);
 	}
@@ -87847,7 +91731,9 @@ openfl_display_Stage.prototype = $extend(openfl_display_DisplayObjectContainer.p
 			break;
 		case "opengl":case "opengles":case "webgl":
 			this.context3D = new openfl_display3D_Context3D(this);
-			this.context3D.configureBackBuffer(this.stageWidth,this.stageHeight,0,true,true,true);
+			var unscaledWindowWidth = this.window.__width | 0;
+			var unscaledWindowHeight = this.window.__height | 0;
+			this.context3D.configureBackBuffer(unscaledWindowWidth,unscaledWindowHeight,0,true,true,true);
 			this.context3D.present();
 			this.__renderer = new openfl_display_OpenGLRenderer(this.context3D);
 			break;
@@ -89677,32 +93563,38 @@ openfl_display_Stage.prototype = $extend(openfl_display_DisplayObjectContainer.p
 		var visibleHeight = this.__logicalHeight - Math.round((scaledHeight - windowHeight) / scaleY);
 		var visibleX = 0.0;
 		var visibleY = 0.0;
-		switch(this.align) {
-		case 0:
+		var _g = this.align;
+		if(_g == null) {
 			visibleX = Math.round((this.__logicalWidth - visibleWidth) / 2);
-			visibleY = Math.round(this.__logicalHeight - visibleHeight);
-			break;
-		case 1:
-			visibleY = Math.round(this.__logicalHeight - visibleHeight);
-			break;
-		case 2:
-			visibleX = Math.round(this.__logicalWidth - visibleWidth);
-			visibleY = Math.round(this.__logicalHeight - visibleHeight);
-			break;
-		case 3:
 			visibleY = Math.round((this.__logicalHeight - visibleHeight) / 2);
-			break;
-		case 4:
-			visibleX = Math.round(this.__logicalWidth - visibleWidth);
-			visibleY = Math.round((this.__logicalHeight - visibleHeight) / 2);
-			break;
-		case 5:
-			visibleX = Math.round((this.__logicalWidth - visibleWidth) / 2);
-			break;
-		case 7:
-			visibleX = Math.round(this.__logicalWidth - visibleWidth);
-			break;
-		default:
+		} else {
+			switch(_g) {
+			case 0:
+				visibleX = Math.round((this.__logicalWidth - visibleWidth) / 2);
+				visibleY = Math.round(this.__logicalHeight - visibleHeight);
+				break;
+			case 1:
+				visibleY = Math.round(this.__logicalHeight - visibleHeight);
+				break;
+			case 2:
+				visibleX = Math.round(this.__logicalWidth - visibleWidth);
+				visibleY = Math.round(this.__logicalHeight - visibleHeight);
+				break;
+			case 3:
+				visibleY = Math.round((this.__logicalHeight - visibleHeight) / 2);
+				break;
+			case 4:
+				visibleX = Math.round(this.__logicalWidth - visibleWidth);
+				visibleY = Math.round((this.__logicalHeight - visibleHeight) / 2);
+				break;
+			case 5:
+				visibleX = Math.round((this.__logicalWidth - visibleWidth) / 2);
+				break;
+			case 7:
+				visibleX = Math.round(this.__logicalWidth - visibleWidth);
+				break;
+			default:
+			}
 		}
 		this.__displayMatrix.translate(-visibleX,-visibleY);
 		this.__displayMatrix.scale(scaleX,scaleY);
@@ -89751,7 +93643,9 @@ openfl_display_Stage.prototype = $extend(openfl_display_DisplayObjectContainer.p
 			}
 		}
 		if(this.context3D != null) {
-			this.context3D.configureBackBuffer(this.stageWidth,this.stageHeight,0,true,true,true);
+			var unscaledWindowWidth = this.window.__width | 0;
+			var unscaledWindowHeight = this.window.__height | 0;
+			this.context3D.configureBackBuffer(unscaledWindowWidth,unscaledWindowHeight,0,true,true,true);
 		}
 		var stage3D = this.stage3Ds.iterator();
 		while(stage3D.hasNext()) {
@@ -90218,22 +94112,37 @@ openfl_display_Stage3D.prototype = $extend(openfl_events_EventDispatcher.prototy
 });
 var openfl_display_StageAlign = {};
 openfl_display_StageAlign.fromString = function(value) {
+	if(value == null) {
+		return null;
+	}
+	var upperCaseValue = value.toUpperCase();
+	var value = "";
+	if(upperCaseValue.indexOf("T") != -1) {
+		value += "T";
+	} else if(upperCaseValue.indexOf("B") != -1) {
+		value += "B";
+	}
+	if(upperCaseValue.indexOf("L") != -1) {
+		value += "L";
+	} else if(upperCaseValue.indexOf("R") != -1) {
+		value += "R";
+	}
 	switch(value) {
-	case "bottom":
+	case "B":
 		return 0;
-	case "bottomLeft":
+	case "BL":
 		return 1;
-	case "bottomRight":
+	case "BR":
 		return 2;
-	case "left":
+	case "L":
 		return 3;
-	case "right":
+	case "R":
 		return 4;
-	case "top":
+	case "T":
 		return 5;
-	case "topLeft":
+	case "TL":
 		return 6;
-	case "topRight":
+	case "TR":
 		return 7;
 	default:
 		return null;
@@ -90242,21 +94151,21 @@ openfl_display_StageAlign.fromString = function(value) {
 openfl_display_StageAlign.toString = function(this1) {
 	switch(this1) {
 	case 0:
-		return "bottom";
+		return "B";
 	case 1:
-		return "bottomLeft";
+		return "BL";
 	case 2:
-		return "bottomRight";
+		return "BR";
 	case 3:
-		return "left";
+		return "L";
 	case 4:
-		return "right";
+		return "R";
 	case 5:
-		return "top";
+		return "T";
 	case 6:
-		return "topLeft";
+		return "TL";
 	case 7:
-		return "topRight";
+		return "TR";
 	default:
 		return null;
 	}
@@ -92150,6 +96059,7 @@ openfl_display__$internal_CanvasBitmapData.renderDrawable = function(bitmapData,
 	}
 	var context = renderer.context;
 	context.globalAlpha = 1;
+	renderer.__setBlendMode(10);
 	renderer.setTransform(bitmapData.__renderTransform,context);
 	context.drawImage(image.get_src(),0,0,image.width,image.height);
 };
@@ -94342,7 +98252,7 @@ openfl_display__$internal_CanvasGraphics.closePath = function(strokeBefore) {
 	}
 	if(!openfl_display__$internal_CanvasGraphics.hitTesting && openfl_display__$internal_CanvasGraphics.strokePattern != null) {
 		var scale9Grid = openfl_display__$internal_CanvasGraphics.graphics.__owner.__scale9Grid;
-		var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.b == 0 && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.c == 0;
+		var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && Math.abs(openfl_display__$internal_CanvasGraphics.graphics.__owner.__rotation) < 0.02;
 		if(openfl_display__$internal_CanvasGraphics.bitmapStrokeMatrix != null || hasScale9Grid && openfl_display__$internal_CanvasGraphics.strokeScale9Bounds != null && openfl_display__$internal_CanvasGraphics.bitmapStroke != null) {
 			var matrix = openfl_geom_Matrix.__pool.get();
 			if(openfl_display__$internal_CanvasGraphics.bitmapStrokeMatrix != null) {
@@ -94400,7 +98310,7 @@ openfl_display__$internal_CanvasGraphics.createGradientPattern = function(type,c
 			point2.x = px * matrix.a + py * matrix.c + matrix.tx;
 			point2.y = px * matrix.b + py * matrix.d + matrix.ty;
 			var scale9Grid = openfl_display__$internal_CanvasGraphics.graphics.__owner.__scale9Grid;
-			var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.b == 0 && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.c == 0;
+			var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && Math.abs(openfl_display__$internal_CanvasGraphics.graphics.__owner.__rotation) < 0.02;
 			if(hasScale9Grid) {
 				point.x = openfl_display__$internal_CanvasGraphics.toScale9Position(point.x,scale9Grid.x,scale9Grid.width,openfl_display__$internal_CanvasGraphics.bounds.width,openfl_display__$internal_CanvasGraphics.graphics.__owner.get_scaleX());
 				point.y = openfl_display__$internal_CanvasGraphics.toScale9Position(point.y,scale9Grid.y,scale9Grid.height,openfl_display__$internal_CanvasGraphics.bounds.height,openfl_display__$internal_CanvasGraphics.graphics.__owner.get_scaleY());
@@ -94546,7 +98456,7 @@ openfl_display__$internal_CanvasGraphics.createGradientPattern = function(type,c
 		point3.x = px * matrix.a + py * matrix.c + matrix.tx;
 		point3.y = px * matrix.b + py * matrix.d + matrix.ty;
 		var scale9Grid = openfl_display__$internal_CanvasGraphics.graphics.__owner.__scale9Grid;
-		var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.b == 0 && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.c == 0;
+		var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && Math.abs(openfl_display__$internal_CanvasGraphics.graphics.__owner.__rotation) < 0.02;
 		if(hasScale9Grid) {
 			point.x = openfl_display__$internal_CanvasGraphics.toScale9Position(point.x,scale9Grid.x,scale9Grid.width,openfl_display__$internal_CanvasGraphics.bounds.width,openfl_display__$internal_CanvasGraphics.graphics.__owner.get_scaleX());
 			point.y = openfl_display__$internal_CanvasGraphics.toScale9Position(point.y,scale9Grid.y,scale9Grid.height,openfl_display__$internal_CanvasGraphics.bounds.height,openfl_display__$internal_CanvasGraphics.graphics.__owner.get_scaleY());
@@ -96311,7 +100221,7 @@ openfl_display__$internal_CanvasGraphics.playCommands = function(commands,stroke
 	openfl_display__$internal_CanvasGraphics.setSmoothing(true);
 	var hasPath = false;
 	var scale9Grid = openfl_display__$internal_CanvasGraphics.graphics.__owner.__scale9Grid;
-	var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.b == 0 && openfl_display__$internal_CanvasGraphics.graphics.__worldTransform.c == 0;
+	var hasScale9Grid = scale9Grid != null && !openfl_display__$internal_CanvasGraphics.graphics.__owner.__isMask && Math.abs(openfl_display__$internal_CanvasGraphics.graphics.__owner.__rotation) < 0.02;
 	if(!hasScale9Grid) {
 		scale9Grid = null;
 		if(openfl_display__$internal_CanvasGraphics.fillScale9Bounds != null) {
@@ -98514,7 +102424,7 @@ openfl_display__$internal_CanvasGraphics.playCommands = function(commands,stroke
 openfl_display__$internal_CanvasGraphics.render = function(graphics,renderer) {
 	var pixelRatio = renderer.__pixelRatio;
 	var scale9Grid = graphics.__owner.__scale9Grid;
-	var hasScale9Grid = scale9Grid != null && !graphics.__owner.__isMask && graphics.__worldTransform.b == 0 && graphics.__worldTransform.c == 0;
+	var hasScale9Grid = scale9Grid != null && !graphics.__owner.__isMask && Math.abs(graphics.__owner.__rotation) < 0.02;
 	if(hasScale9Grid) {
 		graphics.__bitmapScaleX = graphics.__owner.get_scaleX();
 		graphics.__bitmapScaleY = graphics.__owner.get_scaleY();
@@ -102718,7 +106628,7 @@ openfl_display__$internal_Context3DGraphics.buildBuffer = function(graphics,rend
 	var bitmap = null;
 	var bitmapMatrix = null;
 	var scale9Grid = graphics.__owner.__scale9Grid;
-	var hasScale9Grid = scale9Grid != null && !graphics.__owner.__isMask && graphics.__worldTransform.b == 0 && graphics.__worldTransform.c == 0;
+	var hasScale9Grid = scale9Grid != null && !graphics.__owner.__isMask && Math.abs(graphics.__owner.__rotation) < 0.02;
 	if(!hasScale9Grid) {
 		scale9Grid = null;
 	}
@@ -105040,7 +108950,7 @@ openfl_display__$internal_Context3DGraphics.render = function(graphics,renderer)
 				openfl_display__$internal_Context3DGraphics.buildBuffer(graphics,renderer);
 			}
 			var scale9Grid = graphics.__owner.__scale9Grid;
-			var hasScale9Grid = scale9Grid != null && !graphics.__owner.__isMask && graphics.__worldTransform.b == 0 && graphics.__worldTransform.c == 0;
+			var hasScale9Grid = scale9Grid != null && !graphics.__owner.__isMask && Math.abs(graphics.__owner.__rotation) < 0.02;
 			if(!hasScale9Grid) {
 				scale9Grid = null;
 			}
@@ -117004,24 +120914,11 @@ openfl_events_Event.prototype = {
 		event.currentTarget = this.currentTarget;
 		return event;
 	}
-	,formatToString: function(className,p1,p2,p3,p4,p5) {
-		var parameters = [];
-		if(p1 != null) {
-			parameters.push(p1);
-		}
-		if(p2 != null) {
-			parameters.push(p2);
-		}
-		if(p3 != null) {
-			parameters.push(p3);
-		}
-		if(p4 != null) {
-			parameters.push(p4);
-		}
-		if(p5 != null) {
-			parameters.push(p5);
-		}
-		return $bind(this,this.__formatToString).apply(this,[className,parameters]);
+	,formatToString: function(className) {
+		var $l=arguments.length;
+		var args = new Array($l>1?$l-1:0);
+		for(var $i=1;$i<$l;++$i){args[$i-1]=arguments[$i];}
+		return this.__formatToString(className,args.slice());
 	}
 	,isDefaultPrevented: function() {
 		return this.__preventDefault;
@@ -127900,7 +131797,7 @@ var Bool = Boolean;
 var Class = { };
 var Enum = { };
 js_Boot.__toStr = ({ }).toString;
-haxe_Resource.content = [{ name : "__ASSET__:bitmap_flixel_system_GraphicLogo", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUdRQUFBQmtDQU1BQUFCSFBHVm1BQUFCRGxCTVZFVUFBQUE3UVA4NVFmOER6ZnNFenZzRXpQdjNKRTBBelArM1MwTUR6UHdEemZvRHpmb0V6ZnNBenY4N1FQODZRUDh6UlAvL3dqRTZRdjg2UVA4RHkrZzZRUDg3UVAvL3dESC93REwwSms3MUowNy94VEgvd1RML3pEUDFKazcvSWtUL3dURC93REgxSmszMUprNzNJVXIwSms0QXp2L3R3REQwSjAzL3dESC93ekVEelB2QVJrVXNYOGZJdnk3L3dURDBKa3ovd0RJN1FQLy93akQvd1RML3dERUxva3NXakhRM1NQRTdRZjhEc1M4a2Jxd3ZWOVVPbTFrRHkrMEN4YWtDdzQ0aGRaNHpVT01BdkVvRXpmc0J2MlVCd0hQMUowNEF1U0xsTUV2L3dUTEhRa1ZiZ2pMUHZ5OFB1U09aWFQyZnZpeVB2U3N0blNwZnZDanZ3REVQcnlTdnZpMGVwaWQ2Y0RndnVpWEtyZHZYQUFBQU5uUlNUbE1BdnovdlA3OC9ENzlmbjk5L0grK2ZEejhmZjcvZlgrK2ZYOThmZncvUEQxL2ZuMzhmN3kvZnY3OHZyOSsvMzI4dnI0OVBqOC81R3BYYUFBQUNrVWxFUVZSNDJyWFdCWkliTVJoRTRWNW1abVlNODBJNHMyQTd6TG4vUVVMMEtvbzljZWVYM3dXKzZwb2FTYW8yYkhaQlZpdnJadzBDK2J1WnhTV0QyTmc2TXhFWWczQVJtTlZtakxuNU0yb2VvYlZWZzdBUm1MRXlvbnY1akh5RTltQlNZdmVNYkNSbDl1c1JWeUVjeFBsdE52a3g0Z2lNUi9nSXZ3MC9SbjRFQmlJL3d0ODVCNUVYb2NzWHo4eDg1Tm56ZHpVWDhZM3pjNVRjQ0lhdHlEZDhSYjd4b3hldFF0NWpvR1JHWGlKNGluekRWK1FidmlMZjhCWDVocS9JTjN4RnZ1RXIybk9OdEk5TklHTzJrZmIwMzRobVhjTlhwS1Vaei9DVmVVbFhTbzFYNTBtK01pZEpheVhHbTNPeUZZWklZNGJoS1F5UnJobUdwVEJFV3BneERFdGhpTFFZTUZBcVpVT2twVFhYSUhxTlVtZUlkTU13TEdWWm9qM0RjSlJ1aWZZTncxQjI5VWMzY3hnb0RDR09NSXlvd2hCYURSc29ERW03OVpONCt5bGlvREJFTklhUlNXRUl6V0xFK2xCakNQSHRNU0s5cXpFa2JSRWpyREFrYlFjanJEQWs2ZExSZVRhbFYvVnJQN3liVFhreXFmcTFIYUpFamZ0Rlo0TWhoeWhobytocU5PUnJ4NW1NZ2luSkVKU3d3WlJrQ0VyWVlFbzZCQ1Z1TUNVZGdoSTNtSklPUVlrYlRHRklGdVVFZ3lrTVNYcjBYOFpwUVV4aFNOcWRxTUVVaHNRVkRMcVFESWtvR0dsRHlaQ0FncEhXTDRZWWltRXdoU0VSQlNPZHdoQkRNUXltTUlUb1hzUmdDa09JRG00SERLWXd4RmN3U3Fjd3hGY3d5bU9Jb1poR3dSQkRNWTJDSVlaaUdnVkRETVUwQ2gwMjErTWp6L0FSSG4yZUFSSlFIaFl1NGlzUGl0d0lDa1p1QkFVak40S0NrUjFCd2NpTjBERkdmZ1FGSXorQ2dwRWZRY0ZvR1RJeVB0VGZZcVN0WFpLMnV6ekVKNzdYQ1pNWG1ab1dPWXhzZ3ZvR01pUERFeUtYVVpQRXFNaGdET1E2aE5KNkJqc2lDRCtHeUdBTXBBM0NZQ3lFSDZPODhrUGdDNTI5U3ZkVGZJcUtBQUFBQUVsRlRrU3VRbUND"},{ name : "__ASSET__:file_flixel_system_VirtualInputData", data : "YmFzZSA9IDI2NiA0NiA4NCA4NAp0aHVtYiA9IDI2NiAxMzEgNTIgNTIKYSA9IDAgMCAxMzIgNDUKYiA9IDAgNDYgMTMyIDQ1CmMgPSAwIDkyIDEzMiA0NQpkb3duID0gMCAxMzggMTMyIDQ1CmxlZnQgPSAxMzMgMCAxMzIgNDUKcmlnaHQgPSAxMzMgNDYgMTMyIDQ1CnVwID0gMTMzIDkyIDEzMiA0NQp4ID0gMjY2IDAgMTMyIDQ1CnkgPSAxMzMgMTM4IDEzMiA0NQo"},{ name : "__ASSET__:bitmap_flixel_system_GraphicVirtualInput", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQVk4QUFBQzNDQVlBQUFEcXhOS1RBQUJ5VzBsRVFWUjQydVNaQldoY1N4aUZiNlJLOFdkMWI1ZTZ1N3U3Uzl6ZDNUM1Y1KzVlZDEycEt4b1BSZXZ1RWlYbnpRK1hNTnpseG9EWjZiNkZyeEk3WHlZbi93eDNGTzBMZ0VNOUdkOE1aSXdTaklGMzBPalpsNjhFa0ZOem5NK2RPemZ3N05tem8wVENNbHU4eGpkdTNCaklHQ1dZLzFVbk12SXhNQ01QbzRTU0QrMGEyNjJ2RERSVjFoR3BYMFVpNWN0SFNQb1VTTmpKMkNFR3lrcjZESlROSEh6SmhaZHYxRGY5SzRCSUU0T2ExMnhmRlNjVlo1Rnd1WTdXdnZyT1o4NmNpYlJZTEk4c0ZqTXNGcE5nektCczV0RGtOUzR2TDQ5a1BDb3JLMFZwYVlsUUtKT3lHWGJkaWRRY1JLWms0eEg3R3luWmpDd3hVQlpscXRuYU5XN1VOek1mSURKRXdHWHh2bmJUQ1U3V0NTbGY3RUo0RGpETkV4aXdFakNzRUF0bHp2SUdJcGtEdVpDVEtxL3JtL1lsNEpjTmJFZ0cxaWVKaFRJRG1HdjZsNDM2Y2lWb3hXaXQwa1lrWEM0NU9GdjdXanV6b2IzTFpEcUZYYnQyNGJmZmZzT3Z2LzRxRk1yY3MyYzNUS2JUSUpmRzFwZ043VjFGUlFXNGNPRWNqTWJUT0gxYUxKUjU4ZUlGRkJjWGdsenNzUk1wMmRpVmtBNnNjUVZtTHdGbUxSWUxaYTczQUJJekFITGhuZlY4czdjQ2tRbUFYeWpnR3lJV3lveGkyZVJBTG5iUUNZMXc2cGR1aU1vRGhxNmhRVzVUeUlGY3lJa1h0L0tsaldOekNyQXUwYWFRQTdrMDVLditJTm93MnM2Wk02ZG52Mzc5Sm9tbWQrL2VFeGN0V3RTTkhNaUZuTFRGMEd3Y2JtYnphZnp4eCs4MHlHMEtPWkFMT2ZIT21vM0RqWWEyeVdTaVFXNVR5RUhkUUxTK2p1OXpKOUp5NFphVUFTeFlTWVBjdHBCRFVpWkFUcnl6MWpkckt4QVlBZmdFMnhaeW9BMkVuTjczT2FGd3dxMlI4R2tCRnZnRC9aZkx3ZUlBSVBIVFMrUkdqanoxdmtHNU5MemxJQ1JQejlkWmZWdmJqaDA3TG5OMmRyNUdTei96bzI1WTNybVBVS1orMkFXVXpSd3VkTzNhZFM0NWNiNk8yazVZTEphQ2ZmdjIwdkNXZ3YzNzk0RTU2WGFpdExTMDRQTGxpelM4cGVES2xVdGdUcnd2UHlDc09qRmt5QkNNR3pkT0tJTUdEV3BXSjlqR1ViRFpCNWk1V0E3Yy9JSGtET2gyZ254amttaDR5MEZjQ3UvYitKem8yR2tTdW5XZko1U1BPNDVydEJQMGh3UERpYWlwcVI2ZzNIMnFTUE82LzBKNVYxazVnanpKai9OMXJ2ZDkrWTYrUnpsNFhhSG42OFF1Zmx1M2E5ZnVpL3YzN3gvNFlleThNWlZSV3hXVGQ0U3kzeVdRRVNBRXlqcnJFNjFROW81aDB5ZmR2bjM3WkljT0hmTElrM05WK0U1VVYxY1BlUGV1UXBwS1ZGWldLaFVWRmJxZHFLMnRIVkJSVVNtUmJ4VkQ3WVFHdmhPQmdZRmpUcHc0b1h6NjZVNGxKeWRMS0o5Ly9wbEMyUjRlSGszcVJFMXR6WUFuVCtUNXRYdjZsSzF6MVR2ZFRwRHYyemZ5K0w1OXkvdnF6NG1KVTNlTWlZcDdxWGo1bmxWY1BJNHBMdTVpb0N3Zi80c0taWThlbDY3ZkNmVUUxSllKNXlOcUcyQ2dVLzh5T1JpMkJpK0NzOERFc3dDMDQ1N0h0YXYzWFpjQXJKV0VUY2tOK1g1T3kxMndNZ0FJcy9XZGtnOFFua3N1SUNmVnR5MTFRZHNKbzlGSUozNXArT09QUDNEdzRFSGRUcFNVbE5DSlh4ck1aak91WHIycTlXM0xkK0tycjc2QzBVaDNTdi9hK0U3cEZMazAyb25ZRkdBV25mb1h5UUU5dWdxTGZhSGJDZktsRTc5M2tCd0VoT240Y3AxWXQra1M0bFBxc01iRmhuZEs3a0I4YWgyNVdIZENMVVZyOW94ck5QdG5MU0syU0xOeEVIVHY4U1lvRStRMmN1VEl3YlM0eElBQkE4YlUrNjZObDRlTlNjdzN5OHEzZi8vKzQybXA4NFpPQVNJa3VsT0t6Q01uM3JlMXRoTTBBT1hhUEg3SG9VT0hkRHRSWEZ3czFlWkI5eDdYcjEvbmZkc3kyck5IUlJNY0hCemc0dUlDMmU2VXlLbWhUc1FrQXpNV3lzUDhGVUJZekd1UTI3aHg0NFpvTzBHKzNvSHk0QjlLbTRlMXI4RmdvRG1CVVdNU2taQmFKODJkRXJtUWs3WVRqc1N0VzdkOC91UHVLb0RiU05yc0U5bE96QTV6RmtMTEVGaEdlNW1abVpuM21KbVorVzZaNmNmaytHNlpHVXdib3h6TGRzVHlUTTgvcjF5dHFTN0pra2ZxYk5wNVZWOU56VXlyL1VycGZQUzZiUUFoMkFLbUlXdzdJTGZQUC8vOExsbm05ZmIyM2hJSUJNems2eFR5ZGIvZisxMit1UEh3WTRIUGU0SE1KT0E0dTlmSTRjdnR1T3FnTFNCSE4yTy8wMnRSZUd2QzRWaE5TQ2FUTkZTTFlEQTQ3WnJReVhkeWNwS0dhaEVLaFFyNGRuWjIzZ2NBWjU1NUpzYkhkOEkyWUMyVHc4UkVIQjBkSFNYWGhCQXdEbzRUQXYvOVAvNzQ0enZsZDl6VDA1UG42OEFrSzg2M3U3djdmZ0E0Yk9PdDJENFFRRGEzKzNtU3c4QlFBQWNlZksyNkptVC95dTFyZDRBUWR0VS9ybk15Z2JjelkzbjdKRHRSMVh4QlljdGU5M0d5UDVqTlp0c2wzMnFkYUdmYzVUazZrTGRQeHFOVnpSZDBSQUZmMXdFZEN3Q3R6YzNBZ0VHYTB0QVlGclMwU1VkNUlybUM4TllFZERuamtaRVI5UGYzWTJCZ1FFc0FLYjRtOVBGTkpCSVlIUjJseVFDaWsyL0FzaXl1Q1RTN2E4STBUYW10cmZTYThCczhVb2t2c0hQODdieGxNLzNGZjNhNnQveTRZbkFBNFFSQXVPc2d2eVl5bVV4N0pYekh4NzdBU1BUdHZDV1R4WGtrNHIwbHhwV2hyUEpWL0VSajB5THNHRFZJVXhvRG1sdVdxbXRDQmc4aHhISVFkdlVoT25Eblpkam5pVC9JVyt0dlA0aTBzQ3VmMHhheXZiYVlYR21PNDNoOHEwVGc0cE94eis4K2tyZldlNjlHMnJaUU1XeEg0ZXRHYXU2Z1dBZ0FJV2JNMlVselZvVmxJUUFIaEJCaUVTVGttdERrakJrMDZJUmJXMXZSMHRJQ1Z3eEU1WkNjQ3RlRUxyNWpZMlBZdVhNbjNCNHZEYkZZVEN0ZmQrdHVSQWl4VUZaUnRtM0RGTWdLcU5TYUVNSmZUblgvUGF2eGwzKzhUOTVPUG40Q1FsaktHTnRLNDd5ejB0NjRQOWtYWjUrNVpJWS9Rd2tRY2sxVXpQZkc2MWJqVjM1K243eHRPblFDdHEzeXRTYlRPT0hZdERmdUYvYkZ5U2RXenBkK0lyOG1BbUV3WHpFRmRJZHdnZ1ZySWlncmF4M09PR3Buc2ZLbVM5RjI1R0Y1VzNiSm1ZZ3Ria0hGRUhsbkVKYUxRdUZiUlpVUXpTU3g4cUxUMFhiSWZubGJkdnJ4aURYWFZUaW5JQ2VGNzNQUFBWY1BJS2p3TlFVT0N2akNRMGlITSs3cjYyTjJCWGU3SCtycTZ1QUtnbGkrZkxrV1o2eXVDVDE4R1RoWWFTeFlzQUNSU0FRMU5UV1lQMysrVHI3QnA1OStlaTZ2OHAxWmNNaXA1SnJ3bThtLzhWWWROaDdlbHJlSDdsdUxjR2k3TXFhNXNRc1AzNzgrUDJiOTJoYjgzK3ZCR1RLV25OUTFVU25manordHcwRUh0dVh0NWh2WHdyRlZ2aldSTHR4NjAvcjhtSDMzYnNHSEg4MlFyMVBJOTVsbm5tbVFhMEk0TXVDWlk4SlIrVUtTemNPdXJtMlZPV2tUd2swTlVBSGtUdDVjMFh4a1RVNkVKS3lWNzJGckVXNm9MK1I3K0xySzV5M2tHNFNFaWMxaUljbzd2aW9DaDl2cXdNS0ZDNW14TU11bU0rYTlMbWNjME1sWEJnNVdSNUp2T0J4bWEwa3pYMjlObUtjcGxlY2toTC8vRWg5OEJEejdvb0JFWTJNWUY1NWpRMWhwdnNka0xvYjc3bG9BUXVKMy9qQ0FoSS90dGVSVWZFMzRkOFJmZkFYOGFKdUFSRU45R0NlZllMUGFtSklMTXpGY2U1WEs5eC8rTllCa3lvY3pWdmxTL3dqT0tqZFJHRHdxWjIwNURrTHRXMUFNOHk4NkRXbkhoaStVNFZSdG04MFNBcUhOQnhUbjIzRU0wcFpWVlp0TklwVktoUlMraG1sS3NMVUhEeVZ3TEY2OG1FNllvakV6ZVN4YXRJalBOVGczdlh4bDRHQnJqWnNiSkdjR0VzdXl0UEtWYThKVVRha2NwMG9FNkg5K0xJaEV3b0hFYlRmdmk2YW1McjdEaHJXRE9QSDRoWkQ0bi8rMzhUK3YrL3daUWwrd283M3lXaENwbE1mM3FpdjJSVTI0aSsrd2N1a2dqanJDNC92ZSt6YmUvOERYL09SVWRFMllxQ2s1eFRucHF6eEc2c05zVVVIQzN2bzZKQnIzWDRPQlJVMFZ6Q3ZJQ1FwMDhRMEp0MFYxQWlUc056LzIrSzVaallIR1NHV1ZraWpEMXpoTnlkWWRQT2pFWk9CUWRoeTVwMmJad2pJc2VDaUJROW5SUmVHWXozVUhEd25UTlNVVjFlV1lpU1R3MjMrb0ZnV3NOcEx4VC9EZ3ZTdTljUW1Cdi9qYlVBVlNvOTRjTTVrRy91RmZWTDdYWGJNQXNkZ251UEY2ajI4eUpmRGtjeUYvODVjSkVHWnJTaDZDZWpKNTJacnlFUHIxdjFmdTY2NDlWMHNtTDFHdDVwSGJ1RUhsKzgrdnFIelBQcjZTZWN2d05VbFRrcXZZMFJvOFpPQll1blFwQ0dieHRiVzFXTFpzR1UrR2N6ZVBCb2Vwank4REI0UER2SG56SkY5V1NMeG5vR1B3a0hOcTUyUzJwcVRMdVVsalJRRzgvNkdBeEVsdXRmR3pqN1ppM2RwR1NQelRZMEVNRGxYUWt4ZjYrYjc3QWZENWx3SVNyRFp1djdrVisrenQ4WDNaclZCR2R1amphNkttaEYxWmVhUWRDM1BhajRSRTdyTk9vSDhZbVIvOUh5VGFUajBPY2VGL3AxSDV5c00vMHJiTDk0aURQTDVkMjRIb0dES3ZmK2p4UFdZajRsWU9aVkdHazdtYVV2bnZseEErVnZMUTBCQURCeXNNT2lDcGNiQlZ4Yktjd1VPSHd5UW5MWHduSmlZWU9GaGhrSlBVT0ppOUt4V1NmcjdtYTBxbElHeFVDRllmUWNRVEFoTG5uclVNRXU5L2FMdmFDSHloREtlcVR5RDh3ejhIV1YxQTRwUjJqKy9uWDlqNDBkYks1aFZpZG1sS2psTXVlRmdDbFNDMnBBMExUenNlRW9FWHRvR28yZlkySk9hc1dJTFJ0Y3YxYWg1V1pTa0ZkMU10UEhhengvYy8zdUZ6MUx6N21jZDM4UUtNTG1uMVA3L2xRSUh4bXBJK3pVTzJxcVJtd0NzemVQYmdHVHg0TDRUZzFZaE1ub0ZEdHFva3A2YW1KZ1lPbWphK2U0eW1wRUhRSFJvR25uc3hpR0w0ODc4SjZSRjBOV2cwMGtaR2dSOXZLODczaVdkRGxjMWJocTl0b0taazc2TEtvNkJsRmRuNkpwOGp1TzExOWZrRjdSWHN0aEs2TS9tQ2xsWGtuYyttK0w3MXFmcjhwTTJhS3lVak5TVnR6bTNseXBYeTlIY2U3bC9WNDRFN09tRE9KUjJ4Q2NHRDIzRVZQckx0eGdwSk0xOGpOQ1VOMExGREhuLzdqekhFNDZxTzlOS3JnL2p5cTdRY283OWI3RlJ1VHowYlF5S3A4djNSMWtGMGQ2VjN5VDRWWVphbTVLTnQ1Y0NYVWF4bDV1dTFyTDRCK29hbjNrOGtlYSswcnFKV1RwK2dXd2xmeThMOFU0LzErSFp1QjRaalUrOFRhZDRycmF0b0pxV1JyNUdha3JiZ3dmWVBlKzdTNGZMSzdMNjd1NXRYemtWak5tK0VNMjVzYktRZW8vQzFiUnZEdzhPOFNyNEdhQjRhTkNWREtnL0hzYkJoYlIvWVdpRTgvV01CbWh1L3JuRFNYVmQ1VUhoZXNhd1BEZlVxMzZPTzVEbWdyL1ZYSHVaclN2cTI2a1lYdDdxWjcxcElkRDM5Q242WUdwSEdlNlYxbFduZkRCL1FubEpFbTJ2UnVHWXZqKzlyVy9IRDRSNXB2UGY0TGxtSXpNWU5QaW9sVVhwVm1LZ3BDWDJWUnp3ZUJ3L1UwWm14QXVGbmVjOVQyajA5UGZJa3RURnRLenBidHFuWTdwRjhlVS9oT1JxTnFrSE9BTDcrTlNVanpua29GZ2x1ZDA5a3J5a1N5TVA0eFo5ZGpzbHN0TEpOam1MWDhIWEVkamR6TCtUTFlITHZuY3VSU1VYMWF4NkdhVXJTVGVodlcxMXdrakxGK2wrNkg2ZjJ2eW1OOTJvcmlFNVFaeHZJYndnOWNaUEs5NTdyY2VyL1BTZU45eXJmTFFmNm1iOE1YOE0wSlZsNWFCTE0yVElaSHg5bk80aE9qYzR0WDVITW5UdVhGWWpNNkt0d2JOb0VhTzZrb2g3RFE0QVV5aVZmV1pHd0F0RVJRTWhwOW10S0duYWNXMVljRjU1dnUxWFRIRG1WMHFmZmRIZ2JObThjZ25Bcy81bThaamRCeStYaTZEakpkb056bnE5eTl1UGdnOXF3WVozTDE3YjhaZkhsM1lSWm10Sk1OUTgvaUFzTEN5OCtFMzZ3NExUakVMVnoxWVM4eXZsYU9UcGhmM3lQMjR4b05xVi90NVVKbXBMbVE0SjBXbXliY1BzcmQveklDb1RQV1lIVTE5ZXpBcW5TSVR2a3BJc3ZIVEkxR1FZUVZpQ1NyNzRLcEF3bnptMldwaVE1Nlc5YnJWajJMZTY0WlY5SURBNEozSENIeXZkWGYyRS9oSVBkL2prNyt2bk9iLzBXMTF6bDhSM1pJZkJ6djZMeWZlaisvV0RiUHZrNjVRODFtcVFwaVJtMXJTeC85UjB6WFdhOGZoQnVha1RpNUkwenIwZkpTVVhsZkplMnNSWGxqMjlEUFJJYjEvczV1bDQ2Zkp1bEtXa01IcXBEanNWaXJFQVVUWUgzMUVUWWZqRkVRNUM2REIwd0F3WXJFTW1YQVlVVkZJTmhOVnhwczB4VDB0KzJ5cVo3M2ZhUDZpdCs2L2VEN2xyZ1lUeDFtK2tOMTlUQXlzVjh6YTliODBna2VuSFREUXBmMXlsUG5lbDQvaVVCaVlhR01DNDhyd2JaYk14ZnBlUVlyeWtwY0hRTDVxRUxPcURnN0x1QWZjOG90QlBVVmxERGhhZkJFbzRQNTZhbkhnMmR0QVVLN3Y4ZDRMeDdDKzJXWDFiNXRoOEZTOWdhdG4zWUJtcEsralFQbWZueXlwWVFUejNUNFRHQXlPY01JSVFCbWJ5Y2gxYzZYMm8yYkZreGdFaStEQ0E2TXZsWnFDbnBjOGEyU0xzT05ndTJwU1QrKy85c3ZQZmgxUHRuWGxUNzlGZGZzUW9iMXZYcEZLQjlFZVpwN0k0VHMyQmJTdUtkOTJ4OC9zWFUreDl1VmM5K1hIaitLcXhjMXFjdDJObUdhVW8wMjlFb21MUDF0T1RTTXlGaDlRMEJuM2VoR0pncFo3ME1HV3dkamRSSE5Bam1QdmhtMDFoeTVva2UzK0VkUUhmL05JTmp5SForNi9FOWJndEdJaG8ybkp1cEtXbHRXM0c4N0wwemdGQURvWU9qNXNIbnREVnIxcGhRZVpDTHdwdk9sL29CS3hBWjhHamMyZlFkOFRWQVU5SmZlYlEwZHJrbnMvZUdCQVBGbi81bEtQOCtFWWQ3cjdxaVgvbUZOY2lrT3ZWVkhzN01yUzdTaGF1djlQZ21rd0tQUFJtUzc5MTc0TEVuVkw0UDNyOEc4WjJkK2s3RW02WXBsYTA4Zkt5SzJsT09BbHRRRXM1elB5NDVQdmhqdFQ5ZmYrb3gzK21xcUQzeUVMYWdQTDdiM2l3NVB2am14eXJmSXcrcmZsWFl3a0JOU1dpdFBLUkpoMHlISnlzUWJpZmxUaUZxQ2ZxZHNSNitESGpNOEpuTmt6TVBFZEpSNitkcnVLYWtTZk5nRytYaEIxWXJiWlJubmc5UzJGWHcvUjhCWDM4aklMSE1kWUEzMzlEcW83clR4RmRZdVBYbTFXQTdTb0tWQnR0VkhsZzVBVDI5QWhLTFhWSDlzb3YxOHpWR1U5SXBtRGNIdzhDZi9GdmVJdHdCTkQzNFhobmZsTWhvRUtCOThJM1VBRTk4UDIrUi8zZ2JKY0QzeXZpbW5JMnljTXJ6TlV0VDBsUjVsUGs4TlJEdVhHSldUK2UzWThjT1kzOVhsR3hoTWNPWEIrNzRoNkgwOHpWV1U5SWFQQmcwdXJyclhWMERlZnZIZjBWUi9PYnZCWlZ4NFhEYmQzN0NmRzVER0gyRDlYanVKU2hXYk96Zi9HTlFHUk9wYmRQVFpyTUQ1bWxLNUtUdG5BY3JpVDk1ekRPS3VDWEE5OHA0ZnI0ODlHWHliM3dFUFBsOXo2SXhsQVRmZStQNWVUMXROdU0wSlVkWDhHQVdMRTM1dGVheVAwOVJtbGs5NzAyclBJUVE4ck5LQzR1bUlTRE5RazFKanpPT0ovaTNMbFNiYnV4WG5RVmp2M1BOSTVVRW5uOVJ0ZW5HOXZZV2p0V2xlWmltS2RrKzJsYm1XUGxWWVpDSkFyNnpXVk9TanNRMGtOT2V6OWNVVGNuOC8zYU9vSlhoYXhpRW1QMmFVbUhsRVF6QUdBUm1JcGdIekZuSWdVQnB2c0kyVUZPeVo1VHRtb0taY0RHSUxybnNVWm9TSVJ6RDNFU0FuRXJ6SlJ6SERBdUExOW1pS2Mwd2VPUW1KNEU1TmVZNDQ5cEl5VC9FazNNRUVBbkFHTUtoQUN5blhMQXpUVk1TWlU5aGg4TWhtSUpRS01nMVVaSnZLR1FTM3hENTdpR2FrdnlPVTZpdGd6R29yUVdzRXB0RUxDdUZTQVRHSUJ3RzdCSjhoV09XcHVUUXltM1ZIVXNuZ2NYemdIRElqRzk0MFR5TXBKS1lEbU1CTWNVMUZEU0FieENvQ1dNa1lFUEI3TldVNU5rQ1pySkdWQi9rUUM1czFVd0hpdHZjSFdVSVg1NWFKOTg5UmxNaTBxaytMRndJQkVPN1AyVUxoWUg1ODRGVW9udjZZSmZyYzllTmcxQm85eWVZWVpkRDdSeFdqTjJ6UzFNcUZ6eStHb3ZDN28zK2hMcXowRzFjaWNMd1Z3aVU3Q3d6N3o3TDVUZnNNMXdVd3pKektjeEpNY3haUTN6bmxMbkNVVHJTVndqOW42d2owOG5ZOFBBV1hBN0JaQUNDZnIxSTVwVVFQTHlCbTEwbjFpaHgwb2dIQnJqelNUQ25RUWo0d0RldUY4azBaOENZeHYyZUlEYnVIcjVuaEhkdWUwcmI5NDJvMXh1WTVveXN1R1VDbmF5d3RDS1o4aTBpd3pDbzFScklsV1ZQR29WQ2dWYXJ6ZVRraEd4RWRsYXVXcEhNUU1DUE9JaExQcDgvVWhQbnRVY0RVQzA5bzdoc2NmOHVYQXhCTUFBQnYxNGs4MUlJN3QxR3VUaFVLNjg0YVhSYXo0Z201RGJEWUJnZWZyK0h6NmNYeVpSc1V6bEVZcTV5T3VBclI4eDdOVEdFcTRrelo1aDNIWnY1OGlwT3NnaFhEWGh5R3g0ckhtbENzb1RMQnBaeW1DdXYwTEl0VGhyZFVaaWY4SERlejhQQWdTc21YQTNKYnkxSWxyamlXRmpLWVU2NXRFWTk5ZzJaTCtDeU13WkQxMU1TcHpNbnBxWFRhVXFsQ3NHZ0g5TTB0cG5SaExFOWFXOWNPWlRFUmE0ZWU2WnZveUZISU9OTVRVMHFwalF6aWM4M2pteDBVNm5VRWQ5QUlPREtDdnE4OXBSc3UwWnAvVCt5K1I5Y3Znd1A3OFA5ZTNxUnpJdVhJWlB2c3JINkY3WlZQcVhWV0tQVC9JKzVSWXV4c1JHdVhnRTVjcnB5UlE4N1dhTXFlMzZocDF6K3duVU8rRXJkdUVPN21oZzV1ZWZocVlMcEFEUThsNDEraHpjYmVkS2ZGNmw5aWRLY2k5T2MxNE5rVmI5R1NIOVo1TTE2bnBKeTZiTmpqUVVNdHRueXRTMDJmUERHR0NHOUVLWDI3QlBONTRvWG43VWdXVlgxTzcwVVF4eEtQdWk3em41ZjcrZWZmMjV2LzgwUHl4cTZucEp0SC9RRjJGOFRzdUpyTkJxRXcyRkZsRXdtU3o1ZlVCUTFVWkNKYnlvN0pnN2lvcHp0RTJ0Q3p2dkxhYUxGeFVWaXNRVEY0aktycTZ0YUtSU0traTBPNG90bFdRZVc4UjkvL05GV3k5Y0M1TGxoNnluSjhqMjFKbHkzUTYrVFlLVXd5L2Z2YjFsWUtoS0pydWxFWmVhWlU5bmkwT3VtOEFiV2taclk4WFdjRHJhVm9GV2I1Y3ZYZDd6NXNNSzdEeHU4LzZnSHlYcjd2c2hYbGQyc3p5cVhGQVAzWUUzOCt1dXYvN1AzSGVCUlZWdmI3NVQwUWlnQ1NnZ2xFRks1dENCTnhRSlk3N1gzZ3RTZjhsM0ZMbGV3Z2QwUDY4VmVMMWNCcVhZNkF0SkZNSFFwZ1VBZ1FEb3BaR2JXdjlienpZa25NNWtrd3lSblRvYnpQcy83RENuT2VtZTdzdGJlYTUyOWQ1SGlFeFdzVjFjOXBXRHBLWlc3K3dRUmhYSlpJQU1BVFE1dFF6OUZkTkVWSHcwNVg0UVMxNDdYRTFHVWtNc1JHVHpRTkRtaEYvMTA0Ylc2NHFQeDNhcm8zYkpsUzR5aWQwZTdpNGtHMzArVWNEVlJ4eUgrWmNJMVJFT0cwK2EyL2RWNlExMThRcHlheG84ZnJ5c09HalRJbzAvY2RkZGROSFhxVkYzeDVwdHZGcjNFR2tWdjlLWk5tNXFJWGdBMFpjb1VtalBuRy9yODg4L3BzODgrOHl0Rnc5eTUzOURreVpOcjlJbVc1OTlON1R1L3FDdTJhSDJySkRmaTBtcWxUN0RlN2FLM2ZmemQ5TGRlTCtxS2NSMnE2djN0dDk5aUZMMDkrbXlrTzRZU1hUU1lxTi9sL3VYRlE0anVIRWIwdDk0cjNYekN6Q1JlUnE4RzQ2TXpKMUJLRHVnRlowRDRxdUlVR0ZMelhxWE1LSGpBMXhBUlBqcTBFNlYybTM3ME91ejQ2c2lmVmZSMjY5YXRndld1RnIwamptK0Q3ZEFKSUY0SFBhWDRDNlMvaFlkTzdJQ0FOYTVRenpJVm4xaXpabzB5RTlVRjVNa2xEcjRlZmVLbm4zNVNadnE2Z0l6ZGloVXJsREVXdlk2ZVBYdFc4UGpLdi9IcHA1OXlIeWRmVnoybG1UTm4xdWdUZVNkL2hNT2huekVtcWtCQjduSVFrWHlPWDFRK0lXT003Q3hkNldVdEZUaWVYVlZ2OSs3ZEt4UzllM2VNNGRWcnVmUnovTjVUaW1zRFh2MVg0TUNlSjl4OWdvaUMyclZyTjRRYmZZY0JVQjlMSk0wSjcrejNGY2ZNOEU3VTJ4SkJva20wZGVyVTZRckplTUw0K1BncksvVTJiVVZ6ZWwzcDl4WEh6QjZEcVhkTXkrcjBoaVVrSkF6azcrVUFvRWVqMjlPWnpsY1RYVHVLNklaeFJIOGZRM1NkUmhSYjE0OGxzVjNXK1NxYUVCMVhxVGM1T2JtMytFSjFQdEdoUXdjYU5XcVUzMWNjdzRjUHAvYnQyOWZxRTBsSlNUUnAwaVMvcnpnbVRweElYYnAwcWRUTG0vY0dpVCtJWHJWUERCa3loRDc4OEVPYVAzOHVmZnZ0UWxxNGNBRnp2a1lVV3d2WjloeDYvLzMzWlZWWEo1OElqMGlpdVBpbi9iN2lhTnZ4S1FxTFNLeldKenAyN0ZqcEU5RXhTWlRhL1dtL3J6aFN1ajFGMFUycTFSdkcvbEhwRStmSGpxVitsNVhTdlNPSlJvd2h1biswdGh3K2h0aTJnL3BlV2tTdFkwZFg2eE1nSWl2L1FWN0l1MVJIOHpJcUh3QTFOMW5wdnVBVzlIcG9ITDBkMWs1VHZocmFsc1IyRTVPRm5IWFdRajRFYmpqL3NmVWlvbUFoRDNpZktucURRK20rMkM3MGVuSS9lanYxSWszNWFsSmZFdHQ4ZHBaSHZmMzc5NDludldQNVp5VUFLRFVva2hhMjdFWlpjUVBwZUx2TE5PVWh0aW0yNDYxaFZmUU9HREFnVG56QmswOXdRNC82OU9sRE45MTBFOTE2NjYyYThvWWJiaUN4emJPME92c0V6NkpKQXFFa3ZiRmp4MnJLRVNOR2lHMFpzK3IwaGpDRDB0UFRPNnA5Z2svdUpVbVFyNzMyR2syYk5rMVR2dkxLS3lTMitXZ1RyM3pDWW8ybXBzMEhrd1NYQytMR2EwbTJPWXJFdHNWU2RZdzVXVmY2QkU4b3F2aEVVSEEwdFc0em1Eb2xqcWFFNVBHYU1yN0xLQkxiVnF0bnZYMzc5cTBTSjhKNEV0MGxkUWIxN0xlSGVnM0kxSlE5K3U0UzIxeFdhK2ZSSjBCRTV2WU1kdDVCdkVQMVZxNXByUUZBZWlBdnFUUDRmdWI3UkJzSGgxZ2lzZ2dibVY3ckR6LzhFTksyYmR1TFpQRDVkL2JxVFMvZlVEZUFTMEZCNGd1R1R6U2MzcFNVbExiaUQ0WlBHRDRSQ0hFQ1JHVGk1V29RSDIvUWwzL2hDaFkvbVAvOUlNK2FQdWFtM2tyNUVGcVNiUzVuMngrSUJ0RWlta1RiOHVYTHJTSmEyTWowQ2kwREJ3Nk00WjlkeHY0OGhJLzVma1F2ZXZsTzdJRlhYWFZWdEdoa21neWYwRVN2eWZBSnd5Y2FkWnhRbkVMSXk2ZW9tSmlZaS9sQy9TdmtnMGxXbFA5SVBvU2FuQ25ybGE3dkx6YkZ0bWdRTGFLSloyeVJpczVHcWxkb2xzSG4zN3RRTDNyWklkSnZ1ZVVXMFdwV2RCbyswZUI2ellaUEdENFJDSEVDYXNkZzBTR2NiYnJ5eHJiTCtQck55K1ZES3BRM2FVaXFiWWx0MGNBbmhmWmtoQ3Y2R3J0ZVpYYVJtSmpZbkp1UEhXSmpZN3VLa3doNWFkMm5JYW5ZWVp0cFlqc3RMYTJwNkhGMUNNTW5ESjh3ZktLdU5IekN6VGw0dWRTRU0yTTcvcUNwL0VIVHVmbW9DY1VXMjB3UjI2SkJKVGFROUNvMHEyalJpR3FiSmhlOWhrOW9vRGNBWVBpRUVTY01HREJnd0lDQmVwNVZDRzNibjAxaDl0S1lpV29OZ2F4WEQvVFdKMWF1WEpuQ205NTZhVW0yZWRaanZHZlBuaFJtTDQwWkFENmg2eGpWbE5tYmVSdHpBbk1LY3hyekF5ZW5PYjgzd2ZrN2ZlUy9RWVBEU0JwbVc4YmtoMjBaazNKc3UvNUY5bDFQYWtyYnpuK1IyR1lObzlYTHBqcnAzZjBzMmZjOHB5bkZwcmQ2WFphZ1ZvMXBFZGFsanFuV3pFK0ZQTHhzMmJLY1pjdVcwckpsU3pUbVVoTGJyS0hPWTd4cjE2NkhtVGs3ZCs2Z0hUdTJhMHF4S2JhWkFlQVR1b2hOdlpnUE1lY3hNK25za1NudjRYeXZYdkFkQnRSTkdudkdwSm1PUHg4bU9uQTljeUR6RW8wcE5tOGkwU0JhVkU1dDhxZzNjeXJSeVVsRWVZOHpIOU9XWXZQRUpISWNuRm9YdlVwZ0NHSUdPeG1pTVJXN29zSHFydGRkTXdmdG1VdVcvRXg4YklWZnptQVNtN05uejZJbFN4YVJhS2x0akRsb3ovempqNjIwYXRWS1dyeDRFUzFhcEMzRjV1clZxeWdqWXh1SmxrRHhDWTFqMG8zTXI1aFo1QUkrK0pJMmI5NU04eGNzb0E4LytwaGVmZTExZW43S1ZIcHk0bFAweEpNVDZabG5uNk9YWG42WnBrOS9qNzc1NWh0YXYzNDk1ZVhsVVRYSUVodGlDejdDU0J6Ym54N3EyUHNJMFlITGlmWmY0bGVLQnNmZVIwazBxWjNaVGUrQktVUjVUeExsUHVaWGlnYlJVcE5lWmhBemhCazZlUERnRHJ6amVJRFc1RjIzL2ErOTl0bzQwYURzZGxicnJTWnhERjI2ZEJGOStlVVhmais0VHpTSUZ0R2sxdXlTT0laSzBGNnlaSWtFY245U05DZ0p4Rld2dWJINWhFYXhxQ2Z6Mzh4dHBNS09IVHZwMDg4K3B3a1BQMHAvditFVzZ0MzNJcS81dHg3cGRQSEF5K2orWWNQcDdiZmZwbTNidHBFTHRvbHRZMFhpQlZST0hHelBtTGlWOXQxR3RPOFNmWEQvSFJ5TS83Vkd0SWxHaFZYMEhwdE1kUEpSWFZDMGVOQnJkWDR2bE8rWXZ0NXF0YTRIUUZmMlBJOXV2ZWg4VFhsNXQrWWt0bG5ES242V2U0aG9VdWsxdS9vRWw0dTJ5cW12RXJ6MXdMbHo1eEJyOHVnVGZHejcxbDkvWFMzQld4ZGN1M1lOc1NhVlhuWFNjUGVKcmwyN3lsRXNtakkxTmJWR245QWdCZzFremlNVnRtL2ZUcSsrUG8ydS9jZU4zaVFKTDVKSmI3cXdUMTk2L1BISGlVKytKaGVJbG9Hb0VRYk1UQlBUSXF5dzJaS0Jrd0NSUHVqSVEybHBlUStuVG90S3I3VlNyN2tjSU9pRDVncFBlaTNjK0EzbXM1bmU1dnNlNXMxNG9tZnZzbzBQNGJzWkkvSFZoL2RweXArL0dnMnhQWDE4MXdGODY5NVAvQWpoUzZKVHBSVnFuK0FUYXBOTFNrcWhFOGdkM1hMSGlFZWZzTEZQbEphVzZVaHZ1V2hXOUZhaDJpZkdqUnZYKzhjZmY4UWJiMHpEQ3k5TTBaUnZ2ZlVteFBhd1ljTTgrMFRESkkwTG1kOENXTTY4dnFTa0JQK1o4Vi9jZWZkOUdEcDhOR2JObm9QangzTkFSUFZPdVdYU0FRdVdyVnlEdSs4Ymhrc3Z1NXpIL2cyNUR3YWlSVFNKTnRHSTZtSEFPUU1LWlNkKzJaN3hHTkhlUzVnWDY0Ti9Ya0c1Nng0Z2R1WXBSQlNtcXRHR1Zlck5lVVEvUFA1WVRYcmZBa0M3Wjl4QTlqOGY4bXRQeWJIL1JyTHZmVmkwRUFCRmJ5Z3p5TlVuRmk5ZXJKTlZoMUs2K3BMbXo1L3YwU2RreHFxWFZZZHc2ZEtsdEc3ZE9sZTlvV3FmZVBmZGQ3bFBJajJsci8zY1UvcFp0TGo3UkQzRHVhcjVtSndvS0N5a0R6NzhtQVpkZVEybDl4bmdOOHBxSkNXMUt6My8vUFBTVnlFVlJHc3dETGovaitTNlp6b0FtejNqRWFJOUYrdUhlNitnb2czL1E2S05kMlNtRVZHWVVJNEZydFI3L0dIOThOaWpWTFR4QVRlOWZFUkNYd0QweHY5TGxhQ3RsNTRTYTNsRU5LbjFCcnY2aEFSQWZTV1BMMmpCZ2dVZWZZSnY3OU5WOHBDK3g0WU5HOVI2UTVuaFhDcnFKNWNCM1h2dnZhUzNucEpvVXZ0RVBjZWJXNWc3bU1Tcld2cnNpeS9wc2l1dWxPQ3RHNloxNjBrSkNZbHl3akh4dGNZa2NHcStHUVlxWVJieUJmMmpBRmdBQWtoZkRMSVFSTnZPblR2SEs2V0t6TXpNVWZ5SDU5UUxQWkgxd2swdmorOEUxb3VoTjZmRGJNNENIRFovNnhRTnJPVUk3dng3TjRoR25yR1BVMG9VYXA4Z0l2Z0tLUVVJNndtczIrelJKNGlvWGk1d0V0WVg1TUlsVjcxOHQvbURZRnh6elRYSXp5K0UzZTZBdnlFYUNncUt3TWZKdS9oRS9VQm04QUJtTVpQV3I5K0FPN2c4OWU2LzMwZFJjVEgwaE5EUU1EUnAxZ0xUMy84SWZEeUhjcGxYRW5PMjh6TW9NSG9lUEFNWUJBRTVtS2d6OTJXVzRlZFZlYlh5MTk4SzVYZGhzM2tmN00xd0tMWHVpNVVhTjg4R3J2aExMOVdaK3c2d251VUhhdVd2RzQ3STc4SldZZmM2MlpsTjVLYVhBOUZGWUVRMmJ3cGQ5WlFvRHpIbk5WTUM1cVdpbFFtMVR4Q1J6NG5qNk5Hak9ITGtDRTZjT0lGNmd3ZWZJQ0tmRThlcFU2ZUVLQzR1YmlpOUp1N05pRStBenp1QzNucEt6WnE1K29UUFNTT1crU09BWWV4WGVQMzFhZmpuZ3cvalVPWWhnRWl2NUhGb2p1Z216WEhIblhmaHdRY2ZCUHNZR01Qa3N6QmpBUmpKdytGd09BZkNBVy9RdE9OSURCbitSNjFNRy9RMXFQbFEvTFpMYWswRWIyQnlhaUtpMXZLbGtJZ1V2VjRsb3FadC9vNGh0OCtwbFdrRFhnQkZETVp2R1lXY1FMeXo0YXFYWjI5V0ltb0orY0pzVmxZZE9xR045UklFN0FPdG9FRHhpWG9JeHR3TUJwL3BBejdUUndLeUpKSDZtTUY2OEFuZjllYm01b0xyL1VJVUZoYUM5d2ZVdTE1K2REZUl4N2Vsc29xeTIrM1FDOVFySVBHSmV2anNpUUJXTTYva1pqeEdqQjZMcjdrUjdpQUNBYm9uekdiRXhuWEFuTG56d1JjaDRjQ0JBNURQd2x3am4rMWNUeDRDaTlOMXZCblpPaU9xZVNJNjlSaUxwRXMreE41REZpOXRWRHF6VlFrVVZmVlNYVmwzdlUwN29GUGFiVWk2OENuc1BWRG14ZnNMN1ZYMHpwa3pKK0t2Y1ZaV1N0QVAzY2RYZ2FVK2dqR2Z6aW4zTk12ZHgrREhRR1gyaHF5c0xGOERrZ2VmOEYwdjMrUW1UK0tBTHc4QzM2d25zMjlKSVBXcDF6eHIxcXh3ZVhYVnF3K1ErL2o2OERRVmdNM01kaXRXL29MN2hvM0V6cDI3MEJqUitvSlk1QmVlUm84ZVBmRDk5OStERWNmY0xKL3hIRThlQ2h5QWcrcE9Zc0s3SkJJVFA4RXJHNkpKb0RpeGIzcmhGU1NKeExTOTFWZTl5aGdyWlRhZDBWRnI0UE1GZkN1YUJHT1pZY3RNVnI2R2xDNThTQ0JxVGFiNjFpdGxKTjd2b09pVlZaUFBDWVNJUFBxRW5ucEs5YW1KaUFZQVdNY01uNzlnSVo2WU9BbEZSY1ZveklocDJneXQyOFRoK3V1dkJ6K2hCa1k0YzUzenN4cko0MnhYSGtVNW00RHRGN2x6M3pEWVQrK0ZndlBhWGVhRkRmSlVTdk5kNzZrZHdPRUo3anoyR3V4bFdYL3BiZFBiUzcxTUZmalpkUXNxb2IrZUVrQU5Ha2drVWZEOUFES1RsOGF4QkdYdzVUSStKUkFpYWpDOTNJdVFoRkdwbFp2d1VuTHpLWUVRZWZBSm5mYVVpS2crRXNjcUpqNy80aitZK3VJck1xNGdva2JQaUloSUpDWjN4V09QUDhtOW05Zmh4Q3I1ek9kMjhpQUhFOTVSRGFxR3BYdVJ0K2Qvb2NBYUhPV2xEZmZrNGROTVhnMGlkNTdKUXQ3QnIxUjZJK3B2SmsvNjZ5bUpwb1pPSGxLcTRsM1VFcENoUUVrZ0V2VDBsandrVVVqVFdKS0hBbFVDMFY2djlqMGxYM3NjM3pQeDhTZWY0ZTEzcHl2dkZ6QUk0UkpzcTlZWDRKRkhIc0ZMTDcwRUo3NG5vaVNqYkhVV1pTQ0hBOGpOcTNCajVwRXk1QlEyaHdKYjZWSHZ5MEFlSVhwUmQ3cnF6UzF6WStiaEl1VGtoZjJsdCt5a2R6WlFZL0xRVTA5Sms3SVZFU203d3NFM2xTRWtKRVJtOHhEd05aZG5rMEFhWEs4a0NVbDRmUHVickpnVXZmSzFKQmRKSVBXaVNmYzlKZS8vdTdZQWxqQ2p2LzN1ZTd6M3dVY0lWQVN6SDNkSlNzWEVpUk14WThZTU1LS1ppMlVNenNua1lmS2hZVzYyUm1KZmJwSWJTeU52UmtLZng2SEFXdkNUVnpaRWt5ZVlmR2lZbXkxaDJIZThoUnRMZy9zaG9lZjlmK2t0M2VpbERUczh3NjZ2bmxLdGVpRjEvL29JUkpJOHBGd2pKYXpLSGdnUlFWWWtra0NPSFR1R3VrSTBOYlJlWmNVa3MzcnBnU2g2WlVVaUNhU2dvTUIzdmJydUtYbC9SaDZBejVodGxpNWJqdWVudmdUUlEwUUJ5NGpJS01SM1RzUjk5OTJIaFFzWGd0R0crYm1YNTRFWlBZK29Gb2xJLzhlbmJrenMvemlzSVZFUUhOODFBMFg3UHZUU1JzUDBQS0thZFVENmtDbHVURXdmRGlsVlFmVHUrd0ZGV1F2clR5L3ByYWZVNEdVcm1iVkxFSkZYU1I1U281Y1p2SHl0OUJTVUVwWXVadkpxdlpJOGhIeVZxUEt6eWhLV0pCRGZvZitla2hmNG1Iblp2djM3OGR5VUY1WEhqd01lMFUxaWNINmJ0dUJkK2VCSHNNRzRWTWJpSEUwZTVCMjlRRkJVQW5abXQ0SE41b1VkQ05YUTd1bXdvSWc0N013TWs4MkN2cGZadE9zcDZTcDVLRUdYaUNDdnN2R09iOXB6MnpFZUZ4ZW5pK1RocWxkV1RLNWxOZm0rUE1icnZWNTk5NVI4U0lDM0F4Z3E1Y2tubnB5a2JLNDhaOUN5MWZuY0J3bkhUVGZkQlBFWEdRc2l1dVBjU2g0K2xLM3NaNHFBb2kxdWxPQ21vRm1iZFBTNDdsTms1NFo0WWFQbU10RFpDclpYbkJadDdpelAra3R2NjFUMEdQdzhzazg2dkxCUnMxNzk5WlRzRFpvODFLVUxtYTNMSml0NVZXYng4aW8xZXlrSDZTRVlLMXFGTW5zK2Z2eTR2RmJSSzMyYnFLZ283L1hxdGFma3U2WW5tWGpqclhjZ0t3OGlPdWQ0UVd3YytPaDlTQlBkaVNkUU54aFBXNVhrN1FiMmpIZm5qcUhBd2FsUUlDVXNhbmExcnpOajMvWG1ad0paYjduejBNdkE4ZjlVZWRxS29pNzB3Z1o1cjFmN25wS21aU3VCQk9DREJ3OUNkbTdMUmp3aWdxdzRKTmpKMTBWRlJicFplU2hKTHljblJ4clJVclpTOUVwNVNMNldZSzIxWGcxNlN0NXJJcUlQQUhUZHRIa3pabjh6RitjcXhNL2JkZWlFNmRPblk4MmFOWkF4a2JGQjdUQ2V0Z0xWOEhzbnZrZEI5a1lvYUJvNzBPY3lrTzlscXhwK0wzOGRDbksyLzZYMy9GNWV2SDhOZXNtdS81NVNBelNnSlhISWlpTThQTHh5aFNIQlRZS2NsSC80K0dzcHZkVHgvUnEwQWExOFpsbHhxRmNZb2xjYTU3S0pVUG8yWGgyY1NFUUIwMU55K2IxMEFDTmxKZm5hNjIvSzF6aVgwYXg1QzdRNHJ4WDRiaGFsSnpheXRwc0pqYktWQXFxZVIzTE93R3lOZ2dLTDJWUkhHN1dXZ1h6cnp4QlZ5eVBIaXVWcExMWGUrbm5haW5UWVV5SkhnNWV0Wk1VUkVSRWhLNHpLb0NhQldaNE1rc2RlcGV3aTM2OGJ5SWRnN1BXS1EzUXBLdzVKSEZMUGwwRHNRYS8zbXNTZWJucEszbXQ2bW9rWi8vMGF1OWttRVozemxPU3hkZXRXdlBQT08zRGlHZFFNNDJrcm14M1l1TDNZamIvdzd1ZTg0Q0dJT2k4UkNvSXIvdlR6MDFhaWw3RHhqeHczL3JMeEtQTFFEVkhOTy82bDE1N3QrNDU0WGZhVUdyem5JZVVTNlduSUNrUGRNNUN2NVJCQ2RTRFd3MHhla3Btc2lDUlJLSHBseFNHSlJBS3owcS94UnFzd1VIcEs2dCs1R3NBMXNtcjhpRGNER3FpNmdmQ1paNTZCK0xlTWtZd1ZQTU40MmtyS0t2R0RQbkpqK3AwL0kzWFFWS2hoelpsVngvZXU3N0pWMVVkMTQvdFBkbVA2OWU4ajlaSUhxK3JOWCtGN21VMy9QYVVHS3dOSm9pQWlKWEZJSUpQZDBGTDZVYjR2cjdxWnlVdmlJQ0lsY1VqcFNub3l5aEViM282TGFBcVlucElLWTVUalI0cmx2WWtNT25sZXk5YVFmVUI4bVpSNnJJeUd1Wm9DZGRCcUZ0dmJqV0hSYlZBRmYwNEJ5ckw5M2pDWFJuaXpDOUxjR0JiVkVsVnc1QXZnektuNjA2dXZubEtESjQvT25UdExnQk5LejBNQ21mUTRKSEZJVUZXWFhIU3g4cEFubEVTTGt1aGt4U0Y5QkFuT2FwM2E2OVdxcHlTa3VweVdlMjFCUVNHK21Uc2ZCQmhVMFdLMVNnS1I1cm15bWZSYUdUT2piS1ZpVkpnRmRZWnNaTnYxT0pEemZUMGUzT2RnVXAwWkZXRkZuU0dISXg1NkQ4aGI2KzBWZlZCRDN6MGxOSGpaU25vSDhzU1BQRWFxckRna2tLbFhIQXIxRUl3bDRNb21RTkVxczNpWnNVdWkwNnRlalh0S0NrWXlNWGZlUEE4ckdnUE5XdnhmMHY3b280L1VZMllrRDRWQnAzNEVNc2JWenZXRGdOL3ZCVTc5QWhEOHRzTThxR2dEc0g5YTdkenhFTEIzS2xDd3RYNzFrczU2U2hxVXJVNmVQQ25CUzJidjhnU1Q5RGc4djZjT2dyRmNBS1ZzdkpNL2ZpbFZhYTlYMXowbE00RGhSSVFGQzcvelVMb3hHQm9TaXZDSVNIejQ0WWZLZU1xWW1RUDRiQ3Z2WnZJb1B3b1ViSzZkdGlKZkx0dUdKNWk4N2RHVW53U0tkOWRPVzhsWk80MEpCSThnWGZXVUZEWm84cEJac014T3BkbXMxT0hWeDUzTHEwSzlsSUVrMGFsTFZjcjNaWmF2L2NwRFZ6MGx3YzFNYk5xMEdRY09ab0lBRHpRbzkzL3MzcjBidi83NnEycnNqSldIZG5STkhvMVpMOWwxMkZQeW9teWxFeENSb2RjL1BTWEJUVXdzV3JMRVdHSFV3aVpOWWlDWU9YT21ldXdDT1htWWRCU0kzWU94cnZXU3lWMnY3bnRLdFpldEpQRG9CSFhTb2lPNW9pVlFla3BLeWVwV0lzS3k1Yi9VNGxvR3JVSEJDQWtOQTE5RnJZeXBqSjA1SUpPSG82d2NzSVRvWi9STndYRFlLdUFKOWdvSFlJSitaaHV5MjlmdWZjOUR1NTZTOXowUG1jRmFyUmJvQlJhTFdmb1FOZXExV1BTazF5SjZBNlduMUl1Sm5UdDMxdkhXUWdOUlVkR1FteDR6TWpMVVl4aDR5YU1zSngrSVBBOHdtZjJmT1V3V0lLSUZUaC9KZ3llVUZ3QVV6R1M5NUcvRm9pSEloTk9uQ0o2aHQ1NlN3MG5Qa0g2RnpHNzFzUG9RRGFKRnlqSTFOYnpsaVNtZDZKV2Q2YUkzVUhwS0E1aFk4K3ZhT2s2b0RJYUhSMEN3ZVBGaTlSZ0dYdkxJMzdJUGRDWWJGQmtIc2pZRG1jTkFwaEJ0S1RiRmRsUmJVRVUyVG00OUNFL0lPMmdDU25ZQXdlRWdTeVRJRk15MGFrdXhhWWtDUXNLQjBneWNPRUN1MTVxU3k4cERaNnc1ZWNpZEVQbjVCVnkvalpMQUxadm1KRGhwU3JFcFR4VEpub3U4dklJYVQ0azlmUGd3QjlOaWhJZUhTUkpSQXFtbUZKc2hJY0VRRGFMbDBLRkQ3ajdST0hzMEE1alk5a2RHSGQzTFlDajNvUVNxcG5uL2dFd2V0cUpTbkZ5ekMyUTdCRVEzWmNZQlVlMlljUnF4SGNTbUtUb0dWSjZKazZ0MjhPcWlGSjVnS3pQaHhCNExxSFFqVE1GbFFHZ1VzNG5HakdUYnArRW8zb2dUdXl3b0w0RWFzbGZBRGdXa3Q1NlNxZGJrSWZYei9mdjNjNW5pRkNjUE9iWWoyc2tvalJndFNZT0RzVlZLSmFKRlRwQ3RWVzlCZ2F4QXJJaUlDR2RHYU14d1huRllJVWwzMzc1OXJucmxpU2c3RVRYR25sSlBKbmJ2M2lQQ0RkYUJ3ZHoza0FuRnhvMGJBN0pzUmV3d3A4RTRWUUtVWnAxQzluZWJVZlQ3cnpoemZDc3Fjak9ZMnpWaUJzNGMreDJGdjYvRjBXODNvL1JJTGs1WFFNRVpWWjFGOUNLMytBeEtjODA0K2xzUUN2L2svejVuRFd3blYydEpIcU5mMmZaT1pHOEpRbW1lR2FmTDdXcTlkT1dWVnhZNy93MWJPYitZOWRWVHN0bXE2bVZDNVJNUytHU1hyTnhWd056Rk81a1A4a3o2TUROTEl4NldUWEJzZTdkb0VDM1MxL0RvRTFMN2x6S1IxSmgzNzk3TEs2Y2p5TTdPMXBTSEQyZUpiZEVnZXFVUG9kWkwxMTEzWFRHUHIveGJmcWEzbnBMcitKSXp5Y1VBaUpPeTROSHNZMTY0bWNHUWtGQlpmU3E3emVOa0xCRUlJS0pRTGd0a0FLQVAvZ0hLZkVSZm5IWTFTTFJ4N1hnOUVVVUp1UnlSd1g5ODlQN0lyblR3bmN0MXhmKzlONldLM2kxYnRzUW9ldmQvbkVpT0RUY1MvZEtYYUdWdi8vS1hmdVRZZUJOdC8zZG50ZDVRVjUrNCt1cXJhZno0OGJyaW9FR0RQUHJFWFhmZFJWT25UdFVWYjc3NVp0RkxyRkgwUm0vYXRLbUo2QVZBVTZaTW9UbHp2cUhQUC8rY1B2dnNNNzlTTk15ZCt3MU5uank1T3Avb3c2U05HemRSU2xwM0wyaVFyNm9sQUxSKy9YcHlvbmZBckR4NEdiMGFqQmRXUW1iNnVrR1pEWGg3SFFSUzgxNmx6REs1OXI2R2lQRGkvTDB5MDllUDNnb0gzdm41UUJXOTNicDFxMkM5cTBYdi9hOGRoTDN3Q0NpMHJmOTdTbUd4Y0xDV2YwN1Bnb0ExcmxDdlBCU2ZrSXR0WkNhcUY4aVRTeHg4UGZyRVR6LzlwTXowZFFFWnV4VXJWaWhqTEhvZFBYdjJyT0R4bFgvajAwOC81VDVPdnA1NlNzcStCRmVmNk1ERW9jT0hqTldFbDdSYWd5Q1E4OGVVc1F5VTVPSGdqVVh6dUM2WGRUQWZlT0E3b0tnY2ZvZVUwTVlzQlBibkFxS056K241Q1lCZHlEdHEvMC92aVZJOCtGa0dpa3B0OERla2hEYjI0eit3LzNpSnExNEhYOGJ6TlgvdnhNcWRaWGh1K2g3WUN3NEF3VTJBOExiTU9IblZpR0lyRmhRY3pTWENmWmowOWk0cy9hTVVvcmR0MjdaelJDc1RhcCtRcGZhaVJZdDBFWkNsaENiSlFjNXI4dVFUc3M5aDFxeFprTWRYL1EwcG9YMzExVmVReDJsRkc5L3k5N1BpRTd3M1k2YjRoUFJFWnMrZXJZdWVrdHhqOHZYWFg4dXU2T3A4b2pXVGRaNkVBZThnQnlVS3BLVHB4QVdCVXJheXRtL2Yva0lPRnFONTJaOFBnRnBIZ2g0WkFQcm1EdEIzOTJqTG1iZEJiRlB6Y0pDejlsN0lRV0o0UWtKQ0x5SUtGbmJxMUtsUEZiMHhJZlRJZGZFMGUwSlArdmF4M3BweTVnTTl4RFkxaXd6MnFMZC8vLzd4ckhjcy82d0VBSFZyRjB5TG40bWxuSytTS1hkMnFxWThOaU5KYkZQQytVRlY5QTRZTUNCT2ZNR1RUM0FqbVByMDZVTjh5VC9kZXV1dG12S0dHMjRRMjhTejR6cjdCQWRFS1cvUnFGR2phT3pZc1pweXhJZ1JZbHZHckRxOUljeWc5UFQwam1xZjROTjhwU1JIZkl3M1RaczJUVk8rOHNvcllwczRBZGZrRTFPWTlOTExyMUJ5YWpjdmFMRFYrVzBJQUUyYU5JbWNlRDVRa29lNVBZT2RkeER2VXIyVjY1eHI5TExpNHlWMUJzL1c3aE50SEJ4aWljZ2liR1I2clQvODhFTUl6K0l1a2o5SS9wMjlldFBMdDh3TjRGSlFrUGlDNFJNTnB6Y2xKYVd0K0VNajlZbTNtUFRVcE1tVWxOck5DeHBzZlVFc0FhQUhIbmlBbkhnelVKS0g2ZjMzM3cvaW93MzZzdE5jd1E0OW1QLzlJTSthUHVhbTNrcHhiQzNKTnBlejdROUVnMmdSVGFKdCtmTGxWbkZrWVNQVEs3UU1IRGd3aG45MkdjZTRJWHprOXlONjBjc2x0WUZYWFhWVnRHaGttZ3lmMEVTdnFSSDZ4SFFtUGY3RWs1U1U4amN2YUxDMWMrVXhac3dZY21KNndDUVBZWmN1WGFKaVltSXU1c3Z6cnhCbmw1bVNPSkk0dHBvODI2dFh1cjYvMkJUYm9rRzBpQ2Flc1VVcU9odXBYcUZaL2lENTl5N1VpMTRPRXVtMzNIS0xhRFVyT2cyZmFIQzk1c2JvRTByeWVPenhKeWlSQTZMQnVyTmw2d3NDTTNtb2d3VTdjZ2pQUUxyeXhyYkwrQ3JPeThYeEZZcGpOU1RWdHNTMmFPQlRRbnN5d2hWOWpWMnZzZ3BKVEV4czNxNWR1dzZ4c2JGZEpYQUl1ZHpTcHlHcDJHR2JhV0k3TFMydHFlZ1JLdm9Nbi9CRXd5ZVVzdFdURS85RmljbGR2YURCRnVlMTBxQnNwWk1rd2t2b0pqeGJhc2ZPbjhyT244N05SMDBvdHRobWl0Z1dEWXFlQU5PcjBLeWlSU09hRmFxMUdENmhnZDVHRHFWaFBuWHFDOVFsdWFzWE5OaTBXUXNOR3VZR0RCZ3dvTS9rTVlGSjc3NzdiK3FTbE9ZRkRVWkZOeUVBOG1RYk9URWhVSjNFcFBDNUxFcGg5dEtZaVdvTmdhaFhUL1RXSjFhdVhKbkNtOTU2YVVtMmVkWmp2R2ZQbmhSbUw0MFpjRDVCUkhjd2lmZlFHQW5CUzRhR2hoRUE0ajAvNU1RZGdabzB6RThmcG9jbkg2YWNKNDhRUFhaVVc0cE5zYzBhUnF2TEszWFIrMncyMGJQSGlKN1JpTThLczczWDYxS3FzbXBNaTlCanY4T0RabjVTNk9GbHk1YmxMRnUybEpZdFc2SXhsNUxZWmcxMUh1TmR1M1k5ek16WnVYTUg3ZGl4WFZPS1RiSE5EQmlmVUk0bldiZHVIU1VrcFhsQmc3emhNdkNPSjFHZ2J0eE5Pa3d6eHh3alNqNUJGTTJNMUpoaTgyODVSR05aZzJoUk9iWEprOTVuY29sR2x4UGRhU2U2UTJPS3pURmxSS0toRG5xVndCREVESFl5UkdNcWRrV0QxVjJ2dTJZTzJqT1hMUG1aK05nS3Y1ekJKRFpuejU1RlM1WXNJdEZTMnhoejBKNzV4eDliYWRXcWxiUjQ4U0phdEVoYmlzM1ZxMWRSUnNZMkVpMkI0Qk5FRk1Na1BuU1NPc1FuVUVKaWFoMW9VTVlLZ0ZER2pweUlDYnpFa1VWRHh4MGphaUdCUE1lL0ZBM2pXWXRvVWp1enE5Nm5UeExkWXlPNjNjOFVEYUtsSnIzTUlHWUlNM1R3NE1FZGVNZnhBSzBaSHgvZi85cHJyNDBURGNwdVo3WGVhaExIMEtWTEY5R1hYMzdoOTRQN1JJTm9FVTFxelM2Slk2Z0U3U1ZMbGtnZzl5ZEZnNUpBWFBXYUc1dFBDSWdvazBtOWV2ZWh6b21wZGFEQjg5dTBKUURFbXk3SmljeEFPcExkNUtTbHdvRUptMHhBbVFNQStaZWk0VGZXWW5OZ3BHaHphalFMMVhwUGhnSDhDdmlab2lFM3pLTmVvVVhJejlOZnhUdWdWM0p3MlovZkpHN1Y2UXRTTkdWaGROdlYzMzMzWFNacldNd09QVkRScGZJRHFIMUNtbnY1K1lXdzJ4M3dOMFJEUVVFUmlNaWpUemdjamdseWJEaS93czhRRFhMTG43eXE5U3EwVk9jVGNuZ2liOWJUbEh6c1MxMThRckNaaWFURUxnQlJIV2l3dEtRRUFqNk9CazVzQ3JUa1lSR2VzVlVrN3dlRDlNSERBRXJMU25vb3dWZWwxNnJvTGJUb1IyK1IyYU5lQ3pkK2cvbVA5RzArSEcxZTc4a2Y5WDU0ZHhudW43OFlkL3gzcnFZYy90MXlpTzF1RDAwYndMZnUvY1NQbGI3a0VvQlJ4U2ZPbkVrdUtTbUZUaUFISHNvQmlSNTl3bWF6SlplV2x1bEliN2xvVnZSV29kb254bzBiMS92SEgzL0VHMjlNd3dzdlROR1ViNzMxSnNUMnNHSERhdklKd1dvbWV2Ym9Yc2MvQ1lNbEpjVVE5T3ZYRDA2c1FhREF1VVFOWlNkK2VVSW1VV1EyVVlSTzJPb1kwZGlNZkdKbm5rSkVZYW9hYlppaTkvWXlvdHQwd3J0TGE5VDdGZ0M2YWU0MkduMk1LTW5QUFNYcGE0a1dBSXJlVUdhUXEwL3czY3ZxMHBFT1NsZGYwdno1OHozNnhQYnQyNlZrcEJzdVhicFVtc3l1ZWtQVlB2SHV1Kzl5bjBSNlNsLzd1YWYwczJpcDFpY0UwdWhsMHUrLy8wN3RPM2FtVGduSkJtdWdqSkdTUjdadTNScVF6Zkpncm51bUE3RDlNNU1vNHFoKzJKTDUvM1lVazJqalhicHBSQlFtVEU1TzdxM292YTFVUDd5cmhHak1UbmU5Zkd4R1h3RFU5WDllb3JIWit1a3BpUmJScE5JYjdPb1RFZ0QxbFR5K29BVUxGbmowQ2I2OVQxZkpRL29lR3pac1VPc05aWWFucHFiMms4dXI3cjMzWHRKYlQwazB1ZnFFd05rRElTN0RVVnJYYmthQ3FJVXR6bXROeW9uSk1tWk9tQkVnTUF2NWlzUlJBQ3oyZWloWlVWNHVIQWYzVlpKTzVBQVZ0ck43THdCMml4V2liZWZPbmVPVlVrVm1adVlvL3NPckY3MW5jbk5Sdkc5ZkpjdHlja0JucVZmb3FFWXZqKzhFMW9zZWQ0M0FKck4rZWtwYldFdmF6ZmRBTlBLTWZaeFNvbEQ3QkJIcHoybk5abzgrb1VlOWN1R1NxMTYreCtOQk1LNjU1aHJvcmFmRXg4bFg1eFBnOFJXUnM4U1hMNzlzWUMwdVpyQzR1QkNDRzIrOEVUSm16ckZ6QkZUUGcrdmE0aTJ3KzVJMERtZkN2bW9wQm1Udnc4UklxdVExK1VjUXVXRWxITHN5emlxSjJHRldhdDBYS3pYdTh2THlLeFM5ZEpZOG5abUpZOHVYb2kwbnVKdXNWTW5VWTBkUXZIb2w4cmRud01GNnZYcGZEM3I1TnJtTHdJaHVFWU1EZXVvcE1XTmF0WUNBTlY0cVdwbFErd1FSUWE5dzlZbEdwTmZFdlJueENmQVpXTkJiVDRtYjZLNCtvY1k4SnZocVhad3BMek9hNGg0b1kxTldXZ0xCYmJmZEJpZm1NaEZReVlPWFZMRmcySmdnN3ltSllheTFGTWR1dUFRL1g1Nk9wOUk2VlhMV3hkMXg3T2JMOFg3N3BvamN1a0d1Zy9NeWVWUXVtVnVMVmlFUithUzNnQlBERUZzcHZodDBDZDdzbDQ3N3UzU3E1SlRlM2ZIOVZaZmpnWlpOVWJacEErd2x2dW5sMlp1VmlGcEN2ckJhVU9yUWo0OVhBSENZVE1xVFFhMmdRUEVKblFaakl2TG9FNDFCTHorNkc4VGoyMUpaUmRudGR1Z0U2aFdRcTA4b21LVTBnRnUxYkdHc01EeXdzQ0FmQWk1Wmd5K0RneE96QXkxNUNDeE0yTTVpbEtRMEpZbmgxWjZKYUJKc2hTZmMwN0VOMWwvV0hiSDdkM2p6L3FKSmdWVUpGR3E5NUNXTDl1L0RBNjJhWW54cUlpS0RQT3U5S3E0TlB1alRIU0c3ZDlUNXZSM1Y2SjB6WjA2RWpMTjZwUVNkME9FUVRXN2pxOENpOTJDczlvbEdwTmZNUjN5RXk2cys5VkoxNHd1WDB0WEgvSXJiYjdzVmRwdk5XR200VU1ha0lEOFhncEVqUnlvbEt4a3pSOEFsRHdWMkpoeGVrR2ZsRTZNSTk4UzNnUnIvS1FaZXlBZmVMUVF5YmFoRXU4Z3d6T3FWQURwNnBNNDI3Q3EvWmNJWHZmYlRwYmpGU3BERW9NYUtDbUIyT2ZEOUdlQ0VBNVZvSFI2R1oxSVRVSnJsZzE3VkdOdElYejBsUlpObjFFOXdrM3ZRdDIzYkJ1NUx5RXk3UG9PeHFTSDBTdW1HZXo2USs5Q3RWbXY5NjFWOFF2L0p6aE0rWkdMNDhPRUEyVkVWQnBURXdTY3JnNjhrL3Yvc25RVk1KY2thaFQ5a2ZGZ0Z4ckx1N3U3dVJKNi9kWGQzZDNkM2QzZDM5MlhkRFJhWEs5amwrdXVUbDBxbmM1ZWJEcmVITGFCUDhxOU0yNmthK0UvL2RhcXFQWDAyNXNSanVNbHRvYTRXVGxsbFNRd2FVam5XYjRFRHVrRGljWHdFVm1nQ2lZbkJ5Z3RVc2N2RWxMOUVtUytTM0V6bGtmTWYwOXRiMkhNNWwyOUhKc2V4dlhCdFB6eVVnRHNHNEtBZWVDT0ZBVXZOVzhYRytaVGZaeFR3SFJnWXFFQ3cxRlBLeldYeDZPcnFJaEtKc1BqaWkrTk1UZVhubjMvV20xaEF5UzE0dm4xOWZWclloL05SSkp3djdOSFMwaUxETzFDKytwa1lwZUpocW84UGdXZVVIUC83bjMvSkcwRlhoSUg2Z2xpMEc4SDUrSk04TGRSWDZqTmNoT0p4Y00xa0JJTUR1c3Y1TWxsNDNnR2QwRENZd1dEbmhhcjlld2g1dkNpQjcwNVZYcjdYSmNyNVBWTjRuc1NrUGVYeTNYcG1NSHl6MW5wS2MwYzhPam82dEtBUFo2cWlFckYra1dUR1NrQ3NGQStKUmlxVlFoeFZjVGpmNXFDcXFncG5FWjhxSml2NFdpQWVCdGNESEhQTU1lU3lhZEExWVppcVF6L3I2aHRQWDQxdDhRREkrWXgwaHAxbUw0REJXN0VFYnc4TWZmNTFmWlc4blFCRjJiUXEzOC9KTURReStLODZjcWtNRzlhNmZML3NUZkIxYXVqem4wOVg4azBhRkpYVHEvdzlwd2hmdXoybDRNV2p2YjJkWkRKSmJXMnQ1MTZxUG1wcWFuQ21xaElZQXVDckxVMzAxcWhmZWdOQm91ZDg1SW0ydGpaWFFFTHhVUFh4SFBDY2hQYlFRdzZpdjYrWDhRNzFRVTg4aW5EU1NTZVpXV3ZQcXE5d0VWWWU4d3owSWcvRFFNSlI3UHhyWTdCZHM0a1NrOXN3K0U3czYyWG1OSmZ2TjZuaTV6K1RnTlBqYmdRenpHYVhwK1FPc3hYZm4yazRGWWNTc2ZPSlV5VmNoUktTL3Eya3c2UkprNHlBRENkNWlsT1FmRlZ4YU1hVHhxZzlmTVZWNGV6NVZJcUFpTk9vODVSODRqeUFJNDQ0Z25ubm1hYnJ4blYwdExjZ0xMWFVVamlmblBYMDBmaW9QUEwrWXVVcDNyZmd0M3N6Z1E4ZzV2TStLbys4djFoc2twZnZWNGxNc0JXckQ3NjJlVXBCVng2bTR0RFFqNFREZUJ0S3Znc3R0QkRPWjFrUmxPQk1CZkxiYjcvOXBXL3lxamd5bVF3U0RzTlhIb2U0T1Z0MEdMNFN2QklFWkhSNlNqNnFqM2VCMjlVM045NTRJOUZJRitNVmtlNU8weWVvTDlRbjZodm4vOThiNCtJeGpEZmpQRjZZYXdPT3d1Um1OZC9pbm9lRm5sSXV3T1NtaWtQQ01XdldMTXhidTd3RENZa1N0Skt4Qk1RY216WnRHdFhWMWZ6NjY2LzYvNUVXRDFVYzR1WGhKT0dRa0tnU2NYYTRGV2R6VFA5dkJFVG5CY0RYQWsrcGRCd0lmTC9aWnB1eDgzLy9iWVp0eGhYVVpvVXh5ZFVYNmhQOUw0VUlLdy9LSy9BZ21ZUThnVWMyb01xanpNdVhyTU4zNUNzUEN6MmxnQ29QRFozSTQxQWlNOE0wUmpna0tIbzcxa3dtSlYvaksrZzhtZEo2eTllUXl3Z21ZMDNIMWRDYWtxMnVNUldHaEVPQ292Ym9IUEZUbUh0TFFNUmZpVHNBdm5aNFNpVndrcWdtZ2JNQUxybmtFbWJPcU5GT3N1Tm1xRXB0TlZXSHM3OGFGMTk4TVlMNlJIMURJVUxQbzJmQ1ZBeUVSWExGeFNQZjNFRHVxNDlOakxqbk1Uakp5N2M2WFp6dndCOE5ST3MvTmhFTVh5enlsSXpZQlpCSWxJVE5HN0R4TmlRY211NnFSQnlOUmhINisvczFUQ1FCVVpJMkhvaVNzeEt5N2pFU3lWam5LUEVhUTFNY3hFVVZpQ29PY1RSVGFoWGlweXJKVkVjYWt0RC9xMjNCOExYQVV5cUJrNTU1UDNDSGhPdXh4eDRqbWVnbk9aaGdyRU50N0docndjeXVjaFlFbXhlTk85VW4vRGxDOGZneWdRY2JUaStIek5DK3gwSHpaSGhod3lYK0g1c3VGNHpuNGI4aTROY1VIcXd3cGJ6bzNsVTdUTXB3MmVwTG9MaDhuZVg4clRESHY5alo0Q2twZ2pETVRiSXlTVmhES0JJT0pXaFZIQmk0QXFJcHNNWm5VRWhROU5ic0k3R1ZiRURMZzlFdnUyZG9UY0toaEt5S3c0VXJJT0ptQk1RSW50b1p2SGpZNlNuNXdON0FhOXFPNDY2NzdxS3JzODJJNjVpRTJ0Ylcyb1R4eU5UbVpaZGRGdUIxWUMrR1JqaHNwWGk2YXhDRHVrVnFxQnBpbW1pdThSY09XWFkyRzg5YUFFVzhyTkovY3NPTFV2aStIM1A1Ymp5N2h0eFBmODYzLy9kZitQc1NzMWx0eGdJb0V1VUI4YlhTb3lrNWtVZ0U1SE9ZTjNRSmg0WjhUTVVoRENrZ1NuQktmZ3N1dUtBcUFUK3ByZVJrTEk1NmxrUlB3MUJHT01TcEVKNEtSS0tqWkNIdWlwS1RzWVRRTmsvSlA2ZUNiVXYyQUpycjZ1cHd0bmhIUGtBNm5ScHpRMVZxazFuUG9YNTF2b2VDMnF5MkE3dXJMOGFWZUF4bnI2aG5rcE14MEJxRUcxZVpTYmIrUFhMdHplUmlFWExkSFdTL3JlZWs2anlMVkUzQlFOZjVmVWFRaXdRL3lidDhwenQ4ajFsNkpwR1AzMk93dFpsVU5FS3lzNFA0Vi9YOGEzcWVXZTYwWGwwWC9LSkdTenlsSUR3UFZSZEt2aElOaGJ5TldDeEdNVWhBdEhwYkNYelJSUmZWVzd6dU15SnY4cW91akZFdTRaUFFGUXBIb1lCMGRuWks2SlNzbGJSMUgxOWNGYVBmVS9JbElIOEFXd0k5TysrOE15ZWRlRHd0VFExb2g5bXhBclZGYmVycmpTT2NkOTU1cUsxcU03Q1Yrb0RpQ0JjSkt1N3BocmY3OGhqVUxWckxCOXV1eE01bFVUYnMvb1VkRTgwOHVPWWNUbGx6U1F5K0hNanB1aEZmSktoNHRSZStUcmg4TjE2b2xsczJYb2tOVTFFV2EvbUZsV1BObkxIQ0hQWmUyZVg3YXpLbjY0SmZKR2lOcHhSTUlsR1Y4ZnZ2djJ1WXhDUlZYNUNBYUd4ZU01aUVrWHFUbDFobzViaENzNjc4UWdMUzNOeXNmYStDWCtkaHY2ZmtSMEMrQjNZQU9PR0VFN2pvb290b2Iyc21NZERQYUlmYVlJYXExSzh5eDlWR1FXMTIvdXc3L0NIY25rVHhyOS9MYUVqbE1WaWx1b3FiTjF1Umwrclc0cUZ0VnFOdXNWb000dGs4LzI0b0wvM051QVMrNTNlVjBlSGVsS1VXcU9MazlWZmttcTNYNG9KTlYwT0NZdENmeTNOQlYvQjhyZktVRE4vUnZ3SjY5UE8xeEZNeW5Fb1FrSGVBalFDT1BmWllicnZ0TnFLUlR1THg2S2dkcXRJUVhHZEhxNm40MUNhei9ZaXdrZHFNd2JpdFBIekRDQUtzOTJNWmIvZFJGRHF1OHhwUytFYWU0QllKbXVqTHdoRXRaWHc5U0ZIb3VNNXJUL3UvZDg2UDUyR1pwNVFOeGNOT3ZoWjRTZ0VJeVBwQVlvODk5c0Q1N2p6NWJKcFlwTXZjZjFSQVhNWFpiSFlvRVZaYjFDWWdBYXhuaEdQOGlrY0p1NzdHTTdEdHo3RGVEM0J1bTRUQ2pXczZkVXdCRFVtQzIvVzFCTDc5V1RpNUZZNW9odnVqRWdvM251clJNUVYwcElQbGE2T25GRlllbHZLMXdGTUtRRURlQjFZSEd2VzUzYzgvLzV4bGxsbUtwc1pmR2VqdnczYUlvN2oyOXNZUjFseHpUZXJyNjFGYjFDYTF6V25qQi9oQk9OdXFlSHc1QU9lMXdyWS91WEY4azZhWmxtRG80a1dRZkg5THdnTlJPTG5GalZ1NzVJc004NTRVNTV1MTBGUEtFb3FIN1h3dDhKUks5VUEyQWw1WWJMSEZlT2VkZHpqa2tFT0lkSGRvT3hQU0dmdTJjeGNuY2V2dWFqZHRFR2R4MXpZd0FDK3FUV29iSG9TVmgxVWhUbDVZemhjdnJQV1V3c3JESjBLK0FRaElveFBiQWJlcEVycjY2cXQ1OWRWWG1UV3pscmJtUnVMUmJyS1p2MzViZDNFUUYzSFNiQ3F6eWVGcnI3MG16b2k3MnVDMFpWdTFDUmVFNGdHVVc1U0l5NG9uWTdLWUpHaEhsUGtSRHlzOEpmK2N6TzZ5bHNBWEY0dm9pc3ZvRitmZy91NzJCdjV0OXNMNit1dXZOUnVMTW5LME5qY1NpM2FSVHFVWWFlaVo4alRFb2Jjblpyd056YVlTUnpiZGRGT0E3OFJkYmFBUWhNTldneW1tbGRzakhwUExJWnZPTWhUeXlSUVZaWFoxWnE2UTc2ajFsTXcwMGNyS0NteEJSVVc1cHFjVzQrdWNZeFBmQ3ZFTnhjTVZrQWVCVllIYjVjTm9OcGJXb0p4OTl0bE1tamlCOXJZbTJsdWI2TzJKazgxbW1GdlF2ZlVNUFV2UE5KV0dKaGFJaXo1RHJObFU0aWl1d0dyaXpoQUl4YU10eHV3cFVHbEJRcDVRQnJNblE3cXBjK2h6T21Oa3lxRENBcUdyQkhKbE1LRzEwNzk0V09BcGlSUEZkNTdWS213YnFnK3pzMjFSczFpempQUUxid3RmelhRUzMxQTh2SnNwT3JFWHNEN3duR2FUblhMS0tSSVJycmppQ3BaZGRobmlzVzVWQWtydXFncTB4cUtrN1U1MHJlNmhlK21ldXJlZW9kWGl3a29ycmNUbGwxOHVEdUppRmxvK0I2d25ydUpNaUlJZmxLa21sVXc3NDMvc25RV1FGRmU0aGRmZGQ5RjF4WjNGNFpIRjNkMDludUM4b0JFc0h0eUpHdzV4M04wZDR2SWtpdHZLZWVla2FxcWFmanZFb0tjM05aYzZOWGR1eS8vVjhPLzkrMHJmdXhNUmgzT1FlUXBJT2d3VU9nQkVXeXpaVEtadE1VUWN6VVhRMkExaUEvL3pyb0JGRXAvbTlCMWxudCtCeUNNNTZQb2wwUE56b09ONW9QMDVheVdic2kyR1NQS1duTEwrTnQ3aHc0Y25PM2hqRHdKQk5sTEVJYUQ0N2x0RzNpQ3pUNUFmaXhjdnh1clZLL0h1dSsvaXpUZmZ4QnR2dkdHcFpQTzk5OTdEcWxXcklCWnV0T1BVSjdpeUt6NysrR1BzM0xrRFc3WnNBZnZXc1dIREJrc2xtMXUzYm9FWXhNSzNrSjM2Qk5kRUFwZnlzSXZJOHhyNERvUFpKKzUxSFZTZldnMURPblRvRUlZT0hRcE9VUllMSFBMMDhvS2ZuejhDZzRJUkVocUdzUEJJaEVkRUlTSXlHcEx5S3RNeG5hTnpkWTJ1TlV2M2xnM1pNcVhWWXZMNDg4a2RQSUtHclVmd3kwY1FkaWdiTmM0Q2RVOER0VThCdFN5U2JNbG1qVE5BMklHYkNIN3BNQUlmV3UyMG9xZ3c2VE9rTHpqTWdKZU5ObDhBQTc2aXFQNFd5V0dySlcxSEhyeUo5UG1IVUhiTXF0dDRKMDZjbU9EZ0xYb0FDS0dDYkNFeEEwVjIzVGw0Y0pZSnhvNGRpNFVMRjBJQlpOMjZ0Vmk3ZGcyMTJpTEoxbHJhWG9FRkN4WkFMSU1IRDNicUU1TW5UOGJzMmJQeDBVY2ZZZGV1SGRpelp6ZDI3N1pXc2luYkgzNzRJV2JObW9YeDQ4ZmZ4c3N0U2hQNHNoL0V5M1dSSkxzRUR3YnIxeTBQSG80RW9BbzFoenBHUVlsdjUwT1Yrd3N2dklCMjdkb2hJU0ZCYkg5THVsYjMwQU9HN3FsN0c1SnN5bmJWUDAvc0RoNkJjaEpsQXg5WXJnQ0NvSEhiRVB6bWx3alo4QnRDdGx5MFZ1dC9sVzBFUGJGVkxBZ2MvSTdEa1g4RkVDYXhvcmpDN3lnemNwa0NDTXBNMzRyNFpWOGladk52aU41MjBWSVYydlNyYktQczFDMWlRZWxoYnh0NXcxbVpSSkgzcG5oanR0OUFFVDMxNzdlSGloMENZclpjTS9JR21uMWl3SUFCQ2lCNlF0TVROR2JNbUtFSzBWTEpwbXh6dTFPeG9GKy9mazU5Z2hXekFnZzRFSXVsUzVkaStmTGw0RExobG1yWnNtV3lqZW5UcDRzRm8wZVBkdW9UQ3NwdnZmV21iWUxIMjIrL0NlNkVaL1lKeXhPQTl0VDd5Q2R4MmpJRDlCNjFoTUd1SnJDYlNhMVJQVlJJeXF0TXgzU096dFUxY0pMZWw2Mi9SK2tPSGdGODNmNkVzdjZ0SjZuQ3RwWDhtbzZHMk5oM3ZCZEFxTVErN1JOMGJDUjFtYWdLMjFaS2FEZnFObDYrVkJUaDRBMS80elFxSFZlcnl2V0JJNXdNVmNTeThLQ1JOOERzRTgyYk4xZUZiU3MxYXRUSXFVOXdrVHBWMkxaU3g0NGR4UXN5aWpmc3dJRUQ0ZUpWMlRQUFBJTVZLNWJib2ZVaEJnYS81Wmd3WVlMSkoxeGFQM2xSMWFoaDFDcnFHL3o5cEd0MWp4RlVkZDM3bjlHNWc0Yy9senlZcDZ4blJIRUVQYkxXUHNIajBRL2dGUmtQc1hIcTNQTUFnaVhtNTZ2TVA2bzR5ajJ4eGphQm85ellkZkNQaWN1UFY3OHZ2RXZYUXNTdWJHUWV0OEdZRWhraWR1ZkFwMXg5OFlKTFdVeVhMNWg5Z2dPSEdESmtpRzBDeC8zMzN3K3VodXZVSnpoYkJ1d3F0RTNnbURScEVyZ3N1cEUzaEFyaTd6MVhaYW1wcVZpMGFKR3R4cFM0SjRmWkoreFdaMFZTTmFndTFGRHFHZW9WYW9Ha3ZNcDBUT2ZvWEYxejkwbmN3Y00zTVRHeENmdGd2OU5YNzlTYUdtZHdlZUJRRjVwM1NuV0lTV3hwYVdrTkFRUkkvSU5yNnVBTksxRlQ0d3d1RHh6cVFndkx5SmMzTUNNam96N0xmdFF4djg2akVMYmpGbXFjQU9xZUJHcnpzNVpGa2kzWnJLRVd4N1liOE9zd0RBNWVicUZaVGI2UW4wL3d6V0IxQjdnOGNLZ0xqVXR0L0tGUGxDcFZTdU1NTGc4YzZrSnpWTVJpNHd0bmplUVA0alg2UkpNbVRld3dwcVR1S3JYcTh2R0ovSk03dVlPSEQvOGdxL1BwYUFpYi9SZFU1QmtTQTkvYS9SRFE1U1VFOUpoanJUcS9BTm4yREF4MzlMdGU0ajdOQS9qSFZoV0FuOFJLbzRhUjF6Y3NCa1d6K2lLdC80dklHRHpiVXFYMmZSNnk3UlBzbkxkMjdkcXA1SDJReDY3cEhLK2tjZ2ljdkE3QkszOUE4TG9mcmRXSzd5RGJYc1ZTYitPdFU2ZE9nbnpCbVUrd0pZSWFOV3FnUTRjTzZOeTVzNlhTSUtkc2MxWFlQK3NUZXNxSEtrSUZ2UWNmZk5CU0RSdzRVTGIxbStYSDYwLzVabVptcGhoOWdzdXRLMEJxTUZkOTlaWks0ME95elVVVW5mckVYVTZlbEJmbFN3VlFRVlNvU1NyVE1aMmpjM1dOTzlrcEFhekxtT2k4aldKall6dXpuM09uaXUwZ0RpcWU0R1kzZmNUR3lpRU9nTGRVd0hoOU9QUEhuOXVFMXRVZkpNODViemRlemtLcHczNTRYL21DMnlmdUhXK1pNbVhpNVE4RjBTZnVVc0R3b1lLb0NDcUo2a1NOcFpaUXk2aFBKZVZWcG1NNlIrZnFHbDJyZTlnbmtMaURoeWVicTc1Y3Jya21uYVloSGJveDg0L3pxV2t4Qi9XMnlyR3RGRzF1cHUwRlloQ0xtTVMyZWZObUh6bXlWTUI0Slc4dWNSREJZMW1zNDVxd3ozNkVYWGk1U212OVpzMmFoWW1SOG5UN2hDVzhuZ1hKSis1Q0M4T2ZpcUFxVTlPb3c3U1p4eTY5bTFsWldkZTdkdTE2dlUrZnZ0YzV0bmFOcmJiclhicDB2ZHFxVmF2TGJKMWRZUkM3eHNrYnVicUcwclc2aCs3bGI0TVdpVHQ0U1B5UERPV2JudlU0NE5oUXpxNG5KVG1TSE5zb1B1M2RWWm52TDV1eUxRYXhpSWxQYkNFT3pnTEtLM25wRDVMblZiY0xMeXVKekU2ZE9vVTRLalRKN1JQM25OZXJ3UG5FMzB1T29CRkY5YVEyTVVEbXRHblQ5c2JreVZOeVgzdjk5YnpGaTVkZzNyeDVuTkw4SENjV1BJa25uM3dTbzBhTnhzaVJvNkVaWC8vNXhGaU1HemNCR3IvcTNyM0hsVXFWSzEvZ25pYTNkQy9kVS9jMkJCRlhKbmNBb1NOcmxrMTVicVNmeFZrMkRlVDREc214N3FXTXRtUmJESFNVS2t4QkRyNkN6dXRvaFpRc1dUS2FBOUxKY1hGeDVWVnhTT3h1cVhFdjViQkRtK1ZrbThzeFJJckhXU1hoOWduSjdSTi9zN1hoUzRWUlBhbk5uQ2lRUFc3YytKdnZ2NzhNZWdGeDhwU3BIR041QkowNmQwR0RCbzFRdDI0OVpGYXJnWExsSzZGU3BjcFVGVlN1a29sNjllcWpjZU1tYU5teWpZSUhKMHdNUXIvK0EvS3lzaHBjWkNEU2UwaGJxRjZ5Slp2dVZvZ05nZ2ovWThMNXRKUkk1eTlMNTgvazRLTWxraTNhTENQYlluRHcvTXQ0SGZJeXlOc0tHVzBhV2R3K1lUM3Z2M2l0dkFBcWpucU40ems1YkVIY1dyNThCV2JPbklXaFE0ZWhaYXZXcUZDaE1wSlQwbENzZUR3aW93cWpTTkZZQ1ZIUlJWRzBXSnlrdk1xVVIrRWlzVWpQS0ltcW1kV1JsZFVJYmR1MjU4U05Uc2pNclBZemwwbS9KbHV5S2R2dVZvZzd1Wk03dVZQQlN0NVVFTldkczdWWXdiZTlzV0xGQ25aTHpXY3I0MUc5YklxVTFBd1VLbHdNbkhXRzZKaWlpQ2xVREp3T3pMTGlWQ3pLbGkyclFDRXByeklkMHprNlYxSzVBZ21xMTZpTjFxMWJzOVZTUDd0d2tTTGFYQnhVRHpHSWhYSW5WN1UrcEsxYnQ1Ymg0bkpWclJSdGxqUXkvQlhlYytmT2xhR3FXcXkvd1dzZi9WV2ZlQnF2cGorRnBWV3RsR3lhbWY5dHZIYlMzd3djb2RRNHRyeHl1VFRJcmJmZmZnZmp4azlFaXhhdGtGR2lOQU5DY2JVaVVEdzJBWVVZSE9MaWt4R2ZrSXdpeGVLUmtKaENwZko0Z2o1TitSU2RvM04xamE1RmJGeWl5aG1FU3FGYTlWcFVUWmJGLzdkV3ZoV0RXRndUUU54Qnc0dXpRb1p6OTZ3Zk4yM2FpRTJiTmxncTJaUnRNZ3d4OWIwNjVUMXo1c3h3NnNmVHAwL2gxS21UbGtvMlpadjZzN3ptcmlvZmkrV3c2N1J2Mjh3OE8yOWw4TVM4eFM5T3lGdDBZVXoyTEl5NCtiS2xrazNaSnNNMHNaaVk3OGc3TVhzK3h0K2NhNmxrMDh4YllIM2l6d2VPeWV5bXkzM2xsUm0zRmkxYXpQZGRIa0tWS3BtczhCUFZQYVVXQkN2NEpBVUJSMkJBWXBLNnJoTDFLVEd3SkNJcE9WMVNYbVhHY3h4QlJmZlF2ZGl0Rllma2xIU09sVlJrNjZRY2loWXRmb0VCNUNwWnByZ0RpRVhKT0hESFN2dTlEUnMrMVhJRkxsbHZSemFYTFhzZkd6WjhCckVZbk5velAxNVcydThkUDM0VTI3ZHZ4ZnIxbitHeno2eVZiTzdZc1IwblRoeURXTzdFYTZnWWZDay9pZkszV0E2N3ZtSXg4K2JIUEM1M3dTZTlMNDVGOUZmL0FjL3psZUZ4dnBLbGtzMFkydTV6YVJ6STh1SEd2QU4rWm1Zejc4aUxMNkRObHcraHdibit5TEpZc2luYm84amc0QzM0UHVGMGpDT1lHczlwdmptelpzM08xbHZxM2JyMVFNbFNaY0ZKQUFvYXF1UlJ2bng1QlFFR2hTUlVybHhabFQrVkRFNG0wT2VmelA5K3JlNmhlK21lRENieEtnZW45U3FRSUNRay9EZU9tMThWazlpc0d3TnhCNDYrR3pkK3BtV1piYkUwdEZqRVpIUm1VK0RvcTBwYmV5aW9JbmVoeE9BSUlFWmU4MU9sTCtWUEJUUnUzRGlaZmI5MXJCYVg4YWpkc21YTEJER0lSVXhHWHJOUGpNOVo4TUNnU3hQaGZ6NFRIdWNxdVZSaUVJdVlqTXhtM3RHWFhrTGpjNE53MzluK0xwVVl4cERGT1cvQjhZbDhrc29EcUg1ODh6LzN1ZWVlejJhcmc0dEFka0ZHeWRJb0hwZUF3Z3dhOFluSmJEV2s4bnN5a2xpNUo2ZG1JRFkrUlovL0tLOTc2WjY2ZDBKU0NzdVRrRjZpSkdKcE56ZzRWRHV5M1JTYkdOMnpzTzVSTWppeEg3dUxqbXFGVDdzc0Q3MXk1UXFRYWFmWXhHaVMzNmxUcDQ1cTN3UlYzbmJRN3QwN1FTWWpyN0dDVUZrQU42QnB5NWVlOXVxbjE1T1RsdDJ3VWhwd2xHMHliT2Y4L2laaU12SWFmTUpINWFOdnpUNWU2dHMyOERoYnlSYXE4RjFIakxrMVo0L1pKNHk4M2I0ZGdmdk85TE9GZW40MzZvNjhacCtJcXhLSGpLWWxMSlZzM3RrbjhrMitWQ0s3aWZSdXh2VVpNMmFxeFlHMGRGYmdzUW1JaTFmclFOMVFEQmdwR2Z5ZWdwVFVFaEx6cVhjcG42Sjd5NFphSS94TVJWcGFDVVJGRjBGUWNJaldEUU9WSkZiS25lNTJjbFRFVk9Bbm4zeVNyVlUyN2JPM3dGdmFVT2U2bk5uVXJQWVg3N0ZqeDdJM2J0eGdtK0N4ZWZNbWJUTGo0SFd3NnRPZkxhZ1FicUc2VUQrNTlodlFEbk11R2xPU2JjZUdTbHAvNldVRHI3ZlJKOFE4OU9yTHVRSG4yT280VTlFV2l2eThEaDY3OEVLK1B1SGdiWHgySU80NzNjOFdhbkgrZ1R2eXlpY0N3dnpSK2YxZWVPUzNLWGpveWhRTXVmeVVwWkpOMmU3NFZuZUl4ZXdUVHJxcndxblhtelp0ZWswdit2WHZQd2lsU3BkWFY1WEdKVlNabzJMRmlxcnNFWitRcHE0bmZkNlR2R3pJVm14Y0NyK25nQzlrTW9BVWhyZTN6emRpRkt1Nysrb2VyYXBMQmJEcE9YMzkrdlcyQ1J5U0F0bnExYXZCZWZQUEtGaFEvcEx5NGoxNThxUmRBb2VrN1VlMThZeVpONEFTN3d6OTNOcmxidjE2alNtOTYrSXhwVS9GQWpHSjExRlptSHhpeHVQWFg0TEg2WXEyVWNpNW1uamdmNmM2OHdueG92NnB2clpSazdPRG5mSTZmS0wvZ2NmUStaZWhIRk9xQjgvUE9hYjBlU1ZMSlpzeHROM2xsMkhvdC9kUmVQbDZtMzNDM0YzbFQvWGhRb3EzMkZXVk4yellDTDNrcDRGc3RqWVMyQUpJVTR1QTMxT1JtbFpTUWtKaTJyM015NVpzVXVrYVdOZXNMZ2FRUXRua3ZDaFdNYnU3cis1KzhQQmp2MmNtc3ptcUFPMFZQRjdIbWpWcklEWStaWlFERUNocHFXaVZuVGh4d2xiQlErTWUrL2J0TS9JR1VFSHNLcXFsNW4zdjNyMWhzekVsTVJsNS9SdytvVlZxbFgzazJ2UHdPRlhSTmdvK1d3TkRmbndHWnAvZzBpUTFIYnoxVC9hMWpScWZHVWpleVU1NUd6emRHRDEvSFFuL3p6TTFPY0NWRWdOWlJvbko3QlBtMlZWUjFEYnVyWEw5cWFlZVFhUEdUWkdZckJhR3hoNlNrYXh1SlZYdVNlbElUUzhsV1pLWFRkbU9JNGU2c29vVWkwVkFZTkQzWWhXenUvVnhkNU9YOU8yMzN3NldVd0N3SDZBWEVjbDIrdlRwaC9WVitXKysrV1l3SzJOYjhuS2h1Zi9IKzhVWFh6eXV3aFl0V25oY3VIREpJemMzeitXY1lyaDQ4YklIbHc3L25aZXR1SWNNVDJieWlhSEs1T1RscXVmWVZzcmxQL052TEY3NmhDMTU4enlkOHlaM3ErU3g3L0pwajV0NU9TN25GTVBocStjOEV0dVhOZnVFTWZsUXJSSVQvNCs5czRDT0cwbTM4RmVTMnBqWXpzVEpRakl2VHBhSGw1bVptWmtaRHoxbVptWllabWJlWVR6N2hwWWhNVE4wdTFsU1ZUMzk1ejA1ZWg1M3A2Mk8yL0pzM3puM3FEcXRsSzQ5bmJxcS8xYTFqajN3MkxHeHZsUGpwMWhkV2NLdkJ4aHJPWFJ3R0syTk1Hb1BFWVphMkpGMmZOM1JjNFlRTFFxSFE2TUhqeWlsemdPZTJzMCt6cjU1S04vM0h3OWdyU1dycU5WcWp3QmN3S25YNjQvYlEzcFZHSVlQQnhnZUhxWlNxV1pKSTlFU1N3UkJFRHc2Y1dlbW90Y1BTMlVlTXo1TTFrK3paQnFmSys4bkdkcVdyaEZpYnZPWjhIMy9vYkZlYTIzTHJNNFVxVXl1YnpBcytRM1BsZmVUTktGcDZScWh2YTNlSUFnZURxQU85alBoTDRDMW1lQk1mUWwzZEhDcno0UkFBZjNBcXgvK2lFY0d4V0tSOFZQakxDeXQwdHZUZzNDdFVJbU9PWHB5SGl0ckpUbDJ0QzNYRmcwNXo2T3Z0NWVhcjRsbUh4cDRqV2cveTZXcnJua1lZNDVtZERDT05jbnhqb0FTUnUwOW96ZGF1cHN6eGh5T1oxRmFhN0tDNUF3bzBuaUh1SDNWVlZkSm9DdXYwU2JjMXVEenJyRlg4RnVqYjl6Z0pXdGpXNStiRCtYOTB6ejZaa1p5KzgvWXY0MG9tcEsvNCtnTzJRTVNlbW1aTHhwN09xODY5S3dObnJ0MmNHdkR5dGVUNS9HYW84OWxmMjZ3cFd0c3BUZHFId2JRQ3VvNnlNd3NLVEFhcld6eU01R0VDOXc5ZWp6dFE2S3ZTaCtZbloxallXRVJhOEZ4WGZsOG81VEtETDFjanB6ck1UaTQ3eER3QU9ENDJkMDQyRFVQZ1p2eHdWamd4ZWF4aC9RNkgvLzR4d2ZrbUUyOWRxdmZMOUV6dFFjQk44M01JOTlmNXJmdjk4NE4vdFdGdndyNTIvYnhxTm9seWZONDFDODlpSHhZYk9rYW9pbXBPZm9PcFUxNmJjdXM5UWU4K1g0djMrQzdMM290WWI1Mm0vUE9xeDhqZWQ0RGpsMUNLU3kzZEEyOXRWNEhRR2VzekdhMzBNdHA5QURQanpMSGl0R2htcDZlb1ZTdWNHQjRFR1BsNzFrT0h0aEhxQTNDYzBZR2Q2TXRHa1JMUk1PQkEvdFJ5bEdlNTYwQUx3WjZPS3ZvbWdmYkdkeVdsNWVKZ21GdXZQRkdWbGRYYVJWUjdaK3JyNzZhbi8zc1oya0dZNFVnaGQ1U3FZUmNjM3g4bkVxbFFxdFlYRndrK3U0cUZoWVcydEhySU1pNDJTWFIwOU1UYXljd0lSaGE1bnRYUHM5NGJaWVlqN3J6QTNsVWNBa2t6NnNhZnV0ZWJ5T0pkOC8vZVl2WHNJU2lLZkU3OWp3dnFSZHJhSmxmV2JtQ3Vkb1NNZTUvNTRzNUx6aEI4aHhkMWJ6K25pOG1pYitmKzBoTC9Sc2ptblREejRTMkdjeVVyRzYwS2JBSGVPeXhzYkZjdnJCT3ZwREhjUlRGc2s5T3lrYzlMdm4xYXRSMmhidmFGaTJlNTFLcUJQVDI5dERmUHpBQVBBN28yYVhTVmRjOFpFQ2RtNXNqZW1nTVVzT1B3bXZrejg2RUtDeWtXcTBTVFhlcDErdE1UMCtuR3R5MnExZnFzbXRyYTBUZnU4UEF3QUNpVmY3c1RKaWRuVVYwUnNzUnBmWXJmYVRSSzJibDdqWHowRnFydUIybUNISmZQZjJiSlBIT3FKUkZ6V3k4UDdaeUNER1ZHTzlkK2h3M1ZYN2NjditpS1lrd0REZnB0ZHZpSDAvOU8wbTg2UGhUTWJYVC9SeFk2ZVArUnk0bXhsZVdMdWRubFlrVyt6ZWlxZUZuSWpRbWU1bVNNWTNNWXlReTZvdlBPZWRnLzhycUd1VlNHU1dsS3FGeWdJaEtBVXE0eTIzUjVFZzVMYUpIYjEvZkNIQWhNTkkxajEweUR4bUF4VGlpelUxRW00bUl2ck5mQnRxbUJoTHR1c1oxWFRsWDdtcGxRQmJqNlloNTlQYjJpbkhJZFVXelhGZG1TMDBOWkdabUJxbmZqb3lNeUYydC9CMzV1VHVpTndQbUlTYnZJa2hSQmhKZVdyeUJTd3MzRU9OWnh4OGZHY2FvdkNjZDhsdkgzMHdTdjdQNHp5MzNiWTJWd2EzeFlKeWlESFJUOFlmY1dQZ0JNUjV6L0tFY1dPMEhDemEwdlBiRTgwbml2UXVmM1ZiL29xa1J0Tkh0WlVxckxXWktSMXJMbElSbWEvTndnUWVNam82V3cxQ3JXcVZFdFY3SEdzWEkvajYwdHNKTXRyRUtjRnpIY1VyQUE3dTV4eTZaUjJ3WVNpbkVFR1JRanA1R0pnYXlaWGtuMm90QkxwZERCbkQ1T3pJb1I0RWJ3dlJvWFc5c0dQRzFSWXVZZ2hqSSt2bzZtekUxTllYOFhORW1xWTNnTGRyTUpmeUZNUTlCT3pNUDRidG4vNHdrZnV2RVc2Qm1HRm5xNDFYM2ZCNHgzcnY4T2NicnM5c2NqTU9tZXEyMTIrYmZ6MzZZSkY1Ny9Qbm9Xa2h1eWZETWV6NlJHRjladnB5NStsTHJmUnVMYnFBM2RhWjAzM2ZHYkpZcEpjNXJQVk95amMzT0JjNGJIaDdSZ2UrenNsWkVvWkF5VWFrY0lDdWRjcDdMZXNtWFl5YmFvcWtvN2Vnb040RmlIc0I1WGZQWUFmTXd4bkFtS0tXUUFUaDY1akhKQVZsZXo4L1BJNHdSclNxUlFWZVdnMjZZamR6Qnk4eWpSWWltVk84bHo1RVBUcXdoMWlHdnBSUlZLQlNJSWFVMG1hbkV4aVkvbTd3Vzg1RiswdXZOZXFiVUdFRks4NUF5MUhzWFAwY01NWXl4eFZIZU9mcFNZdVNESXUrZS9yTnQ5aDFuSG1kWDcwL0xFM3g1OFhKaVBQTmVUMlJrc1kvbkhUcHRITVdnek45TmZXaWJBVFFFdHJGZXZWT1owajAzWlVvTHJXWktpS1pHNWpFVy9YczJ0WG9kMzYrakhBVktTZGtxVVRGUzJXcUx0djhkcHlLNkFNZTY1ckdMZ2Judis0aGhTUG5LY1J4a01KYlgwUmU4c2JTMGhNeENKT01RNDRpZTU0eFNTZ2J3dU9RVjMvRjM3RTVlc2d2Um1Kejl4QVlpV3ZMNXZHaVdXWlFZUjJ3d0d5VXZDZG5UWSs5bVNvSlFwOSs4OWpzTC80d1lSSXkvdXZCWGVOZEZyeWJHWHk5OE1MNGJUanZ6YUtEWHB1Sjc1eitER0VTTTkwUXJyMTUyMFhPSThZbUZyOFlyckxiRlVPdkdlbE1FNXErZTJaUXBIZHVVS1MxdnlwU1d0NU1wV2RIVWFLellCNFIxK2Zmdnlxa0s0ZjdCSE1ZZ3pHUWJGQllsWTlRQllIOTNwL251bVVkY1o1YVNrQXh5WWd4Q01ZdllRT1E5bVdIRXhpTGxMbmxQQm1vWnZEdHBIbkVkZjZOOEpwcmlrcHU4bHRtSHZDZURkV3dzb2wvZUs1ZkxjcDMwZXJPVEthVkF2TnJLcHVKNGRZYS9udjhBTVo1MTRnbU05QTRoeUFmci9FMWtIdHZ0MDBZTWpHNnFWODVKdzducUlwK1kvK3JwN09QRVE5bmZ1eStlZGNoN0tmbzFCR2NxVzJHM3hVdExEVElsTE9ndE1xV2xmOTVXLzdyeDczY2ZLTStFSVpWYWdPYzZDTXRWbmVtMjZ6Z1JGY2JZQWpESTdxSnJIdkZLSnJrN1Q4NUF4RUR1ZHJlN3laOXRETkl5Q01ycmxaV1ZwSEYwUEVNUUk0Z05SSFFJUmIrVTNKSi9GaHVIL0h4eWpmYjBaaUJUNm56bUVUTXlpQThsWngrSldjZUgwc3c2aEtKcHAvVEs3Q0k1KzlnMDY2aWs2ZlBNbVlkaDIzejMzS1pNNmZoYm9Hb1lXZHdpVTZyTmJxdnYwQmdhUWV2UUJLSEdXRkNPK2o4NjJXOHJBS3ZJQnJybUlaQ3lqd3h5TXF1UW96RGVhU3BIdVpPV3dWQm1JN0Z4N0paNXhIcytSRWZDTEdLOXlZeERaaVBTZndmMGRqcFRTcEY1dElHOEx2THVxVDhsaWZIS0RMOHo4MCtreEk1a0hqRkxRWVcvbS9nZ1NjeVZGL212cVUrbjNIUkg4NWxITzVuU1VndVowc3lmYlZ0dmFCdnFMZGRxOVNBSUEvcHlDbXNqb2hqb1ZSZ3J6R2JiQXNZb0hOY1pCc3AwSHQzQXZKbUJDT0k3NXVRcXBXaHBuNVJjVWhwSFN3RjBLZ01SeUtxclRadmpHQm9hU20wY2pUVmxQbE5xUHJnWjJ4WmxhV3NTN3gzL2RCdjltUjFaYlpYa2x4Y3ZJNGt2akgrcm5mNWFXS3FiTWxPYTM1UXBYUkJsU2hjbU1xWEZkSm1TM2xxdkFZcTFXdFVKZ3hCZmcrTW9YS1dvQmRIUkVXYXo3YUFBUXhDRWEwQVJNT3crdWpPUHBJRm9yV1dBazBGWTd0NWxZRXRwSERIc2ppMTlGUU14eHNoZGU1ekpTS21uVmVOSXBVbXVsN0ZNU1RTbEtGdWxZQkkyUGVPbHBCM1YyNlptMGJRVDVqeGVpektsaFJTWlVqcHoxc0JFcVZRMHNpRERWUzRxc2JwSjJpcWpiWXZCV29QUm9RTk1BSnJzb0dzZThZQXN3ZlRZMkpqc2s1QVNTM3JqNk1DK0NjbEFmTitYR1pNTXhqTHd0bTBjNmZWbUwxTVNCRHA3ZzdGb2FxN1h0czBFMnV6TEVPcjArenhTWjBxTGpUT2xsRE1QRFh5L1hDNTcxVm9OMTlGWTYyQng2UFVNbHV5MnRZRlFHNHd4ZzhBUE1tZ2VYZk1RaUhuSThsTFpxeUIzeXpFNmNDZWZXcStZbkJoSE9yU3VLZnVaVXZabkhrSnRkN1pzSmR3c3Q2MnlWVk85T2xPWmtxVmhZSzZCNjRNZ09GQXBsM1N0YmxISzRrUU10QmNkRVdhdTdZY3VWZ2NSUXhOaEFMZ3VvK2JSTlkrTzdZRGUrM296a0NtMVloNDZnMlVndldmMDJoYjB0cDBwTFo3TlRNazIwbXVCdkxYMjF1V2w1UlUvOERkK1RKUlFaWkxHYW9Jd3BGcXJGb0ZiZ1R4ZzZhSnJIbnRmYjNZekpVRm9kcUFNNUpLNkgydU5hT3JvVEVrNUtuMC90NStNeGdJKzhPMXl1VmdLL1RJS0Iyc1ZuZ29BUjBqT3lWWmJtVHFCSDFDclZtdkFOd0cvYXg1ZDg5ajdlak9lS1NWM1FMZkxTL00zYkhEQ1dXaHZjTFBtREhwdDI3d3gvNE1OTGpuNXR2clN0dmxxcTZ5VkJVMWpzL09CajlmcnRjT0JkcXd4QVFxRHRqMXl4RkVXVGE4Y005RzJKcVRxVzhMUXQyRVlEQU1mQVh5NjZKckgzdGViN1V4Sm9FM0kyY0NqYjM3MUJ0ODcvOWsyYzZXd3FWNXJhWnR2dmZGM052aWx1VXZiNk11S3BzeVYyVko4UFlsQUF6OEJ2cnVlWDUwMDJtQk5SSktybkxKRG8wUDhlbzF5dVZnQXJnVk9kZk9Pcm5sMDlaNFZkQzd6U004VW1VZUdZTStnU1Z1ZHVhWFEycHBtUDA0VitLOWlNYjgvMUJwdFFaa3FGamVpZzJOcm9GemhycmExc2RUOUFMOVdvbHFwS09BL1Jmc09scXk2NWlHT25SRzBwQ1ZEY21NdHR5dnowRWJqb0RKakhNb3EwWFFHdllDMW1hQ3lvSnViWFlZeXBhYUJlWXdRK0lMVyt2dUZ0WlY1SGZob2VzQ0VLQXk0QTNMYzFiWjErZ21ET3RWS2lXS3B2R0t0dlFYNEVoQ3dNK2lhUnhBRWVKNUxWdUM2RG1FWTBnaWkxM1d6cE5jVnZiY3Y4Nmo2N0hQNk1tTWVBMDRQT21qeU82NkZlSTZiR2IwOXJvY05tcHRkMWpJbDBkUUVCaWdELzVIUHIvYjdRVjJIWVlDMkJpdi9zZnNycjBJZFVxMldJMVpNdFZMdUU2Mml1VHZyMkVIektCYUxzbGt1RTdNUDBSQnYzR3V5QWtsV0htVkZyK3owRnIyM0svT3dDMFh1TW5pVUhPNnUzOFgzcWh3bkJvNWdaOVpwQkcraFR1OWdIeTd1YnNzbHB6ejYrdnZ3Wm1yTnkxWm5BWSsrNWRVeDQ2K0RTUTNUWEpNRkF1Q3oxdHJQejgvTlROWXJCVUp0TUJac1VFSTVyaERDY3NmYm9xRmFYSkVOd0JUeXE2dkFwMFVyRUhUTll3Zk5RNTRCa2M4WEdCN2VMd08zQkxKeU45MVJ4bC9ESWQ4eHRiWldrRWZDMGdqeTFMOWlzY1RBUUwrWVNMeUJycU9VYThvRDlrV0RhSm1jbk56OGZHMjcxOHpEOTMwYnQ3MmJGdmgrOFNRUEdEbWZ1L1NmeXdGdmlDRnZYMGQ1VG02WXV3NmN5LzFHenVQVzBrbmNXNVlhL282SGJ5eHplZW0vdWZQSVlZNzBIMlovYm9CQnI2K2pITW9OY25UZ0R0eHg1QkRmTG4rWGZiZFVHdXJWeG1RdVV4Sk5aNEFCS3NDditmWDY4WHhoZmNxdlZRbDlIN3grck5GZ0RVN1BQamwyckcxMGdEd2V0MXoxS1JieTYyRVlqb3BHMFFvWWRnNWQ4NmpYNjV3OGVaS2xwWlhJUEdRdndaQlF6S1JESEJMVG9MZlhreDNUb2tWV0Y5RUlzZDVDUVdZZ0hvT0RBeEVITzh3QmNqbFBURmVlNUNkNk56OURYVnRyOTFLbUpEK1gzamluNk5OejlTelg1Mi9sRHYzRGtZbWN4d09Ieis4bzd6ZDhUdzcxRG5QOXlzMzBYRG1OS3Zna0lNdVdOL1RtU29iUmE4cDh0dkFkYXYxMXpoMitJMk1qUnpqV0ljcTFqZ3dmcHRSWDRYT3IzK0hRVldWeTY3cWhYbTB6bGltMVBoc0tnU1hnNWZtMTFjUEY5WHkrWHE4UkJnRkdtNDIrVklmK3MwYkxYZzdXMXd1c0YvS2xTcVhjRDd4Q05BSWhPNEt1ZVZpbFZEbGVCbG9vRk9UaFFoRi94S2xUNDB4T1RrV2M3aENuR0I4Zmo2NzlZOUVnV2lUWFNLNHhONG1hcTB4TnBVd2t6N1RneHovK0tkUFRNL0lVdm81eWFtcGFyaTBhUksvY3RTZjEycWMvL2VrbHBaUzA1YjNNWlVxYmZyOFc0RG5QZWM2R1psdTFlRE1sQnI0OHpvM1hYY1czZjM0NWwwNWMyVkYrNTJlWGM5UDFWNGtHdk5reU5yQWtOVC9wU1U4cVNSdEFWelVETXlGSHYxTGkyaHN1NTZNblA4K0hKejdQUnpwRXVkYkhmLzRGYnJqaFNrVER3R3lJYWFMWHE5bU1aVXE5S1AvLzZ3V2FiUnI4RFBBSGl3dHpYckZZV0tzVVZ3bU53YUFJNjBXVTYwYjAwTDYwdlIxb3V4Z3NwY0l5VXNhT1RLeFNLaFp5d084Qm4rNXVDdHpac2tXZjUzbmZrK2IvdEc4V3NJMWpRUmdPdVhZY0xqZlVwSXhweXN6Y3c0WDJtSmxSc0NnNFptWSswVEl6TTNaMXpNeXd6THh6TXo1YmNwYlJjYVE4NlZkaW5LL1c3emR2M2t0N2Vucmd6anZ2VkpYYTI5dUIyQmlHV1EwQUZoSk9VWDJPblJ0Y2NjVVY4TWdqajZoS2d3Y1BGbmlSa1hpdC9mMzlOdUtsZlE4Ly9EQ01IejhPUHZqZ0Ezai8vZmZES21LWU1HRWNqQnc1VXY1OE9mTEVtREZqekpJblRGME0yRy9uVkNXK2xRbnh4TktsU3gyU0o1emRpWkIxaDA5VlNtNkxEK0g5NktPUDdCS3YrOE1nQk5kZUJNeUNBR2ptNTRWVjdNSWdsUFlQQU05YlJhR2VPSDdUb3l5b1IxQTdFNUtTMTZkbjVrQkJvQVJLSytxaHZLb2VLcW9ib0xLMmhUN1A0bmRVVFRNVWwxVkRkbDRoT04wK01GdXNOS2pjZzNwVVpEclhJN1ZvNWNHeTdETGFXTDU4dVRnU1ZVZWpYeTVoNTB0ZmFSMWtxVlI1Y0J5M0hBQTBzMmJORWtmNjZtajA3Qll0V2lSOFIwYUJ0N1MwZEQ4K1gvcXVlZSs5OTNBZFo0dXExcFJHang0dDhSSTRpTS82a09TSjNTc1BhRUE5bHREQUFld2QxaDBJOFFSMnhBY2xUNnhmc1JsSCtvZFV4QXVhVGYxYlEzaUR3ZUIrNUYxR3ZGdWYvRW56emZaZk5SVTJGYXdwV2ZOd2Zlc256ZGFYZnduMXhQSGJRWEZONFhIVVkrdi8rZHV5WWYwLy8rN1l2cDErS2tzL21jVnBMRHdGZ0theHpwcm9ubnQzNzlMZ1B5dHF0bXphcU5tODhaOHRPN1p2bzRyalllSWdKcEh0SExabzVjR2twcVoyNHVMdmI3VHA5L3ZoNXB0dkRudkZjY01OTjREUDV3TmlJcmFNakl3MkFPQkk2ZW5wWFJKdmJtNHVqQmd4SXV3Vng5Q2hReUU3T3hzazNzek16SFlBTUJKdlZsWldFKzc3bDQ1MWRuYkNXMis5QlpNbVRZQ3BVNmZBbENtVFVaTVVFc1dhZ3JISHd4dHZ2Q0ZWZFFKdlhsNWVCWGxCOUVTTXgrTTVYMkptZkRxdzNSaitpc04ySFl0bTFSM05FMGIweWdVU3I5blBROFpOM3JCWEhPblhlOENVYWp3cXI5d1RpWmU2Z1p0WEJEWHIrcURqbyt1aC9hUHJGRmRWZngvd2M0c2dzZGQxVkUrY1JOT2plTlNWS0t5ODJWOVRVcHlRa1owUEJjRnlDQVFDV0NrMENaVUREcWlncXE2VmRJcmZXNkM0dUJpQ1pUV1FrMThFVHFjVFl1TVREK2dOaG8xaWtydUtHS0lWaDNMSnc0QXZYbVY4ZlB3dFdFWnZvVjI0WUFwVlZWVXdhTkFnNk92clUxUURCZ3dRWXVNb0RjVDFtRzJKaVlrMzRNdFdScDBhQ1YvQ0tqa3ZqcUtwSXhTUzN1MjMzNjZvYnJ6eFJvcE56K3hvdkN5S0tTOHZUMFBlMi9FWWpZYkk5RUtDZlBycHArRzU1NTVUVkU4KythUVFPeUVoSVlTM3JxN09TMTZRZTBMT3JETnBnYXMwZ0hsQURGaDZsWlg1NGhnaHR0YW9QYjRuWkx3R2t4N2lLeDNnR1pnTTNqNm5vdklNU0JaaTY0MzZZL0xXMXRhbXkzbjVOQk00SDhtR3VMR0Y0Smlvck9MSEZBcXhXU2QzVkUrYzRrd0doM0tqUHFDZlcxaHR0dlVlcjE5SUlua0ZRUWlXVmtKNWRZTXduVlZaMHdqVjlhMzBlWnp2cU5wbUtDMnZnVUN3RExMekF1Qko5VU44UWhMMUVadXBPS1pZWWt4T1pJZzJoWktIem9jTk83UjJsOHZWeHpETWN0cXRCdUUweStkSlNVblhFQnQyRG00QTBKTWlnVGMvUDk5REx4NXB4b3daTEk3azYrbUZ4SE8rVXh1djErdXR3K2xCaHJ3Z2VrS2ZrNU1qUEdPSldlV2VNRVFTYnlSNjRoU2FGc1dnckdJbHNBaVQwV2F6MWZxMzArMDk1UFdsUTFaT0llUmlJaW5FWkZCY1ZvT3FoaEpNRG1WVkRjSW43U3VwcUlPaTRnb29DSlJpbFJFRVgxb21wTGc4bURTU0QzRkc0emE4NXc2Nk44VVFZekZpYkFWYk5IbG9jUXFEaVkyTnJVYlR0S0doTy9EN3ZUaVNmZ2Zua2hlVHNaVVV4bHlJc2Q4a0JtSWhKbUpidUhDaGdZeE1pakJlTFVyZjFOUmt4Mk10bVBjNkhRN0hnMnJoVFU1T2J1cnU3cllTSTdIS1BZR2N0ZlQzU014cTkwUWs4VWFVSjA1L1BaVkZ4WXBUV1F0UXV4Z201aStzUnZZbHBiZ1B1ancrcXNJeE1XUkJXa1l1NFBRNXBHZm1najhqRzNCZ0NDNlBIL0E4UUM3Z1RaYXRoditucC9hSzk3cFN2RGNieG1vam1qeElPRjl2c2R2dERYRnhjVzFrZGhvcGtaSEkySExoNk9tczZ2RDdVMHlLVFF6RVFrdzRpamRMbkJIR3E1TXg2K2lGeFBNcTFjS0xuVVI1YjIrdldjNHA5d1JlYjhXL3Awbjlub2dzM29qenhPazNyU3lKMkZFbDRzTDZSNmo5dUs2eUdkY3IvbUU1YmdObjVEZnl2SGtEYWpQTEdUZkZzT3g2UExhSnB0REUvOVA0U0x5VzdtR1hrb1pLcW8xb0FrRWpzemdDQ1pqTjVoYWJ6ZFpLeHBlRXhqcW5rc2VpMk1UQTgzd3BObDdpaTNSZWxFNmNFb3JEVVpiZjdYWUhxT01nNFVpcjZseEtpb014Q3lsMllXR2hnM2hJb2J5aHpOVHA0WnBTdVlxZnNRSzhVVStjaGFaRkdWQTh5bzd5b1hwUncxSHZvY2FoNXBERTcrK0p4M3JGYyszaXRRWVZKNHhvRXNFUzJvYWpwVlEwZndHYXZ4eGZSa1ZFc1RCbVBzVW1Cb2tuOG5rajN4UFlHVG9peVJPUnhpdEtKNU5lSWNsamFoWHlzRlNSTUNnT3hhTXNoNGtYanpIcXJEQ2k3VC9TQWpDVC9ySzNod0FBQUFCSlJVNUVya0pnZ2c9PQ"},{ name : "__ASSET__:bitmap_flixel_system__FlxPreloader_GraphicLogoCorners", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFDQVFBQUFBQVlMbFZBQUFFT1VsRVFWUjQybHlOaFJFRFFSRERGR2JxdjVzVTlNenNjVGluMFI2dlo5elprSk1SbTBpcmxKSktOTFIwOUdZd0krSTlnM3hYbUNIRkhHbVdMT1NLdFRLMkhNV0ZHMWQ1MW5yTG5ucXA1WXFlaGlVNHBIblR5dDZNY25pRnY4SDFQWjd4UE9NWHIvZlA4Nlc3RFY1dEZIMlFSK281T1NrSk1aRUlST2hWVENweUNsSEs2a245cHJILzFMaUs4a2xCVGtaSy9Nd0l2VXJKM0xtY1V6a21JeUdXa1d2NmZGQlJ5cWs0TStCdEdvYUNjSG1VdHF3dytQLy9jMXFsTm9oMy9YU2NMSVZLRzR2eHlZNmJacm52bloxVTBtS1liS3hiOXlqZkJPZ2lDR04wbC9TWnUxMUxGeWlGRmdoOWtaRGdINHh2V0Q3UW9qRVFUa1BaZ1pEaVZKb0J1djZXQUd6dnIxRnFIYTBXWmxIT0l6SnhEaXEwWlFleXZSWmtzQTFmeFRxR3RyTitXZFlBZzVLRUVkb3RHWlREdVkrdk5uZkZObkpubExURFI2MmNEd3hKWEx3cEJjSVNBeUM5c05zeHg1WXh0MlpFek5hMURzRmlnQ0QxVVFCKzBPQng0QktXYU1YeWIyMThTK1FlTnlrcCtCRXZieEFIMzNwb2Fac0hvbzE1TEJyWkUzYVVQUURZVS8yQ09YcGc5cWl0LzdWenVBNElGd0hrT1Y5YytYQzc5N1lSd3hETDhHQUMwSks5NngvSi83WDVIaXdvQU5lOG9NclB1K3k1MlAzalduTHdRb0FnQVVEOVh2MnRXaks0a1lJRWdPTjNBdHZZcTZuSUFhRTBUZjFiSmdBRUdZQWdsVjg5Vzhmdm93Q01JQlVIb3RsOEVad0FBRXNBbG0wVEdDR01nQ28vclBCTkFURENUUUMzSU15eEgzL2NLK1pveXgyd3RnaVYzM3BmTUNPRGFDV0J6ZDhEeUFBY0J1c1pDSXNSS2dzd0J5SUpnRkEyanYwc0NFb3ZEWFBOY1RSRXpZN2ZSKys3OG9tTTI5bXZMVVQyZ05rbXRDUXVnTW5OMXA0cGdmL1hQaldBaHZtMk9aWW5ibk9CU0NDYTFYRFRzUXd3ZVFHd2w1S0FUMjFySFpjeUFCTkVtNGRRQWtCekYwRXFSdHRiOCt5bHo3dlNFSWpOSDBJdkFQYnFPa2dnVExRSHdRQWxUZHFHU0w1N0FMNzBSTk5QMFZiVnAzN0tsbk5oejRwc1oyL3pJQ1NCUFJsTWVoZ2R2eVRuTDdVNzZERHNCR21qN2VjTmlMbThCWERVQnhZaUs3WFJHN0JjdnhHcTdROFNBTWkwSHhXNlo1THJUd0pIU2RPa0VPSkI0MTVlRjIzdFRMbisvQjlKcXQxcDk3VzdQZ0F3N2dXampMdDR0Y1Y2L2IxdmV5cDM4dFgyVDkyQk9CZ0IrWS9mcmZLWTJsMTlkNVYrRklBUmtnTVl5Y0tqdTJlZXh5eld5TWEyZHZRblNVY1NPTGVlV2lBY3ZCaCtSVEdtZSthNXI3QnlEZmV3ZFV2V2xQeEU0WVY5NnhzbjcyUUhiMHJFYmQ2a3ZZVzVLOGVhY2dWQ0FnYVFqT0RuSWhnY0h5dVc3dDV3eEk3NTJRamVBekwvVG0rZCtjTExnVUI1Z3c2T2ZLamNaWDRIZ1FST1F1QzBCSUtUR0NDWUlRd3NtNDdDbWpVWFFGeVVnczRkZVJQS2p2b053QVZHUUVaWVU2N0lYTmJzZG05emwrakZQZ0Z3dnA5OGJ2M2MvYmpyZVZnTVFJekM2Tm1hK01aVlo0dkw0MGQ3ZEc4OU80Zjk3cVgzN09YUGY3YUxoNlkvK2YvZVM2djBhZVdmR2ZwKy9PUmU0ODh1NmptL05Fdjd2ZDdudDk4YlN4R0tIQlprUkFBQUFBQkpSVTVFcmtKZ2dnPT0"},{ name : "__ASSET__:bitmap_flixel_input_mouse__FlxMouse_GraphicCursor", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUJnQUFBQWdDQVlBQUFBSVhyZzRBQUFCcFVsRVFWUjQyclRSQTVLRFFSQUY0QnhnYmR1MjdUM0RvckMyelR1dGJkdTJiYU5qZFp4TVh0VXJ6WFIvUHlqYUpzYU5GQ1dHRGdCNUJBSGtFUVJvR1JzaGhEQ2dZV2lJRVNVQVJvemxDQ0VJcEJlVVFtQkVCRUVFQWNXMXpUQzlzQW8rSWNFRUVRVDBUU3pCNmZrNWVBVUdFa0lRMERvd0F5ZVh0M0J5ZWdydS9uNWtFQXdNejZ3QlBmc0hCK0RpNDQwUUFnQzlkdy9QREdSbmR4Y2NQVDBRUWdDWVdka0JkamEzdDhETzNVMStCQVBzdnJ4OUFEdHJHeHRnNCtLTUVjV0E1YTFENE0zaThoSllPanBnUkg2Z1kzZ092cjUvK0pDNWhRWFpFUXp3ZHZ2Z0RIQW1wcWZBMk1ZYUkvSUIzV01MOFB2M0J6aGpFeFBTSXhqQVBUcS9CbUVaR0I0Q1Ewc0xqTWdPREU2dmdLaDA5L1pLUUNRQXlSbDU0T1lmQkNFeHNSQ1ZtQ2kwN0orT0VZbEFhbVlCcU9ycU1hcHBhSWlXU0d5aldDQ3pxSkt4V0UxUEQ3U01qR1JiamhFTUZGUTFNSmFyNnh1d0wvYlI2aTFucVdORHNhQzBvUTA5U0xZRE1TZFY2Z05iVncrZ3dWTElsZjlHa0F1b1ZhTUJzUVJ5K0swR0dVN2xoaGVtNGJTd1lDa1FNOU9xNlRnZlpqZ3RMSmhKeThidlpBWWFBZ0JJUDV2ZHJxV1ZzQUFBQUFCSlJVNUVya0pnZ2c9PQ"},{ name : "__ASSET__:bitmap_flixel_system__FlxPreloader_GraphicLogoLight", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFDQVlBQUFDcWFYSGVBQUFGT1VsRVFWUjQycjJhQ1E3VE1CUkUyN0t2MStFY1hJUTdjVVQyblVKUXFoZmxFVDBVbVZnYTJXM2NaZWJQLzNiY25rNnZYdjlQbkFmaDlMOXc1L1RpNVdsd093TmZDL1RyeHJaeEFvejc4cnltQkI0bndIamlaOEc0OExwd2crZnhPY2NMME1ROU52bTRybXZ4UFk0Vm9DSnVzaDd2aUhvNFlaOFFsMzNrVFR5aWVkbUxFRWxDREhaQTI5dEVsNFQ5WElnaWdoNURNdVlOZDBDN3dZVHYwQWNhWitHSUdqREMzcERRT0MzZmhIbGN3b1FBSFdIMW01WTIyWGFDaGFBUHEwZHgzaWxBVjJFVHBsL2hMZ0FsaGdTTzZDYngvUUxRdC8waHZTSi9iOVV6SjkzUUtWQk9TQUdhUEdqaWtBYkx4NzRHZUsrb0NVbE84d1lKd0pleTVTRmprdmNuTUxZQUFQSnlna2xkUTRpc0FYdklROXJrSVF3ZWJEeG1MdVNWQ3JrYUlFU21jd2pnSmNWd1ZYZkVJUW9FQ2JHcUQ1VUcxeUI5N1hxQUFDYmZCYy81YnVJUEo2ekdqM2lNR0U0SE84QmtUSm8rVXFFRU1DQU9uT2VRZy9DeXR4Q2toK3VBOHorSVI1TVlFa0RSajJydmZEZkp4Mzk2OEhnRzgrd0Mxd0RhV2RGbVROL2lXSUIvTFh4cGU1Tjlzc0JqUk5sMmdlOEJIUFVBNUVPQWlMNWQ4SGNCSUE5RVhDTGdBdFVCV1g4bjhXc1dRUk1IVWZnZ2I5c3Z5VCs5allFRm1LSG95KzdnSjMxRjMwS2tBQnQzYzhwOWs1OEFlWTBoLzlnMUFQSWlBRmtERVl4T2dkN3hiVGlBM01mMml2Nk1aMHN4bUwrS3Z2SmV4SDhBa1pjUVVRdk9rd0RLZnhjKzUvNEV5TnNCRUljMFFBQ1JWOVVYZVVTUUVFNkoyaGhkZXJPQUtMMGZjRXJNd0FuZytlUUtRV2t5d1VzbGdubkR4TGk1eVFFbUNyUUV4dExuM0ljWXI1MEo4Umx6VTZTL0E3QzZiaGZRcmlBZFlQVktHSW1qZXdIdERCOXJvd1NZN3p2SXUzVjJrTDlVV1lCdXZVemFKYkZiaENRaU1VOEhLVDVtaTVQa0lDOEJpaXpOdVdZM1dBd0xzeHdEdlVhRWhTQ3UxZ0wwSFZYOVdoT25PZkViZ1FSdVZHc0IyaTVSVkRUV2tpUjRxWXZYTWgvNDJuZ0hNSTR2NHpXYjhSTGZKbFJsMS91QUl0K2NFTURSVmlRMWhtZ3NWOTlXK1BJYlgvLzA0UE9FMnpXQVNFdXhZZ2NvQjVZSWx4M0svVFJNSENJUW5mdVA4L2pUTko3eGFRSnp3RTJNY0VuZUVlNVlCU0t2SFhrVEo3cWZWb1EvTFBDUkhpQUlvaWgxdEIyMkNCS2k5Z0ZiQ3NwcTI1WW42cEQvc01MNzMzaTN3SHVBR0N0WGtCcHlnQUJ4OFpJRFBDbWl6bmpUOGxoOFJmcHRBRkZTQ0p3ZzRsa280WGZwQXdSWGVWdWZJaWNCSFBFbDRUZEw4RHh1VUgyQVBFNndJMDVaQVB0SWpER0lQei9nS2gxaFNUQ0pwUnBCand0d3c1WVRuQmFPZmd2UXY3M2ZFTC9nWGlObEpBQUFkZ0hrNVFaRXVBbzZYb3RUNFNEdDIyZWF5R3VsQUo4aHR5VHJxQk41Uk5DS0VJVXdmaG1pMzNLRWdBaXN0Ym9uMTJyaHpSQWtQem5xTTVqck9nRDQzTjRmK0xmQkZvS3hYK09WQTZoZ1NvUVZSSDdMOWhIOUxvSW1aL3ZIZFgvQTBnVVVxRzg0WUlKRjJINk05WHRIYU9oWHBSU2dDNkd2bTd5M3lpMkNpWU52MitSQjdBUnArZitBYUtxcWtFY0U3eHVvQS9UZklHblNRZDdSNzUxZ0M5QVJ0eEFBOG1EN2J0RkVJUThnN2pVZlJPRUxCMlNoTS9td0d1UWxnb1FnTlJocnh3ZjVKajd3WDJMZCtzNFJRRWhpUUJUaUNLZEtIOGZnNnZjSTRQRlZ6OGR4RmNBTkVLWFhXRERodUEwZWVTanE1L2hDa0lzemdvVHpIbFRPbHpQVEFmdWRZQmZFM1NTQUZHTmZkOVQ3SHlMai95NnZQcHVKNjFoTks0Y2pISWlEbkVFQ0JHbDlhTGtCT0s5WHlLVXRIRGxFZ053dGRoUnMyU0FjeFMxRnA0MFhvTVhaSm0xU29BWGNFZlhSQXZRL3Nxc2lCNEdJYkZ3N1FJRGNGc2NYMjduczlwempCV2czZERPUmN4TnY4a2NMME9UN1dwUHJhOGNMTUlEc2JqR09GMkM4TUNaNmNQc0ZMZ2kyUWU0OEVWTUFBQUFBU1VWT1JLNUNZSUk9"}];
+haxe_Resource.content = [{ name : "__ASSET__:bitmap_flixel_system_GraphicLogo", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUdRQUFBQmtDQU1BQUFCSFBHVm1BQUFCRGxCTVZFVUFBQUE3UVA4NVFmOER6ZnNFenZzRXpQdjNKRTBBelArM1MwTUR6UHdEemZvRHpmb0V6ZnNBenY4N1FQODZRUDh6UlAvL3dqRTZRdjg2UVA4RHkrZzZRUDg3UVAvL3dESC93REwwSms3MUowNy94VEgvd1RML3pEUDFKazcvSWtUL3dURC93REgxSmszMUprNzNJVXIwSms0QXp2L3R3REQwSjAzL3dESC93ekVEelB2QVJrVXNYOGZJdnk3L3dURDBKa3ovd0RJN1FQLy93akQvd1RML3dERUxva3NXakhRM1NQRTdRZjhEc1M4a2Jxd3ZWOVVPbTFrRHkrMEN4YWtDdzQ0aGRaNHpVT01BdkVvRXpmc0J2MlVCd0hQMUowNEF1U0xsTUV2L3dUTEhRa1ZiZ2pMUHZ5OFB1U09aWFQyZnZpeVB2U3N0blNwZnZDanZ3REVQcnlTdnZpMGVwaWQ2Y0RndnVpWEtyZHZYQUFBQU5uUlNUbE1BdnovdlA3OC9ENzlmbjk5L0grK2ZEejhmZjcvZlgrK2ZYOThmZncvUEQxL2ZuMzhmN3kvZnY3OHZyOSsvMzI4dnI0OVBqOC81R3BYYUFBQUNrVWxFUVZSNDJyWFdCWkliTVJoRTRWNW1abVlNODBJNHMyQTd6TG4vUVVMMEtvbzljZWVYM3dXKzZwb2FTYW8yYkhaQlZpdnJadzBDK2J1WnhTV0QyTmc2TXhFWWczQVJtTlZtakxuNU0yb2VvYlZWZzdBUm1MRXlvbnY1akh5RTltQlNZdmVNYkNSbDl1c1JWeUVjeFBsdE52a3g0Z2lNUi9nSXZ3MC9SbjRFQmlJL3d0ODVCNUVYb2NzWHo4eDg1Tm56ZHpVWDhZM3pjNVRjQ0lhdHlEZDhSYjd4b3hldFF0NWpvR1JHWGlKNGluekRWK1FidmlMZjhCWDVocS9JTjN4RnZ1RXIybk9OdEk5TklHTzJrZmIwMzRobVhjTlhwS1Vaei9DVmVVbFhTbzFYNTBtK01pZEpheVhHbTNPeUZZWklZNGJoS1F5UnJobUdwVEJFV3BneERFdGhpTFFZTUZBcVpVT2twVFhYSUhxTlVtZUlkTU13TEdWWm9qM0RjSlJ1aWZZTncxQjI5VWMzY3hnb0RDR09NSXlvd2hCYURSc29ERW03OVpONCt5bGlvREJFTklhUlNXRUl6V0xFK2xCakNQSHRNU0s5cXpFa2JSRWpyREFrYlFjanJEQWs2ZExSZVRhbFYvVnJQN3liVFhreXFmcTFIYUpFamZ0Rlo0TWhoeWhobytocU5PUnJ4NW1NZ2luSkVKU3d3WlJrQ0VyWVlFbzZCQ1Z1TUNVZGdoSTNtSklPUVlrYlRHRklGdVVFZ3lrTVNYcjBYOFpwUVV4aFNOcWRxTUVVaHNRVkRMcVFESWtvR0dsRHlaQ0FncEhXTDRZWWltRXdoU0VSQlNPZHdoQkRNUXltTUlUb1hzUmdDa09JRG00SERLWXd4RmN3U3Fjd3hGY3d5bU9Jb1poR3dSQkRNWTJDSVlaaUdnVkRETVUwQ2gwMjErTWp6L0FSSG4yZUFSSlFIaFl1NGlzUGl0d0lDa1p1QkFVak40S0NrUjFCd2NpTjBERkdmZ1FGSXorQ2dwRWZRY0ZvR1RJeVB0VGZZcVN0WFpLMnV6ekVKNzdYQ1pNWG1ab1dPWXhzZ3ZvR01pUERFeUtYVVpQRXFNaGdET1E2aE5KNkJqc2lDRCtHeUdBTXBBM0NZQ3lFSDZPODhrUGdDNTI5U3ZkVGZJcUtBQUFBQUVsRlRrU3VRbUND"},{ name : "__ASSET__:file_flixel_system_VirtualInputData", data : "YmFzZSA9IDI2NiA0NiA4NCA4NAp0aHVtYiA9IDI2NiAxMzEgNTIgNTIKYSA9IDAgMCAxMzIgNDUKYiA9IDAgNDYgMTMyIDQ1CmMgPSAwIDkyIDEzMiA0NQpkb3duID0gMCAxMzggMTMyIDQ1CmxlZnQgPSAxMzMgMCAxMzIgNDUKcmlnaHQgPSAxMzMgNDYgMTMyIDQ1CnVwID0gMTMzIDkyIDEzMiA0NQp4ID0gMjY2IDAgMTMyIDQ1CnkgPSAxMzMgMTM4IDEzMiA0NQo"},{ name : "__ASSET__:bitmap_flixel_system_GraphicVirtualInput", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQVk4QUFBQzNDQVlBQUFEcXhOS1RBQUJ5VzBsRVFWUjQydVNaQldoY1N4aUZiNlJLOFdkMWI1ZTZ1N3U3Uzl6ZDNUM1Y1KzVlZDEycEt4b1BSZXZ1RWlYbnpRK1hNTnpseG9EWjZiNkZyeEk3WHlZbi93eDNGTzBMZ0VNOUdkOE1aSXdTaklGMzBPalpsNjhFa0ZOem5NK2RPemZ3N05tem8wVENNbHU4eGpkdTNCaklHQ1dZLzFVbk12SXhNQ01QbzRTU0QrMGEyNjJ2RERSVjFoR3BYMFVpNWN0SFNQb1VTTmpKMkNFR3lrcjZESlROSEh6SmhaZHYxRGY5SzRCSUU0T2ExMnhmRlNjVlo1Rnd1WTdXdnZyT1o4NmNpYlJZTEk4c0ZqTXNGcE5nektCczV0RGtOUzR2TDQ5a1BDb3JLMFZwYVlsUUtKT3lHWGJkaWRRY1JLWms0eEg3R3luWmpDd3hVQlpscXRuYU5XN1VOek1mSURKRXdHWHh2bmJUQ1U3V0NTbGY3RUo0RGpETkV4aXdFakNzRUF0bHp2SUdJcGtEdVpDVEtxL3JtL1lsNEpjTmJFZ0cxaWVKaFRJRG1HdjZsNDM2Y2lWb3hXaXQwa1lrWEM0NU9GdjdXanV6b2IzTFpEcUZYYnQyNGJmZmZzT3Z2LzRxRk1yY3MyYzNUS2JUSUpmRzFwZ043VjFGUlFXNGNPRWNqTWJUT0gxYUxKUjU4ZUlGRkJjWGdsenNzUk1wMmRpVmtBNnNjUVZtTHdGbUxSWUxaYTczQUJJekFITGhuZlY4czdjQ2tRbUFYeWpnR3lJV3lveGkyZVJBTG5iUUNZMXc2cGR1aU1vRGhxNmhRVzVUeUlGY3lJa1h0L0tsaldOekNyQXUwYWFRQTdrMDVLditJTm93MnM2Wk02ZG52Mzc5Sm9tbWQrL2VFeGN0V3RTTkhNaUZuTFRGMEd3Y2JtYnphZnp4eCs4MHlHMEtPWkFMT2ZIT21vM0RqWWEyeVdTaVFXNVR5RUhkUUxTK2p1OXpKOUp5NFphVUFTeFlTWVBjdHBCRFVpWkFUcnl6MWpkckt4QVlBZmdFMnhaeW9BMkVuTjczT2FGd3dxMlI4R2tCRnZnRC9aZkx3ZUlBSVBIVFMrUkdqanoxdmtHNU5MemxJQ1JQejlkWmZWdmJqaDA3TG5OMmRyNUdTei96bzI1WTNybVBVS1orMkFXVXpSd3VkTzNhZFM0NWNiNk8yazVZTEphQ2ZmdjIwdkNXZ3YzNzk0RTU2WGFpdExTMDRQTGxpelM4cGVES2xVdGdUcnd2UHlDc09qRmt5QkNNR3pkT0tJTUdEV3BXSjlqR1ViRFpCNWk1V0E3Yy9JSGtET2gyZ254amttaDR5MEZjQ3UvYitKem8yR2tTdW5XZko1U1BPNDVydEJQMGh3UERpYWlwcVI2ZzNIMnFTUE82LzBKNVYxazVnanpKai9OMXJ2ZDkrWTYrUnpsNFhhSG42OFF1Zmx1M2E5ZnVpL3YzN3gvNFlleThNWlZSV3hXVGQ0U3kzeVdRRVNBRXlqcnJFNjFROW81aDB5ZmR2bjM3WkljT0hmTElrM05WK0U1VVYxY1BlUGV1UXBwS1ZGWldLaFVWRmJxZHFLMnRIVkJSVVNtUmJ4VkQ3WVFHdmhPQmdZRmpUcHc0b1h6NjZVNGxKeWRMS0o5Ly9wbEMyUjRlSGszcVJFMXR6WUFuVCtUNXRYdjZsSzF6MVR2ZFRwRHYyemZ5K0w1OXkvdnF6NG1KVTNlTWlZcDdxWGo1bmxWY1BJNHBMdTVpb0N3Zi80c0taWThlbDY3ZkNmVUUxSllKNXlOcUcyQ2dVLzh5T1JpMkJpK0NzOERFc3dDMDQ1N0h0YXYzWFpjQXJKV0VUY2tOK1g1T3kxMndNZ0FJcy9XZGtnOFFua3N1SUNmVnR5MTFRZHNKbzlGSUozNXArT09QUDNEdzRFSGRUcFNVbE5DSlh4ck1aak91WHIycTlXM0xkK0tycjc2QzBVaDNTdi9hK0U3cEZMazAyb25ZRkdBV25mb1h5UUU5dWdxTGZhSGJDZktsRTc5M2tCd0VoT240Y3AxWXQra1M0bFBxc01iRmhuZEs3a0I4YWgyNVdIZENMVVZyOW94ck5QdG5MU0syU0xOeEVIVHY4U1lvRStRMmN1VEl3YlM0eElBQkE4YlUrNjZObDRlTlNjdzN5OHEzZi8vKzQybXA4NFpPQVNJa3VsT0t6Q01uM3JlMXRoTTBBT1hhUEg3SG9VT0hkRHRSWEZ3czFlWkI5eDdYcjEvbmZkc3kyck5IUlJNY0hCemc0dUlDMmU2VXlLbWhUc1FrQXpNV3lzUDhGVUJZekd1UTI3aHg0NFpvTzBHKzNvSHk0QjlLbTRlMXI4RmdvRG1CVVdNU2taQmFKODJkRXJtUWs3WVRqc1N0VzdkOC91UHVLb0RiU05yc0U5bE96QTV6RmtMTEVGaEdlNW1abVpuM21KbVorVzZaNmNmaytHNlpHVXdib3h6TGRzVHlUTTgvcjF5dHFTN0pra2ZxYk5wNVZWOU56VXlyL1VycGZQUzZiUUFoMkFLbUlXdzdJTGZQUC8vOExsbm05ZmIyM2hJSUJNems2eFR5ZGIvZisxMit1UEh3WTRIUGU0SE1KT0E0dTlmSTRjdnR1T3FnTFNCSE4yTy8wMnRSZUd2QzRWaE5TQ2FUTkZTTFlEQTQ3WnJReVhkeWNwS0dhaEVLaFFyNGRuWjIzZ2NBWjU1NUpzYkhkOEkyWUMyVHc4UkVIQjBkSFNYWGhCQXdEbzRUQXYvOVAvNzQ0enZsZDl6VDA1UG42OEFrSzg2M3U3djdmZ0E0Yk9PdDJENFFRRGEzKzNtU3c4QlFBQWNlZksyNkptVC95dTFyZDRBUWR0VS9ybk15Z2JjelkzbjdKRHRSMVh4QlljdGU5M0d5UDVqTlp0c2wzMnFkYUdmYzVUazZrTGRQeHFOVnpSZDBSQUZmMXdFZEN3Q3R6YzNBZ0VHYTB0QVlGclMwU1VkNUlybUM4TllFZERuamtaRVI5UGYzWTJCZ1FFc0FLYjRtOVBGTkpCSVlIUjJseVFDaWsyL0FzaXl1Q1RTN2E4STBUYW10cmZTYThCczhVb2t2c0hQODdieGxNLzNGZjNhNnQveTRZbkFBNFFSQXVPc2d2eVl5bVV4N0pYekh4NzdBU1BUdHZDV1R4WGtrNHIwbHhwV2hyUEpWL0VSajB5THNHRFZJVXhvRG1sdVdxbXRDQmc4aHhISVFkdlVoT25Eblpkam5pVC9JVyt0dlA0aTBzQ3VmMHhheXZiYVlYR21PNDNoOHEwVGc0cE94eis4K2tyZldlNjlHMnJaUU1XeEg0ZXRHYXU2Z1dBZ0FJV2JNMlVselZvVmxJUUFIaEJCaUVTVGttdERrakJrMDZJUmJXMXZSMHRJQ1Z3eEU1WkNjQ3RlRUxyNWpZMlBZdVhNbjNCNHZEYkZZVEN0ZmQrdHVSQWl4VUZaUnRtM0RGTWdLcU5TYUVNSmZUblgvUGF2eGwzKzhUOTVPUG40Q1FsaktHTnRLNDd5ejB0NjRQOWtYWjUrNVpJWS9Rd2tRY2sxVXpQZkc2MWJqVjM1K243eHRPblFDdHEzeXRTYlRPT0hZdERmdUYvYkZ5U2RXenBkK0lyOG1BbUV3WHpFRmRJZHdnZ1ZySWlncmF4M09PR3Buc2ZLbVM5RjI1R0Y1VzNiSm1ZZ3Ria0hGRUhsbkVKYUxRdUZiUlpVUXpTU3g4cUxUMFhiSWZubGJkdnJ4aURYWFZUaW5JQ2VGNzNQUFBWY1BJS2p3TlFVT0N2akNRMGlITSs3cjYyTjJCWGU3SCtycTZ1QUtnbGkrZkxrV1o2eXVDVDE4R1RoWWFTeFlzQUNSU0FRMU5UV1lQMysrVHI3QnA1OStlaTZ2OHAxWmNNaXA1SnJ3bThtLzhWWWROaDdlbHJlSDdsdUxjR2k3TXFhNXNRc1AzNzgrUDJiOTJoYjgzK3ZCR1RLV25OUTFVU25manordHcwRUh0dVh0NWh2WHdyRlZ2aldSTHR4NjAvcjhtSDMzYnNHSEg4MlFyMVBJOTVsbm5tbVFhMEk0TXVDWlk4SlIrVUtTemNPdXJtMlZPV2tUd2swTlVBSGtUdDVjMFh4a1RVNkVKS3lWNzJGckVXNm9MK1I3K0xySzV5M2tHNFNFaWMxaUljbzd2aW9DaDl2cXdNS0ZDNW14TU11bU0rYTlMbWNjME1sWEJnNVdSNUp2T0J4bWEwa3pYMjlObUtjcGxlY2toTC8vRWg5OEJEejdvb0JFWTJNWUY1NWpRMWhwdnNka0xvYjc3bG9BUXVKMy9qQ0FoSS90dGVSVWZFMzRkOFJmZkFYOGFKdUFSRU45R0NlZllMUGFtSklMTXpGY2U1WEs5eC8rTllCa3lvY3pWdmxTL3dqT0tqZFJHRHdxWjIwNURrTHRXMUFNOHk4NkRXbkhoaStVNFZSdG04MFNBcUhOQnhUbjIzRU0wcFpWVlp0TklwVktoUlMraG1sS3NMVUhEeVZ3TEY2OG1FNllvakV6ZVN4YXRJalBOVGczdlh4bDRHQnJqWnNiSkdjR0VzdXl0UEtWYThKVVRha2NwMG9FNkg5K0xJaEV3b0hFYlRmdmk2YW1McjdEaHJXRE9QSDRoWkQ0bi8rMzhUK3YrL3daUWwrd283M3lXaENwbE1mM3FpdjJSVTI0aSsrd2N1a2dqanJDNC92ZSt6YmUvOERYL09SVWRFMllxQ2s1eFRucHF6eEc2c05zVVVIQzN2bzZKQnIzWDRPQlJVMFZ6Q3ZJQ1FwMDhRMEp0MFYxQWlUc056LzIrSzVaallIR1NHV1ZraWpEMXpoTnlkWWRQT2pFWk9CUWRoeTVwMmJad2pJc2VDaUJROW5SUmVHWXozVUhEd25UTlNVVjFlV1lpU1R3MjMrb0ZnV3NOcEx4VC9EZ3ZTdTljUW1Cdi9qYlVBVlNvOTRjTTVrRy91RmZWTDdYWGJNQXNkZ251UEY2ajI4eUpmRGtjeUYvODVjSkVHWnJTaDZDZWpKNTJacnlFUHIxdjFmdTY2NDlWMHNtTDFHdDVwSGJ1RUhsKzgrdnFIelBQcjZTZWN2d05VbFRrcXZZMFJvOFpPQll1blFwQ0dieHRiVzFXTFpzR1UrR2N6ZVBCb2Vwank4REI0UER2SG56SkY5V1NMeG5vR1B3a0hOcTUyUzJwcVRMdVVsalJRRzgvNkdBeEVsdXRmR3pqN1ppM2RwR1NQelRZMEVNRGxYUWt4ZjYrYjc3QWZENWx3SVNyRFp1djdrVisrenQ4WDNaclZCR2R1amphNkttaEYxWmVhUWRDM1BhajRSRTdyTk9vSDhZbVIvOUh5VGFUajBPY2VGL3AxSDV5c00vMHJiTDk0aURQTDVkMjRIb0dES3ZmK2p4UFdZajRsWU9aVkdHazdtYVV2bnZseEErVnZMUTBCQURCeXNNT2lDcGNiQlZ4Yktjd1VPSHd5UW5MWHduSmlZWU9GaGhrSlBVT0ppOUt4V1NmcjdtYTBxbElHeFVDRllmUWNRVEFoTG5uclVNRXU5L2FMdmFDSHloREtlcVR5RDh3ejhIV1YxQTRwUjJqKy9uWDlqNDBkYks1aFZpZG1sS2psTXVlRmdDbFNDMnBBMExUenNlRW9FWHRvR28yZlkySk9hc1dJTFJ0Y3YxYWg1V1pTa0ZkMU10UEhhengvYy8zdUZ6MUx6N21jZDM4UUtNTG1uMVA3L2xRSUh4bXBJK3pVTzJxcVJtd0NzemVQYmdHVHg0TDRUZzFZaE1ub0ZEdHFva3A2YW1KZ1lPbWphK2U0eW1wRUhRSFJvR25uc3hpR0w0ODc4SjZSRjBOV2cwMGtaR2dSOXZLODczaVdkRGxjMWJocTl0b0taazc2TEtvNkJsRmRuNkpwOGp1TzExOWZrRjdSWHN0aEs2TS9tQ2xsWGtuYyttK0w3MXFmcjhwTTJhS3lVak5TVnR6bTNseXBYeTlIY2U3bC9WNDRFN09tRE9KUjJ4Q2NHRDIzRVZQckx0eGdwSk0xOGpOQ1VOMExGREhuLzdqekhFNDZxTzlOS3JnL2p5cTdRY283OWI3RlJ1VHowYlF5S3A4djNSMWtGMGQ2VjN5VDRWWVphbTVLTnQ1Y0NYVWF4bDV1dTFyTDRCK29hbjNrOGtlYSswcnFKV1RwK2dXd2xmeThMOFU0LzErSFp1QjRaalUrOFRhZDRycmF0b0pxV1JyNUdha3JiZ3dmWVBlKzdTNGZMSzdMNjd1NXRYemtWak5tK0VNMjVzYktRZW8vQzFiUnZEdzhPOFNyNEdhQjRhTkNWREtnL0hzYkJoYlIvWVdpRTgvV01CbWh1L3JuRFNYVmQ1VUhoZXNhd1BEZlVxMzZPTzVEbWdyL1ZYSHVaclN2cTI2a1lYdDdxWjcxcElkRDM5Q242WUdwSEdlNlYxbFduZkRCL1FubEpFbTJ2UnVHWXZqKzlyVy9IRDRSNXB2UGY0TGxtSXpNWU5QaW9sVVhwVm1LZ3BDWDJWUnp3ZUJ3L1UwWm14QXVGbmVjOVQyajA5UGZJa3RURnRLenBidHFuWTdwRjhlVS9oT1JxTnFrSE9BTDcrTlNVanpua29GZ2x1ZDA5a3J5a1N5TVA0eFo5ZGpzbHN0TEpOam1MWDhIWEVkamR6TCtUTFlITHZuY3VSU1VYMWF4NkdhVXJTVGVodlcxMXdrakxGK2wrNkg2ZjJ2eW1OOTJvcmlFNVFaeHZJYndnOWNaUEs5NTdyY2VyL1BTZU45eXJmTFFmNm1iOE1YOE0wSlZsNWFCTE0yVElaSHg5bk80aE9qYzR0WDVITW5UdVhGWWpNNkt0d2JOb0VhTzZrb2g3RFE0QVV5aVZmV1pHd0F0RVJRTWhwOW10S0duYWNXMVljRjU1dnUxWFRIRG1WMHFmZmRIZ2JObThjZ25Bcy81bThaamRCeStYaTZEakpkb056bnE5eTl1UGdnOXF3WVozTDE3YjhaZkhsM1lSWm10Sk1OUTgvaUFzTEN5OCtFMzZ3NExUakVMVnoxWVM4eXZsYU9UcGhmM3lQMjR4b05xVi90NVVKbXBMbVE0SjBXbXliY1BzcmQveklDb1RQV1lIVTE5ZXpBcW5TSVR2a3BJc3ZIVEkxR1FZUVZpQ1NyNzRLcEF3bnptMldwaVE1Nlc5YnJWajJMZTY0WlY5SURBNEozSENIeXZkWGYyRS9oSVBkL2prNyt2bk9iLzBXMTF6bDhSM1pJZkJ6djZMeWZlaisvV0RiUHZrNjVRODFtcVFwaVJtMXJTeC85UjB6WFdhOGZoQnVha1RpNUkwenIwZkpTVVhsZkplMnNSWGxqMjlEUFJJYjEvczV1bDQ2Zkp1bEtXa01IcXBEanNWaXJFQVVUWUgzMUVUWWZqRkVRNUM2REIwd0F3WXJFTW1YQVlVVkZJTmhOVnhwczB4VDB0KzJ5cVo3M2ZhUDZpdCs2L2VEN2xyZ1lUeDFtK2tOMTlUQXlzVjh6YTliODBna2VuSFREUXBmMXlsUG5lbDQvaVVCaVlhR01DNDhyd2JaYk14ZnBlUVlyeWtwY0hRTDVxRUxPcURnN0x1QWZjOG90QlBVVmxERGhhZkJFbzRQNTZhbkhnMmR0QVVLN3Y4ZDRMeDdDKzJXWDFiNXRoOEZTOWdhdG4zWUJtcEsralFQbWZueXlwWVFUejNUNFRHQXlPY01JSVFCbWJ5Y2gxYzZYMm8yYkZreGdFaStEQ0E2TXZsWnFDbnBjOGEyU0xzT05ndTJwU1QrKy85c3ZQZmgxUHRuWGxUNzlGZGZzUW9iMXZYcEZLQjlFZVpwN0k0VHMyQmJTdUtkOTJ4OC9zWFUreDl1VmM5K1hIaitLcXhjMXFjdDJObUdhVW8wMjlFb21MUDF0T1RTTXlGaDlRMEJuM2VoR0pncFo3ME1HV3dkamRSSE5Bam1QdmhtMDFoeTVva2UzK0VkUUhmL05JTmp5SForNi9FOWJndEdJaG8ybkp1cEtXbHRXM0c4N0wwemdGQURvWU9qNXNIbnREVnIxcGhRZVpDTHdwdk9sL29CS3hBWjhHamMyZlFkOFRWQVU5SmZlYlEwZHJrbnMvZUdCQVBGbi81bEtQOCtFWWQ3cjdxaVgvbUZOY2lrT3ZWVkhzN01yUzdTaGF1djlQZ21rd0tQUFJtUzc5MTc0TEVuVkw0UDNyOEc4WjJkK2s3RW02WXBsYTA4Zkt5SzJsT09BbHRRRXM1elB5NDVQdmhqdFQ5ZmYrb3gzK21xcUQzeUVMYWdQTDdiM2l3NVB2am14eXJmSXcrcmZsWFl3a0JOU1dpdFBLUkpoMHlISnlzUWJpZmxUaUZxQ2ZxZHNSNitESGpNOEpuTmt6TVBFZEpSNitkcnVLYWtTZk5nRytYaEIxWXJiWlJubmc5UzJGWHcvUjhCWDM4aklMSE1kWUEzMzlEcW83clR4RmRZdVBYbTFXQTdTb0tWQnR0VkhsZzVBVDI5QWhLTFhWSDlzb3YxOHpWR1U5SXBtRGNIdzhDZi9GdmVJdHdCTkQzNFhobmZsTWhvRUtCOThJM1VBRTk4UDIrUi8zZ2JKY0QzeXZpbW5JMnljTXJ6TlV0VDBsUjVsUGs4TlJEdVhHSldUK2UzWThjT1kzOVhsR3hoTWNPWEIrNzRoNkgwOHpWV1U5SWFQQmcwdXJyclhWMERlZnZIZjBWUi9PYnZCWlZ4NFhEYmQzN0NmRzVER0gyRDlYanVKU2hXYk96Zi9HTlFHUk9wYmRQVFpyTUQ1bWxLNUtUdG5BY3JpVDk1ekRPS3VDWEE5OHA0ZnI0ODlHWHliM3dFUFBsOXo2SXhsQVRmZStQNWVUMXROdU0wSlVkWDhHQVdMRTM1dGVheVAwOVJtbGs5NzAyclBJUVE4ck5LQzR1bUlTRE5RazFKanpPT0ovaTNMbFNiYnV4WG5RVmp2M1BOSTVVRW5uOVJ0ZW5HOXZZV2p0V2xlWmltS2RrKzJsYm1XUGxWWVpDSkFyNnpXVk9TanNRMGtOT2V6OWNVVGNuOC8zYU9vSlhoYXhpRW1QMmFVbUhsRVF6QUdBUm1JcGdIekZuSWdVQnB2c0kyVUZPeVo1VHRtb0taY0RHSUxybnNVWm9TSVJ6RDNFU0FuRXJ6SlJ6SERBdUExOW1pS2Mwd2VPUW1KNEU1TmVZNDQ5cEl5VC9FazNNRUVBbkFHTUtoQUN5blhMQXpUVk1TWlU5aGg4TWhtSUpRS01nMVVaSnZLR1FTM3hENTdpR2FrdnlPVTZpdGd6R29yUVdzRXB0RUxDdUZTQVRHSUJ3RzdCSjhoV09XcHVUUXltM1ZIVXNuZ2NYemdIRElqRzk0MFR5TXBKS1lEbU1CTWNVMUZEU0FieENvQ1dNa1lFUEI3TldVNU5rQ1pySkdWQi9rUUM1czFVd0hpdHZjSFdVSVg1NWFKOTg5UmxNaTBxaytMRndJQkVPN1AyVUxoWUg1ODRGVW9udjZZSmZyYzllTmcxQm85eWVZWVpkRDdSeFdqTjJ6UzFNcUZ6eStHb3ZDN28zK2hMcXowRzFjaWNMd1Z3aVU3Q3d6N3o3TDVUZnNNMXdVd3pKektjeEpNY3haUTN6bmxMbkNVVHJTVndqOW42d2owOG5ZOFBBV1hBN0JaQUNDZnIxSTVwVVFQTHlCbTEwbjFpaHgwb2dIQnJqelNUQ25RUWo0d0RldUY4azBaOENZeHYyZUlEYnVIcjVuaEhkdWUwcmI5NDJvMXh1WTVveXN1R1VDbmF5d3RDS1o4aTBpd3pDbzFScklsV1ZQR29WQ2dWYXJ6ZVRraEd4RWRsYXVXcEhNUU1DUE9JaExQcDgvVWhQbnRVY0RVQzA5bzdoc2NmOHVYQXhCTUFBQnYxNGs4MUlJN3QxR3VUaFVLNjg0YVhSYXo0Z201RGJEWUJnZWZyK0h6NmNYeVpSc1V6bEVZcTV5T3VBclI4eDdOVEdFcTRrelo1aDNIWnY1OGlwT3NnaFhEWGh5R3g0ckhtbENzb1RMQnBaeW1DdXYwTEl0VGhyZFVaaWY4SERlejhQQWdTc21YQTNKYnkxSWxyamlXRmpLWVU2NXRFWTk5ZzJaTCtDeU13WkQxMU1TcHpNbnBxWFRhVXFsQ3NHZ0g5TTB0cG5SaExFOWFXOWNPWlRFUmE0ZWU2WnZveUZISU9OTVRVMHFwalF6aWM4M2pteDBVNm5VRWQ5QUlPREtDdnE4OXBSc3UwWnAvVCt5K1I5Y3Znd1A3OFA5ZTNxUnpJdVhJWlB2c3JINkY3WlZQcVhWV0tQVC9JKzVSWXV4c1JHdVhnRTVjcnB5UlE4N1dhTXFlMzZocDF6K3duVU8rRXJkdUVPN21oZzV1ZWZocVlMcEFEUThsNDEraHpjYmVkS2ZGNmw5aWRLY2k5T2MxNE5rVmI5R1NIOVo1TTE2bnBKeTZiTmpqUVVNdHRueXRTMDJmUERHR0NHOUVLWDI3QlBONTRvWG43VWdXVlgxTzcwVVF4eEtQdWk3em41ZjcrZWZmMjV2LzgwUHl4cTZucEp0SC9RRjJGOFRzdUpyTkJxRXcyRkZsRXdtU3o1ZlVCUTFVWkNKYnlvN0pnN2lvcHp0RTJ0Q3p2dkxhYUxGeFVWaXNRVEY0aktycTZ0YUtSU0traTBPNG90bFdRZVc4UjkvL05GV3k5Y0M1TGxoNnluSjhqMjFKbHkzUTYrVFlLVXd5L2Z2YjFsWUtoS0pydWxFWmVhWlU5bmkwT3VtOEFiV2taclk4WFdjRHJhVm9GV2I1Y3ZYZDd6NXNNSzdEeHU4LzZnSHlYcjd2c2hYbGQyc3p5cVhGQVAzWUUzOCt1dXYvN1AzSGVCUlZWdmI3NVQwUWlnQ1NnZ2xFRks1dENCTnhRSlk3N1gzZ3RTZjhsM0ZMbGV3Z2QwUDY4VmVMMWNCcVhZNkF0SkZNSFFwZ1VBZ1FEb3BaR2JXdjlienpZa25NNWtrd3lSblRvYnpQcy83RENuT2VtZTdzdGJlYTUyOWQ1SGlFeFdzVjFjOXBXRHBLWlc3K3dRUmhYSlpJQU1BVFE1dFF6OUZkTkVWSHcwNVg0UVMxNDdYRTFHVWtNc1JHVHpRTkRtaEYvMTA0Ylc2NHFQeDNhcm8zYkpsUzR5aWQwZTdpNGtHMzArVWNEVlJ4eUgrWmNJMVJFT0cwK2EyL2RWNlExMThRcHlheG84ZnJ5c09HalRJbzAvY2RkZGROSFhxVkYzeDVwdHZGcjNFR2tWdjlLWk5tNXFJWGdBMFpjb1VtalBuRy9yODg4L3BzODgrOHl0Rnc5eTUzOURreVpOcjlJbVc1OTlON1R1L3FDdTJhSDJySkRmaTBtcWxUN0RlN2FLM2ZmemQ5TGRlTCtxS2NSMnE2djN0dDk5aUZMMDkrbXlrTzRZU1hUU1lxTi9sL3VYRlE0anVIRWIwdDk0cjNYekN6Q1JlUnE4RzQ2TXpKMUJLRHVnRlowRDRxdUlVR0ZMelhxWE1LSGpBMXhBUlBqcTBFNlYybTM3ME91ejQ2c2lmVmZSMjY5YXRndld1RnIwamptK0Q3ZEFKSUY0SFBhWDRDNlMvaFlkTzdJQ0FOYTVRenpJVm4xaXpabzB5RTlVRjVNa2xEcjRlZmVLbm4zNVNadnE2Z0l6ZGloVXJsREVXdlk2ZVBYdFc4UGpLdi9IcHA1OXlIeWRmVnoybG1UTm4xdWdUZVNkL2hNT2huekVtcWtCQjduSVFrWHlPWDFRK0lXT003Q3hkNldVdEZUaWVYVlZ2OSs3ZEt4UzllM2VNNGRWcnVmUnovTjVUaW1zRFh2MVg0TUNlSjl4OWdvaUMyclZyTjRRYmZZY0JVQjlMSk0wSjcrejNGY2ZNOEU3VTJ4SkJva20wZGVyVTZRckplTUw0K1BncksvVTJiVVZ6ZWwzcDl4WEh6QjZEcVhkTXkrcjBoaVVrSkF6azcrVUFvRWVqMjlPWnpsY1RYVHVLNklaeFJIOGZRM1NkUmhSYjE0OGxzVjNXK1NxYUVCMVhxVGM1T2JtMytFSjFQdEdoUXdjYU5XcVUzMWNjdzRjUHAvYnQyOWZxRTBsSlNUUnAwaVMvcnpnbVRweElYYnAwcWRUTG0vY0dpVCtJWHJWUERCa3loRDc4OEVPYVAzOHVmZnZ0UWxxNGNBRnp2a1lVV3d2WjloeDYvLzMzWlZWWEo1OElqMGlpdVBpbi9iN2lhTnZ4S1FxTFNLeldKenAyN0ZqcEU5RXhTWlRhL1dtL3J6aFN1ajFGMFUycTFSdkcvbEhwRStmSGpxVitsNVhTdlNPSlJvd2h1biswdGh3K2h0aTJnL3BlV2tTdFkwZFg2eE1nSWl2L1FWN0l1MVJIOHpJcUh3QTFOMW5wdnVBVzlIcG9ITDBkMWs1VHZocmFsc1IyRTVPRm5IWFdRajRFYmpqL3NmVWlvbUFoRDNpZktucURRK20rMkM3MGVuSS9lanYxSWszNWFsSmZFdHQ4ZHBaSHZmMzc5NDludldQNVp5VUFLRFVva2hhMjdFWlpjUVBwZUx2TE5PVWh0aW0yNDYxaFZmUU9HREFnVG56QmswOXdRNC82OU9sRE45MTBFOTE2NjYyYThvWWJiaUN4emJPME92c0V6NkpKQXFFa3ZiRmp4MnJLRVNOR2lHMFpzK3IwaGpDRDB0UFRPNnA5Z2svdUpVbVFyNzMyR2syYk5rMVR2dkxLS3lTMitXZ1RyM3pDWW8ybXBzMEhrd1NYQytMR2EwbTJPWXJFdHNWU2RZdzVXVmY2QkU4b3F2aEVVSEEwdFc0em1Eb2xqcWFFNVBHYU1yN0xLQkxiVnF0bnZYMzc5cTBTSjhKNEV0MGxkUWIxN0xlSGVnM0kxSlE5K3U0UzIxeFdhK2ZSSjBCRTV2WU1kdDVCdkVQMVZxNXByUUZBZWlBdnFUUDRmdWI3UkJzSGgxZ2lzZ2dibVY3ckR6LzhFTksyYmR1TFpQRDVkL2JxVFMvZlVEZUFTMEZCNGd1R1R6U2MzcFNVbExiaUQ0WlBHRDRSQ0hFQ1JHVGk1V29RSDIvUWwzL2hDaFkvbVAvOUlNK2FQdWFtM2tyNUVGcVNiUzVuMngrSUJ0RWlta1RiOHVYTHJTSmEyTWowQ2kwREJ3Nk00WjlkeHY0OGhJLzVma1F2ZXZsTzdJRlhYWFZWdEdoa21neWYwRVN2eWZBSnd5Y2FkWnhRbkVMSXk2ZW9tSmlZaS9sQy9TdmtnMGxXbFA5SVBvU2FuQ25ybGE3dkx6YkZ0bWdRTGFLSloyeVJpczVHcWxkb2xzSG4zN3RRTDNyWklkSnZ1ZVVXMFdwV2RCbyswZUI2ellaUEdENFJDSEVDYXNkZzBTR2NiYnJ5eHJiTCtQck55K1ZES3BRM2FVaXFiWWx0MGNBbmhmWmtoQ3Y2R3J0ZVpYYVJtSmpZbkp1UEhXSmpZN3VLa3doNWFkMm5JYW5ZWVp0cFlqc3RMYTJwNkhGMUNNTW5ESjh3ZktLdU5IekN6VGw0dWRTRU0yTTcvcUNwL0VIVHVmbW9DY1VXMjB3UjI2SkJKVGFROUNvMHEyalJpR3FiSmhlOWhrOW9vRGNBWVBpRUVTY01HREJnd0lDQmVwNVZDRzNibjAxaDl0S1lpV29OZ2F4WEQvVFdKMWF1WEpuQ205NTZhVW0yZWRaanZHZlBuaFJtTDQwWkFENmg2eGpWbE5tYmVSdHpBbk1LY3hyekF5ZW5PYjgzd2ZrN2ZlUy9RWVBEU0JwbVc4YmtoMjBaazNKc3UvNUY5bDFQYWtyYnpuK1IyR1lObzlYTHBqcnAzZjBzMmZjOHB5bkZwcmQ2WFphZ1ZvMXBFZGFsanFuV3pFK0ZQTHhzMmJLY1pjdVcwckpsU3pUbVVoTGJyS0hPWTd4cjE2NkhtVGs3ZCs2Z0hUdTJhMHF4S2JhWkFlQVR1b2hOdlpnUE1lY3hNK25za1NudjRYeXZYdkFkQnRSTkdudkdwSm1PUHg4bU9uQTljeUR6RW8wcE5tOGkwU0JhVkU1dDhxZzNjeXJSeVVsRWVZOHpIOU9XWXZQRUpISWNuRm9YdlVwZ0NHSUdPeG1pTVJXN29zSHFydGRkTXdmdG1VdVcvRXg4YklWZnptQVNtN05uejZJbFN4YVJhS2x0akRsb3ovempqNjIwYXRWS1dyeDRFUzFhcEMzRjV1clZxeWdqWXh1SmxrRHhDWTFqMG8zTXI1aFo1QUkrK0pJMmI5NU04eGNzb0E4LytwaGVmZTExZW43S1ZIcHk0bFAweEpNVDZabG5uNk9YWG42WnBrOS9qNzc1NWh0YXYzNDk1ZVhsVVRYSUVodGlDejdDU0J6Ym54N3EyUHNJMFlITGlmWmY0bGVLQnNmZVIwazBxWjNaVGUrQktVUjVUeExsUHVaWGlnYlJVcE5lWmhBemhCazZlUERnRHJ6amVJRFc1RjIzL2ErOTl0bzQwYURzZGxicnJTWnhERjI2ZEJGOStlVVhmais0VHpTSUZ0R2sxdXlTT0laSzBGNnlaSWtFY245U05DZ0p4Rld2dWJINWhFYXhxQ2Z6Mzh4dHBNS09IVHZwMDg4K3B3a1BQMHAvditFVzZ0MzNJcS81dHg3cGRQSEF5K2orWWNQcDdiZmZwbTNidHBFTHRvbHRZMFhpQlZST0hHelBtTGlWOXQxR3RPOFNmWEQvSFJ5TS83Vkd0SWxHaFZYMEhwdE1kUEpSWFZDMGVOQnJkWDR2bE8rWXZ0NXF0YTRIUUZmMlBJOXV2ZWg4VFhsNXQrWWt0bG5ES242V2U0aG9VdWsxdS9vRWw0dTJ5cW12RXJ6MXdMbHo1eEJyOHVnVGZHejcxbDkvWFMzQld4ZGN1M1lOc1NhVlhuWFNjUGVKcmwyN3lsRXNtakkxTmJWR245QWdCZzFremlNVnRtL2ZUcSsrUG8ydS9jZU4zaVFKTDVKSmI3cXdUMTk2L1BISGlVKytKaGVJbG9Hb0VRYk1UQlBUSXF5dzJaS0Jrd0NSUHVqSVEybHBlUStuVG90S3I3VlNyN2tjSU9pRDVncFBlaTNjK0EzbXM1bmU1dnNlNXMxNG9tZnZzbzBQNGJzWkkvSFZoL2RweXArL0dnMnhQWDE4MXdGODY5NVAvQWpoUzZKVHBSVnFuK0FUYXBOTFNrcWhFOGdkM1hMSGlFZWZzTEZQbEphVzZVaHZ1V2hXOUZhaDJpZkdqUnZYKzhjZmY4UWJiMHpEQ3k5TTBaUnZ2ZlVteFBhd1ljTTgrMFRESkkwTG1kOENXTTY4dnFTa0JQK1o4Vi9jZWZkOUdEcDhOR2JObm9QangzTkFSUFZPdVdYU0FRdVdyVnlEdSs4Ymhrc3Z1NXpIL2cyNUR3YWlSVFNKTnRHSTZtSEFPUU1LWlNkKzJaN3hHTkhlUzVnWDY0Ti9Ya0c1Nng0Z2R1WXBSQlNtcXRHR1Zlck5lVVEvUFA1WVRYcmZBa0M3Wjl4QTlqOGY4bXRQeWJIL1JyTHZmVmkwRUFCRmJ5Z3p5TlVuRmk5ZXJKTlZoMUs2K3BMbXo1L3YwU2RreHFxWFZZZHc2ZEtsdEc3ZE9sZTlvV3FmZVBmZGQ3bFBJajJsci8zY1UvcFp0TGo3UkQzRHVhcjVtSndvS0N5a0R6NzhtQVpkZVEybDl4bmdOOHBxSkNXMUt6My8vUFBTVnlFVlJHc3dETGovaitTNlp6b0FtejNqRWFJOUYrdUhlNitnb2czL1E2S05kMlNtRVZHWVVJNEZydFI3L0dIOThOaWpWTFR4QVRlOWZFUkNYd0QweHY5TGxhQ3RsNTRTYTNsRU5LbjFCcnY2aEFSQWZTV1BMMmpCZ2dVZWZZSnY3OU5WOHBDK3g0WU5HOVI2UTVuaFhDcnFKNWNCM1h2dnZhUzNucEpvVXZ0RVBjZWJXNWc3bU1Tcld2cnNpeS9wc2l1dWxPQ3RHNloxNjBrSkNZbHl3akh4dGNZa2NHcStHUVlxWVJieUJmMmpBRmdBQWtoZkRMSVFSTnZPblR2SEs2V0t6TXpNVWZ5SDU5UUxQWkgxd2swdmorOEUxb3VoTjZmRGJNNENIRFovNnhRTnJPVUk3dng3TjRoR25yR1BVMG9VYXA4Z0l2Z0tLUVVJNndtczIrelJKNGlvWGk1d0V0WVg1TUlsVjcxOHQvbURZRnh6elRYSXp5K0UzZTZBdnlFYUNncUt3TWZKdS9oRS9VQm04QUJtTVpQV3I5K0FPN2c4OWU2LzMwZFJjVEgwaE5EUU1EUnAxZ0xUMy84SWZEeUhjcGxYRW5PMjh6TW9NSG9lUEFNWUJBRTVtS2d6OTJXVzRlZFZlYlh5MTk4SzVYZGhzM2tmN00xd0tMWHVpNVVhTjg4R3J2aExMOVdaK3c2d251VUhhdVd2RzQ3STc4SldZZmM2MlpsTjVLYVhBOUZGWUVRMmJ3cGQ5WlFvRHpIbk5WTUM1cVdpbFFtMVR4Q1J6NG5qNk5Hak9ITGtDRTZjT0lGNmd3ZWZJQ0tmRThlcFU2ZUVLQzR1YmlpOUp1N05pRStBenp1QzNucEt6WnE1K29UUFNTT1crU09BWWV4WGVQMzFhZmpuZ3cvalVPWWhnRWl2NUhGb2p1Z216WEhIblhmaHdRY2ZCUHNZR01Qa3N6QmpBUmpKdytGd09BZkNBVy9RdE9OSURCbitSNjFNRy9RMXFQbFEvTFpMYWswRWIyQnlhaUtpMXZLbGtJZ1V2VjRsb3FadC9vNGh0OCtwbFdrRFhnQkZETVp2R1lXY1FMeXo0YXFYWjI5V0ltb0orY0pzVmxZZE9xR045UklFN0FPdG9FRHhpWG9JeHR3TUJwL3BBejdUUndLeUpKSDZtTUY2OEFuZjllYm01b0xyL1VJVUZoYUM5d2ZVdTE1K2REZUl4N2Vsc29xeTIrM1FDOVFySVBHSmV2anNpUUJXTTYva1pqeEdqQjZMcjdrUjdpQUNBYm9uekdiRXhuWEFuTG56d1JjaDRjQ0JBNURQd2x3am4rMWNUeDRDaTlOMXZCblpPaU9xZVNJNjlSaUxwRXMreE41REZpOXRWRHF6VlFrVVZmVlNYVmwzdlUwN29GUGFiVWk2OENuc1BWRG14ZnNMN1ZYMHpwa3pKK0t2Y1ZaV1N0QVAzY2RYZ2FVK2dqR2Z6aW4zTk12ZHgrREhRR1gyaHF5c0xGOERrZ2VmOEYwdjMrUW1UK0tBTHc4QzM2d25zMjlKSVBXcDF6eHIxcXh3ZVhYVnF3K1ErL2o2OERRVmdNM01kaXRXL29MN2hvM0V6cDI3MEJqUitvSlk1QmVlUm84ZVBmRDk5OStERWNmY0xKL3hIRThlQ2h5QWcrcE9Zc0s3SkJJVFA4RXJHNkpKb0RpeGIzcmhGU1NKeExTOTFWZTl5aGdyWlRhZDBWRnI0UE1GZkN1YUJHT1pZY3RNVnI2R2xDNThTQ0JxVGFiNjFpdGxKTjd2b09pVlZaUFBDWVNJUFBxRW5ucEs5YW1KaUFZQVdNY01uNzlnSVo2WU9BbEZSY1ZveklocDJneXQyOFRoK3V1dkJ6K2hCa1k0YzUzenN4cko0MnhYSGtVNW00RHRGN2x6M3pEWVQrK0ZndlBhWGVhRkRmSlVTdk5kNzZrZHdPRUo3anoyR3V4bFdYL3BiZFBiUzcxTUZmalpkUXNxb2IrZUVrQU5Ha2drVWZEOUFES1RsOGF4QkdYdzVUSStKUkFpYWpDOTNJdVFoRkdwbFp2d1VuTHpLWUVRZWZBSm5mYVVpS2crRXNjcUpqNy80aitZK3VJck1xNGdva2JQaUloSUpDWjN4V09QUDhtOW05Zmh4Q3I1ek9kMjhpQUhFOTVSRGFxR3BYdVJ0K2Qvb2NBYUhPV2xEZmZrNGROTVhnMGlkNTdKUXQ3QnIxUjZJK3B2SmsvNjZ5bUpwb1pPSGxLcTRsM1VFcENoUUVrZ0V2VDBsandrVVVqVFdKS0hBbFVDMFY2djlqMGxYM3NjM3pQeDhTZWY0ZTEzcHl2dkZ6QUk0UkpzcTlZWDRKRkhIc0ZMTDcwRUo3NG5vaVNqYkhVV1pTQ0hBOGpOcTNCajVwRXk1QlEyaHdKYjZWSHZ5MEFlSVhwUmQ3cnF6UzF6WStiaEl1VGtoZjJsdCt5a2R6WlFZL0xRVTA5Sms3SVZFU203d3NFM2xTRWtKRVJtOHhEd05aZG5rMEFhWEs4a0NVbDRmUHVickpnVXZmSzFKQmRKSVBXaVNmYzlKZS8vdTdZQWxqQ2p2LzN1ZTd6M3dVY0lWQVN6SDNkSlNzWEVpUk14WThZTU1LS1ppMlVNenNua1lmS2hZVzYyUm1KZmJwSWJTeU52UmtLZng2SEFXdkNUVnpaRWt5ZVlmR2lZbXkxaDJIZThoUnRMZy9zaG9lZjlmK2t0M2VpbERUczh3NjZ2bmxLdGVpRjEvL29JUkpJOHBGd2pKYXpLSGdnUlFWWWtra0NPSFR1R3VrSTBOYlJlWmNVa3MzcnBnU2g2WlVVaUNhU2dvTUIzdmJydUtYbC9SaDZBejVodGxpNWJqdWVudmdUUlEwUUJ5NGpJS01SM1RzUjk5OTJIaFFzWGd0R0crYm1YNTRFWlBZK29Gb2xJLzhlbmJrenMvemlzSVZFUUhOODFBMFg3UHZUU1JzUDBQS0thZFVENmtDbHVURXdmRGlsVlFmVHUrd0ZGV1F2clR5L3ByYWZVNEdVcm1iVkxFSkZYU1I1U281Y1p2SHl0OUJTVUVwWXVadkpxdlpJOGhIeVZxUEt6eWhLV0pCRGZvZitla2hmNG1Iblp2djM3OGR5VUY1WEhqd01lMFUxaWNINmJ0dUJkK2VCSHNNRzRWTWJpSEUwZTVCMjlRRkJVQW5abXQ0SE41b1VkQ05YUTd1bXdvSWc0N013TWs4MkN2cGZadE9zcDZTcDVLRUdYaUNDdnN2R09iOXB6MnpFZUZ4ZW5pK1RocWxkV1RLNWxOZm0rUE1icnZWNTk5NVI4U0lDM0F4Z3E1Y2tubnB5a2JLNDhaOUN5MWZuY0J3bkhUVGZkQlBFWEdRc2l1dVBjU2g0K2xLM3NaNHFBb2kxdWxPQ21vRm1iZFBTNDdsTms1NFo0WWFQbU10RFpDclpYbkJadDdpelAra3R2NjFUMEdQdzhzazg2dkxCUnMxNzk5WlRzRFpvODFLVUxtYTNMSml0NVZXYng4aW8xZXlrSDZTRVlLMXFGTW5zK2Z2eTR2RmJSSzMyYnFLZ283L1hxdGFma3U2WW5tWGpqclhjZ0t3OGlPdWQ0UVd3YytPaDlTQlBkaVNkUU54aFBXNVhrN1FiMmpIZm5qcUhBd2FsUUlDVXNhbmExcnpOajMvWG1ad0paYjduejBNdkE4ZjlVZWRxS29pNzB3Z1o1cjFmN25wS21aU3VCQk9DREJ3OUNkbTdMUmp3aWdxdzRKTmpKMTBWRlJicFplU2hKTHljblJ4clJVclpTOUVwNVNMNldZSzIxWGcxNlN0NXJJcUlQQUhUZHRIa3pabjh6RitjcXhNL2JkZWlFNmRPblk4MmFOWkF4a2JGQjdUQ2V0Z0xWOEhzbnZrZEI5a1lvYUJvNzBPY3lrTzlscXhwK0wzOGRDbksyLzZYMy9GNWV2SDhOZXNtdS81NVNBelNnSlhISWlpTThQTHh5aFNIQlRZS2NsSC80K0dzcHZkVHgvUnEwQWExOFpsbHhxRmNZb2xjYTU3S0pVUG8yWGgyY1NFUUIwMU55K2IxMEFDTmxKZm5hNjIvSzF6aVgwYXg1QzdRNHJ4WDRiaGFsSnpheXRwc0pqYktWQXFxZVIzTE93R3lOZ2dLTDJWUkhHN1dXZ1h6cnp4QlZ5eVBIaXVWcExMWGUrbm5haW5UWVV5SkhnNWV0Wk1VUkVSRWhLNHpLb0NhQldaNE1rc2RlcGV3aTM2OGJ5SWRnN1BXS1EzUXBLdzVKSEZMUGwwRHNRYS8zbXNTZWJucEszbXQ2bW9rWi8vMGF1OWttRVozemxPU3hkZXRXdlBQT08zRGlHZFFNNDJrcm14M1l1TDNZamIvdzd1ZTg0Q0dJT2k4UkNvSXIvdlR6MDFhaWw3RHhqeHczL3JMeEtQTFFEVkhOTy82bDE1N3QrNDU0WGZhVUdyem5JZVVTNlduSUNrUGRNNUN2NVJCQ2RTRFd3MHhla3Btc2lDUlJLSHBseFNHSlJBS3owcS94UnFzd1VIcEs2dCs1R3NBMXNtcjhpRGNER3FpNmdmQ1paNTZCK0xlTWtZd1ZQTU40MmtyS0t2R0RQbkpqK3AwL0kzWFFWS2hoelpsVngvZXU3N0pWMVVkMTQvdFBkbVA2OWU4ajlaSUhxK3JOWCtGN21VMy9QYVVHS3dOSm9pQWlKWEZJSUpQZDBGTDZVYjR2cjdxWnlVdmlJQ0lsY1VqcFNub3l5aEViM282TGFBcVlucElLWTVUalI0cmx2WWtNT25sZXk5YVFmVUI4bVpSNnJJeUd1Wm9DZGRCcUZ0dmJqV0hSYlZBRmYwNEJ5ckw5M2pDWFJuaXpDOUxjR0JiVkVsVnc1QXZnektuNjA2dXZubEtESjQvT25UdExnQk5LejBNQ21mUTRKSEZJVUZXWFhIU3g4cEFubEVTTGt1aGt4U0Y5QkFuT2FwM2E2OVdxcHlTa3VweVdlMjFCUVNHK21Uc2ZCQmhVMFdLMVNnS1I1cm15bWZSYUdUT2piS1ZpVkpnRmRZWnNaTnYxT0pEemZUMGUzT2RnVXAwWkZXRkZuU0dISXg1NkQ4aGI2KzBWZlZCRDN6MGxOSGpaU25vSDhzU1BQRWFxckRna2tLbFhIQXIxRUl3bDRNb21RTkVxczNpWnNVdWkwNnRlalh0S0NrWXlNWGZlUEE4ckdnUE5XdnhmMHY3b280L1VZMllrRDRWQnAzNEVNc2JWenZXRGdOL3ZCVTc5QWhEOHRzTThxR2dEc0g5YTdkenhFTEIzS2xDd3RYNzFrczU2U2hxVXJVNmVQQ25CUzJidjhnU1Q5RGc4djZjT2dyRmNBS1ZzdkpNL2ZpbFZhYTlYMXowbE00RGhSSVFGQzcvelVMb3hHQm9TaXZDSVNIejQ0WWZLZU1xWW1RUDRiQ3Z2WnZJb1B3b1ViSzZkdGlKZkx0dUdKNWk4N2RHVW53U0tkOWRPVzhsWk80MEpCSThnWGZXVUZEWm84cEJac014T3BkbXMxT0hWeDUzTHEwSzlsSUVrMGFsTFZjcjNaWmF2L2NwRFZ6MGx3YzFNYk5xMEdRY09ab0lBRHpRbzkzL3MzcjBidi83NnEycnNqSldIZG5STkhvMVpMOWwxMkZQeW9teWxFeENSb2RjL1BTWEJUVXdzV3JMRVdHSFV3aVpOWWlDWU9YT21ldXdDT1htWWRCU0kzWU94cnZXU3lWMnY3bnRLdFpldEpQRG9CSFhTb2lPNW9pVlFla3BLeWVwV0lzS3k1Yi9VNGxvR3JVSEJDQWtOQTE5RnJZeXBqSjA1SUpPSG82d2NzSVRvWi9STndYRFlLdUFKOWdvSFlJSitaaHV5MjlmdWZjOUR1NTZTOXowUG1jRmFyUmJvQlJhTFdmb1FOZXExV1BTazF5SjZBNlduMUl1Sm5UdDMxdkhXUWdOUlVkR1FteDR6TWpMVVl4aDR5YU1zSngrSVBBOHdtZjJmT1V3V0lLSUZUaC9KZ3llVUZ3QVV6R1M5NUcvRm9pSEloTk9uQ0o2aHQ1NlN3MG5Qa0g2RnpHNzFzUG9RRGFKRnlqSTFOYnpsaVNtZDZKV2Q2YUkzVUhwS0E1aFk4K3ZhT2s2b0RJYUhSMEN3ZVBGaTlSZ0dYdkxJMzdJUGRDWWJGQmtIc2pZRG1jTkFwaEJ0S1RiRmRsUmJVRVUyVG00OUNFL0lPMmdDU25ZQXdlRWdTeVRJRk15MGFrdXhhWWtDUXNLQjBneWNPRUN1MTVxU3k4cERaNnc1ZWNpZEVQbjVCVnkvalpMQUxadm1KRGhwU3JFcFR4VEpub3U4dklJYVQ0azlmUGd3QjlOaWhJZUhTUkpSQXFtbUZKc2hJY0VRRGFMbDBLRkQ3ajdST0hzMEE1alk5a2RHSGQzTFlDajNvUVNxcG5uL2dFd2V0cUpTbkZ5ekMyUTdCRVEzWmNZQlVlMlljUnF4SGNTbUtUb0dWSjZKazZ0MjhPcWlGSjVnS3pQaHhCNExxSFFqVE1GbFFHZ1VzNG5HakdUYnArRW8zb2dUdXl3b0w0RWFzbGZBRGdXa3Q1NlNxZGJrSWZYei9mdjNjNW5pRkNjUE9iWWoyc2tvalJndFNZT0RzVlZLSmFKRlRwQ3RWVzlCZ2F4QXJJaUlDR2RHYU14d1huRllJVWwzMzc1OXJucmxpU2c3RVRYR25sSlBKbmJ2M2lQQ0RkYUJ3ZHoza0FuRnhvMGJBN0pzUmV3d3A4RTRWUUtVWnAxQzluZWJVZlQ3cnpoemZDc3Fjak9ZMnpWaUJzNGMreDJGdjYvRjBXODNvL1JJTGs1WFFNRVpWWjFGOUNLMytBeEtjODA0K2xzUUN2L2svejVuRFd3blYydEpIcU5mMmZaT1pHOEpRbW1lR2FmTDdXcTlkT1dWVnhZNy93MWJPYitZOWRWVHN0bXE2bVZDNVJNUytHU1hyTnhWd056Rk81a1A4a3o2TUROTEl4NldUWEJzZTdkb0VDM1MxL0RvRTFMN2x6S1IxSmgzNzk3TEs2Y2p5TTdPMXBTSEQyZUpiZEVnZXFVUG9kWkwxMTEzWFRHUHIveGJmcWEzbnBMcitKSXp5Y1VBaUpPeTROSHNZMTY0bWNHUWtGQlpmU3E3emVOa0xCRUlJS0pRTGd0a0FLQVAvZ0hLZkVSZm5IWTFTTFJ4N1hnOUVVVUp1UnlSd1g5ODlQN0lyblR3bmN0MXhmKzlONldLM2kxYnRzUW9ldmQvbkVpT0RUY1MvZEtYYUdWdi8vS1hmdVRZZUJOdC8zZG50ZDVRVjUrNCt1cXJhZno0OGJyaW9FR0RQUHJFWFhmZFJWT25UdFVWYjc3NVp0RkxyRkgwUm0vYXRLbUo2QVZBVTZaTW9UbHp2cUhQUC8rY1B2dnNNNzlTTk15ZCt3MU5uank1T3Avb3c2U05HemRSU2xwM0wyaVFyNm9sQUxSKy9YcHlvbmZBckR4NEdiMGFqQmRXUW1iNnVrR1pEWGg3SFFSUzgxNmx6REs1OXI2R2lQRGkvTDB5MDllUDNnb0gzdm41UUJXOTNicDFxMkM5cTBYdi9hOGRoTDN3Q0NpMHJmOTdTbUd4Y0xDV2YwN1Bnb0ExcmxDdlBCU2ZrSXR0WkNhcUY4aVRTeHg4UGZyRVR6LzlwTXowZFFFWnV4VXJWaWhqTEhvZFBYdjJyT0R4bFgvajAwOC81VDVPdnA1NlNzcStCRmVmNk1ERW9jT0hqTldFbDdSYWd5Q1E4OGVVc1F5VTVPSGdqVVh6dUM2WGRUQWZlT0E3b0tnY2ZvZVUwTVlzQlBibkFxS056K241Q1lCZHlEdHEvMC92aVZJOCtGa0dpa3B0OERla2hEYjI0eit3LzNpSnExNEhYOGJ6TlgvdnhNcWRaWGh1K2g3WUN3NEF3VTJBOExiTU9IblZpR0lyRmhRY3pTWENmWmowOWk0cy9hTVVvcmR0MjdaelJDc1RhcCtRcGZhaVJZdDBFWkNsaENiSlFjNXI4dVFUc3M5aDFxeFprTWRYL1EwcG9YMzExVmVReDJsRkc5L3k5N1BpRTd3M1k2YjRoUFJFWnMrZXJZdWVrdHhqOHZYWFg4dXU2T3A4b2pXVGRaNkVBZThnQnlVS3BLVHB4QVdCVXJheXRtL2Yva0lPRnFONTJaOFBnRnBIZ2g0WkFQcm1EdEIzOTJqTG1iZEJiRlB6Y0pDejlsN0lRV0o0UWtKQ0x5SUtGbmJxMUtsUEZiMHhJZlRJZGZFMGUwSlArdmF4M3BweTVnTTl4RFkxaXd6MnFMZC8vLzd4ckhjcy82d0VBSFZyRjB5TG40bWxuSytTS1hkMnFxWThOaU5KYkZQQytVRlY5QTRZTUNCT2ZNR1RUM0FqbVByMDZVTjh5VC9kZXV1dG12S0dHMjRRMjhTejR6cjdCQWRFS1cvUnFGR2phT3pZc1pweXhJZ1JZbHZHckRxOUljeWc5UFQwam1xZjROTjhwU1JIZkl3M1RaczJUVk8rOHNvcllwczRBZGZrRTFPWTlOTExyMUJ5YWpjdmFMRFYrVzBJQUUyYU5JbWNlRDVRa29lNVBZT2RkeER2VXIyVjY1eHI5TExpNHlWMUJzL1c3aE50SEJ4aWljZ2liR1I2clQvODhFTUl6K0l1a2o5SS9wMjlldFBMdDh3TjRGSlFrUGlDNFJNTnB6Y2xKYVd0K0VNajlZbTNtUFRVcE1tVWxOck5DeHBzZlVFc0FhQUhIbmlBbkhnelVKS0g2ZjMzM3cvaW93MzZzdE5jd1E0OW1QLzlJTSthUHVhbTNrcHhiQzNKTnBlejdROUVnMmdSVGFKdCtmTGxWbkZrWVNQVEs3UU1IRGd3aG45MkdjZTRJWHprOXlONjBjc2x0WUZYWFhWVnRHaGttZ3lmMEVTdnFSSDZ4SFFtUGY3RWs1U1U4amN2YUxDMWMrVXhac3dZY21KNndDUVBZWmN1WGFKaVltSXU1c3Z6cnhCbmw1bVNPSkk0dHBvODI2dFh1cjYvMkJUYm9rRzBpQ2Flc1VVcU9odXBYcUZaL2lENTl5N1VpMTRPRXVtMzNIS0xhRFVyT2cyZmFIQzk1c2JvRTByeWVPenhKeWlSQTZMQnVyTmw2d3NDTTNtb2d3VTdjZ2pQUUxyeXhyYkwrQ3JPeThYeEZZcGpOU1RWdHNTMmFPQlRRbnN5d2hWOWpWMnZzZ3BKVEV4czNxNWR1dzZ4c2JGZEpYQUl1ZHpTcHlHcDJHR2JhV0k3TFMydHFlZ1JLdm9Nbi9CRXd5ZVVzdFdURS85RmljbGR2YURCRnVlMTBxQnNwWk1rd2t2b0pqeGJhc2ZPbjhyT244N05SMDBvdHRobWl0Z1dEWXFlQU5PcjBLeWlSU09hRmFxMUdENmhnZDVHRHFWaFBuWHFDOVFsdWFzWE5OaTBXUXNOR3VZR0RCZ3dvTS9rTVlGSjc3NzdiK3FTbE9ZRkRVWkZOeUVBOG1RYk9URWhVSjNFcFBDNUxFcGg5dEtZaVdvTmdhaFhUL1RXSjFhdVhKbkNtOTU2YVVtMmVkWmp2R2ZQbmhSbUw0MFpjRDVCUkhjd2lmZlFHQW5CUzRhR2hoRUE0ajAvNU1RZGdabzB6RThmcG9jbkg2YWNKNDhRUFhaVVc0cE5zYzBhUnF2TEszWFIrMncyMGJQSGlKN1JpTThLczczWDYxS3FzbXBNaTlCanY4T0RabjVTNk9GbHk1YmxMRnUybEpZdFc2SXhsNUxZWmcxMUh1TmR1M1k5ek16WnVYTUg3ZGl4WFZPS1RiSE5EQmlmVUk0bldiZHVIU1VrcFhsQmc3emhNdkNPSjFHZ2J0eE5Pa3d6eHh3alNqNUJGTTJNMUpoaTgyODVSR05aZzJoUk9iWEprOTVuY29sR2x4UGRhU2U2UTJPS3pURmxSS0toRG5xVndCREVESFl5UkdNcWRrV0QxVjJ2dTJZTzJqT1hMUG1aK05nS3Y1ekJKRFpuejU1RlM1WXNJdEZTMnhoejBKNzV4eDliYWRXcWxiUjQ4U0phdEVoYmlzM1ZxMWRSUnNZMkVpMkI0Qk5FRk1Na1BuU1NPc1FuVUVKaWFoMW9VTVlLZ0ZER2pweUlDYnpFa1VWRHh4MGphaUdCUE1lL0ZBM2pXWXRvVWp1enE5Nm5UeExkWXlPNjNjOFVEYUtsSnIzTUlHWUlNM1R3NE1FZGVNZnhBSzBaSHgvZi85cHJyNDBURGNwdVo3WGVhaExIMEtWTEY5R1hYMzdoOTRQN1JJTm9FVTFxelM2Slk2Z0U3U1ZMbGtnZzl5ZEZnNUpBWFBXYUc1dFBDSWdvazBtOWV2ZWh6b21wZGFEQjg5dTBKUURFbXk3SmljeEFPcExkNUtTbHdvRUptMHhBbVFNQStaZWk0VGZXWW5OZ3BHaHphalFMMVhwUGhnSDhDdmlab2lFM3pLTmVvVVhJejlOZnhUdWdWM0p3MlovZkpHN1Y2UXRTTkdWaGROdlYzMzMzWFNacldNd09QVkRScGZJRHFIMUNtbnY1K1lXdzJ4M3dOMFJEUVVFUmlNaWpUemdjamdseWJEaS93czhRRFhMTG43eXE5U3EwVk9jVGNuZ2liOWJUbEh6c1MxMThRckNaaWFURUxnQlJIV2l3dEtRRUFqNk9CazVzQ3JUa1lSR2VzVlVrN3dlRDlNSERBRXJMU25vb3dWZWwxNnJvTGJUb1IyK1IyYU5lQ3pkK2cvbVA5RzArSEcxZTc4a2Y5WDU0ZHhudW43OFlkL3gzcnFZYy90MXlpTzF1RDAwYndMZnUvY1NQbGI3a0VvQlJ4U2ZPbkVrdUtTbUZUaUFISHNvQmlSNTl3bWF6SlplV2x1bEliN2xvVnZSV29kb254bzBiMS92SEgzL0VHMjlNd3dzdlROR1ViNzMxSnNUMnNHSERhdklKd1dvbWV2Ym9Yc2MvQ1lNbEpjVVE5T3ZYRDA2c1FhREF1VVFOWlNkK2VVSW1VV1EyVVlSTzJPb1kwZGlNZkdKbm5rSkVZYW9hYlppaTkvWXlvdHQwd3J0TGE5VDdGZ0M2YWU0MkduMk1LTW5QUFNYcGE0a1dBSXJlVUdhUXEwL3czY3ZxMHBFT1NsZGYwdno1OHozNnhQYnQyNlZrcEJzdVhicFVtc3l1ZWtQVlB2SHV1Kzl5bjBSNlNsLzd1YWYwczJpcDFpY0UwdWhsMHUrLy8wN3RPM2FtVGduSkJtdWdqSkdTUjdadTNScVF6Zkpncm51bUE3RDlNNU1vNHFoKzJKTDUvM1lVazJqalhicHBSQlFtVEU1TzdxM292YTFVUDd5cmhHak1UbmU5Zkd4R1h3RFU5WDllb3JIWit1a3BpUmJScE5JYjdPb1RFZ0QxbFR5K29BVUxGbmowQ2I2OVQxZkpRL29lR3pac1VPc05aWWFucHFiMms4dXI3cjMzWHRKYlQwazB1ZnFFd05rRElTN0RVVnJYYmthQ3FJVXR6bXROeW9uSk1tWk9tQkVnTUF2NWlzUlJBQ3oyZWloWlVWNHVIQWYzVlpKTzVBQVZ0ck43THdCMml4V2liZWZPbmVPVlVrVm1adVlvL3NPckY3MW5jbk5Sdkc5ZkpjdHlja0JucVZmb3FFWXZqKzhFMW9zZWQ0M0FKck4rZWtwYldFdmF6ZmRBTlBLTWZaeFNvbEQ3QkJIcHoybk5abzgrb1VlOWN1R1NxMTYreCtOQk1LNjU1aHJvcmFmRXg4bFg1eFBnOFJXUnM4U1hMNzlzWUMwdVpyQzR1QkNDRzIrOEVUSm16ckZ6QkZUUGcrdmE0aTJ3KzVJMERtZkN2bW9wQm1Udnc4UklxdVExK1VjUXVXRWxITHN5emlxSjJHRldhdDBYS3pYdTh2THlLeFM5ZEpZOG5abUpZOHVYb2kwbnVKdXNWTW5VWTBkUXZIb2w4cmRud01GNnZYcGZEM3I1TnJtTHdJaHVFWU1EZXVvcE1XTmF0WUNBTlY0cVdwbFErd1FSUWE5dzlZbEdwTmZFdlJueENmQVpXTkJiVDRtYjZLNCtvY1k4SnZocVhad3BMek9hNGg0b1kxTldXZ0xCYmJmZEJpZm1NaEZReVlPWFZMRmcySmdnN3ltSllheTFGTWR1dUFRL1g1Nk9wOUk2VlhMV3hkMXg3T2JMOFg3N3BvamN1a0d1Zy9NeWVWUXVtVnVMVmlFUithUzNnQlBERUZzcHZodDBDZDdzbDQ3N3UzU3E1SlRlM2ZIOVZaZmpnWlpOVWJacEErd2x2dW5sMlp1VmlGcEN2ckJhVU9yUWo0OVhBSENZVE1xVFFhMmdRUEVKblFaakl2TG9FNDFCTHorNkc4VGoyMUpaUmRudGR1Z0U2aFdRcTA4b21LVTBnRnUxYkdHc01EeXdzQ0FmQWk1Wmd5K0RneE96QXkxNUNDeE0yTTVpbEtRMEpZbmgxWjZKYUJKc2hTZmMwN0VOMWwvV0hiSDdkM2p6L3FKSmdWVUpGR3E5NUNXTDl1L0RBNjJhWW54cUlpS0RQT3U5S3E0TlB1alRIU0c3ZDlUNXZSM1Y2SjB6WjA2RWpMTjZwUVNkME9FUVRXN2pxOENpOTJDczlvbEdwTmZNUjN5RXk2cys5VkoxNHd1WDB0WEgvSXJiYjdzVmRwdk5XR200VU1ha0lEOFhncEVqUnlvbEt4a3pSOEFsRHdWMkpoeGVrR2ZsRTZNSTk4UzNnUnIvS1FaZXlBZmVMUVF5YmFoRXU4Z3d6T3FWQURwNnBNNDI3Q3EvWmNJWHZmYlRwYmpGU3BERW9NYUtDbUIyT2ZEOUdlQ0VBNVZvSFI2R1oxSVRVSnJsZzE3VkdOdElYejBsUlpObjFFOXdrM3ZRdDIzYkJ1NUx5RXk3UG9PeHFTSDBTdW1HZXo2USs5Q3RWbXY5NjFWOFF2L0p6aE0rWkdMNDhPRUEyVkVWQnBURXdTY3JnNjhrL3Yvc25RVk1KY2thaFQ5a2ZGZ0Z4ckx1N3U3dVJKNi9kWGQzZDNkM2QzZDM5MlhkRFJhWEs5amwrdXVUbDBxbmM1ZWJEcmVITGFCUDhxOU0yNmthK0UvL2RhcXFQWDAyNXNSanVNbHRvYTRXVGxsbFNRd2FVam5XYjRFRHVrRGljWHdFVm1nQ2lZbkJ5Z3RVc2N2RWxMOUVtUytTM0V6bGtmTWYwOXRiMkhNNWwyOUhKc2V4dlhCdFB6eVVnRHNHNEtBZWVDT0ZBVXZOVzhYRytaVGZaeFR3SFJnWXFFQ3cxRlBLeldYeDZPcnFJaEtKc1BqaWkrTk1UZVhubjMvV20xaEF5UzE0dm4xOWZWclloL05SSkp3djdOSFMwaUxETzFDKytwa1lwZUpocW84UGdXZVVIUC83bjMvSkcwRlhoSUg2Z2xpMEc4SDUrSk04TGRSWDZqTmNoT0p4Y00xa0JJTUR1c3Y1TWxsNDNnR2QwRENZd1dEbmhhcjlld2g1dkNpQjcwNVZYcjdYSmNyNVBWTjRuc1NrUGVYeTNYcG1NSHl6MW5wS2MwYzhPam82dEtBUFo2cWlFckYra1dUR1NrQ3NGQStKUmlxVlFoeFZjVGpmNXFDcXFncG5FWjhxSml2NFdpQWVCdGNESEhQTU1lU3lhZEExWVppcVF6L3I2aHRQWDQxdDhRREkrWXgwaHAxbUw0REJXN0VFYnc4TWZmNTFmWlc4blFCRjJiUXEzOC9KTURReStLODZjcWtNRzlhNmZML3NUZkIxYXVqem4wOVg4azBhRkpYVHEvdzlwd2hmdXoybDRNV2p2YjJkWkRKSmJXMnQ1MTZxUG1wcWFuQ21xaElZQXVDckxVMzAxcWhmZWdOQm91ZDg1SW0ydGpaWFFFTHhVUFh4SFBDY2hQYlFRdzZpdjYrWDhRNzFRVTg4aW5EU1NTZVpXV3ZQcXE5d0VWWWU4d3owSWcvRFFNSlI3UHhyWTdCZHM0a1NrOXN3K0U3czYyWG1OSmZ2TjZuaTV6K1RnTlBqYmdRenpHYVhwK1FPc3hYZm4yazRGWWNTc2ZPSlV5VmNoUktTL3Eya3c2UkprNHlBRENkNWlsT1FmRlZ4YU1hVHhxZzlmTVZWNGV6NVZJcUFpTk9vODVSODRqeUFJNDQ0Z25ubm1hYnJ4blYwdExjZ0xMWFVVamlmblBYMDBmaW9QUEwrWXVVcDNyZmd0M3N6Z1E4ZzV2TStLbys4djFoc2twZnZWNGxNc0JXckQ3NjJlVXBCVng2bTR0RFFqNFREZUJ0S3Znc3R0QkRPWjFrUmxPQk1CZkxiYjcvOXBXL3lxamd5bVF3U0RzTlhIb2U0T1Z0MEdMNFN2QklFWkhSNlNqNnFqM2VCMjlVM045NTRJOUZJRitNVmtlNU8weWVvTDlRbjZodm4vOThiNCtJeGpEZmpQRjZZYXdPT3d1Um1OZC9pbm9lRm5sSXV3T1NtaWtQQ01XdldMTXhidTd3RENZa1N0Skt4Qk1RY216WnRHdFhWMWZ6NjY2LzYvNUVXRDFVYzR1WGhKT0dRa0tnU2NYYTRGV2R6VFA5dkJFVG5CY0RYQWsrcGRCd0lmTC9aWnB1eDgzLy9iWVp0eGhYVVpvVXh5ZFVYNmhQOUw0VUlLdy9LSy9BZ21ZUThnVWMyb01xanpNdVhyTU4zNUNzUEN6MmxnQ29QRFozSTQxQWlNOE0wUmpna0tIbzcxa3dtSlYvaksrZzhtZEo2eTllUXl3Z21ZMDNIMWRDYWtxMnVNUldHaEVPQ292Ym9IUEZUbUh0TFFNUmZpVHNBdm5aNFNpVndrcWdtZ2JNQUxybmtFbWJPcU5GT3N1Tm1xRXB0TlZXSHM3OGFGMTk4TVlMNlJIMURJVUxQbzJmQ1ZBeUVSWExGeFNQZjNFRHVxNDlOakxqbk1Uakp5N2M2WFp6dndCOE5ST3MvTmhFTVh5enlsSXpZQlpCSWxJVE5HN0R4TmlRY211NnFSQnlOUmhINisvczFUQ1FCVVpJMkhvaVNzeEt5N2pFU3lWam5LUEVhUTFNY3hFVVZpQ29PY1RSVGFoWGlweXJKVkVjYWt0RC9xMjNCOExYQVV5cUJrNTU1UDNDSGhPdXh4eDRqbWVnbk9aaGdyRU50N0docndjeXVjaFlFbXhlTk85VW4vRGxDOGZneWdRY2JUaStIek5DK3gwSHpaSGhod3lYK0g1c3VGNHpuNGI4aTROY1VIcXd3cGJ6bzNsVTdUTXB3MmVwTG9MaDhuZVg4clRESHY5alo0Q2twZ2pETVRiSXlTVmhES0JJT0pXaFZIQmk0QXFJcHNNWm5VRWhROU5ic0k3R1ZiRURMZzlFdnUyZG9UY0toaEt5S3c0VXJJT0ptQk1RSW50b1p2SGpZNlNuNXdON0FhOXFPNDY2NzdxS3JzODJJNjVpRTJ0Ylcyb1R4eU5UbVpaZGRGdUIxWUMrR1JqaHNwWGk2YXhDRHVrVnFxQnBpbW1pdThSY09XWFkyRzg5YUFFVzhyTkovY3NPTFV2aStIM1A1Ymp5N2h0eFBmODYzLy9kZitQc1NzMWx0eGdJb0V1VUI4YlhTb3lrNWtVZ0U1SE9ZTjNRSmg0WjhUTVVoRENrZ1NuQktmZ3N1dUtBcUFUK3ByZVJrTEk1NmxrUlB3MUJHT01TcEVKNEtSS0tqWkNIdWlwS1RzWVRRTmsvSlA2ZUNiVXYyQUpycjZ1cHd0bmhIUGtBNm5ScHpRMVZxazFuUG9YNTF2b2VDMnF5MkE3dXJMOGFWZUF4bnI2aG5rcE14MEJxRUcxZVpTYmIrUFhMdHplUmlFWExkSFdTL3JlZWs2anlMVkUzQlFOZjVmVWFRaXdRL3lidDhwenQ4ajFsNkpwR1AzMk93dFpsVU5FS3lzNFA0Vi9YOGEzcWVXZTYwWGwwWC9LSkdTenlsSUR3UFZSZEt2aElOaGJ5TldDeEdNVWhBdEhwYkNYelJSUmZWVzd6dU15SnY4cW91akZFdTRaUFFGUXBIb1lCMGRuWks2SlNzbGJSMUgxOWNGYVBmVS9JbElIOEFXd0k5TysrOE15ZWRlRHd0VFExb2g5bXhBclZGYmVycmpTT2NkOTU1cUsxcU03Q1Yrb0RpQ0JjSkt1N3BocmY3OGhqVUxWckxCOXV1eE01bFVUYnMvb1VkRTgwOHVPWWNUbGx6U1F5K0hNanB1aEZmSktoNHRSZStUcmg4TjE2b2xsczJYb2tOVTFFV2EvbUZsV1BObkxIQ0hQWmUyZVg3YXpLbjY0SmZKR2lOcHhSTUlsR1Y4ZnZ2djJ1WXhDUlZYNUNBYUd4ZU01aUVrWHFUbDFobzViaENzNjc4UWdMUzNOeXNmYStDWCtkaHY2ZmtSMEMrQjNZQU9PR0VFN2pvb290b2Iyc21NZERQYUlmYVlJYXExSzh5eDlWR1FXMTIvdXc3L0NIY25rVHhyOS9MYUVqbE1WaWx1b3FiTjF1Umwrclc0cUZ0VnFOdXNWb000dGs4LzI0b0wvM051QVMrNTNlVjBlSGVsS1VXcU9MazlWZmttcTNYNG9KTlYwT0NZdENmeTNOQlYvQjhyZktVRE4vUnZ3SjY5UE8xeEZNeW5Fb1FrSGVBalFDT1BmWllicnZ0TnFLUlR1THg2S2dkcXRJUVhHZEhxNm40MUNhei9ZaXdrZHFNd2JpdFBIekRDQUtzOTJNWmIvZFJGRHF1OHhwUytFYWU0QllKbXVqTHdoRXRaWHc5U0ZIb3VNNXJUL3UvZDg2UDUyR1pwNVFOeGNOT3ZoWjRTZ0VJeVBwQVlvODk5c0Q1N2p6NWJKcFlwTXZjZjFSQVhNWFpiSFlvRVZaYjFDWWdBYXhuaEdQOGlrY0p1NzdHTTdEdHo3RGVEM0J1bTRUQ2pXczZkVXdCRFVtQzIvVzFCTDc5V1RpNUZZNW9odnVqRWdvM251clJNUVYwcElQbGE2T25GRlllbHZLMXdGTUtRRURlQjFZSEd2VzUzYzgvLzV4bGxsbUtwc1pmR2VqdnczYUlvN2oyOXNZUjFseHpUZXJyNjFGYjFDYTF6V25qQi9oQk9OdXFlSHc1QU9lMXdyWS91WEY4azZhWmxtRG80a1dRZkg5THdnTlJPTG5GalZ1NzVJc004NTRVNTV1MTBGUEtFb3FIN1h3dDhKUks5VUEyQWw1WWJMSEZlT2VkZHpqa2tFT0lkSGRvT3hQU0dmdTJjeGNuY2V2dWFqZHRFR2R4MXpZd0FDK3FUV29iSG9TVmgxVWhUbDVZemhjdnJQV1V3c3JESjBLK0FRaElveFBiQWJlcEVycjY2cXQ1OWRWWG1UV3pscmJtUnVMUmJyS1p2MzViZDNFUUYzSFNiQ3F6eWVGcnI3MG16b2k3MnVDMFpWdTFDUmVFNGdHVVc1U0l5NG9uWTdLWUpHaEhsUGtSRHlzOEpmK2N6TzZ5bHNBWEY0dm9pc3ZvRitmZy91NzJCdjV0OXNMNit1dXZOUnVMTW5LME5qY1NpM2FSVHFVWWFlaVo4alRFb2Jjblpyd056YVlTUnpiZGRGT0E3OFJkYmFBUWhNTldneW1tbGRzakhwUExJWnZPTWhUeXlSUVZaWFoxWnE2UTc2ajFsTXcwMGNyS0NteEJSVVc1cHFjVzQrdWNZeFBmQ3ZFTnhjTVZrQWVCVllIYjVjTm9OcGJXb0p4OTl0bE1tamlCOXJZbTJsdWI2TzJKazgxbW1GdlF2ZlVNUFV2UE5KV0dKaGFJaXo1RHJObFU0aWl1d0dyaXpoQUl4YU10eHV3cFVHbEJRcDVRQnJNblE3cXBjK2h6T21Oa3lxRENBcUdyQkhKbE1LRzEwNzk0V09BcGlSUEZkNTdWS213YnFnK3pzMjFSczFpempQUUxid3RmelhRUzMxQTh2SnNwT3JFWHNEN3duR2FUblhMS0tSSVJycmppQ3BaZGRobmlzVzVWQWtydXFncTB4cUtrN1U1MHJlNmhlK21ldXJlZW9kWGl3a29ycmNUbGwxOHVEdUppRmxvK0I2d25ydUpNaUlJZmxLa21sVXc3NDMvc25RV1FGRmU0aGRmZGQ5RjF4WjNGNFpIRjNkMDludUM4b0JFc0h0eUpHdzV4M04wZDR2SWtpdHZLZWVla2FxcWFmanZFb0tjM05aYzZOWGR1eS8vVjhPLzkrMHJmdXhNUmgzT1FlUXBJT2d3VU9nQkVXeXpaVEtadE1VUWN6VVhRMkExaUEvL3pyb0JGRXAvbTlCMWxudCtCeUNNNTZQb2wwUE56b09ONW9QMDVheVdic2kyR1NQS1duTEwrTnQ3aHc0Y25PM2hqRHdKQk5sTEVJYUQ0N2x0RzNpQ3pUNUFmaXhjdnh1clZLL0h1dSsvaXpUZmZ4QnR2dkdHcFpQTzk5OTdEcWxXcklCWnV0T1BVSjdpeUt6NysrR1BzM0xrRFc3WnNBZnZXc1dIREJrc2xtMXUzYm9FWXhNSzNrSjM2Qk5kRUFwZnlzSXZJOHhyNERvUFpKKzUxSFZTZldnMURPblRvRUlZT0hRcE9VUllMSFBMMDhvS2ZuejhDZzRJUkVocUdzUEJJaEVkRUlTSXlHcEx5S3RNeG5hTnpkWTJ1TlV2M2xnM1pNcVhWWXZMNDg4a2RQSUtHclVmd3kwY1FkaWdiTmM0Q2RVOER0VThCdFN5U2JNbG1qVE5BMklHYkNIN3BNQUlmV3UyMG9xZ3c2VE9rTHpqTWdKZU5ObDhBQTc2aXFQNFd5V0dySlcxSEhyeUo5UG1IVUhiTXF0dDRKMDZjbU9EZ0xYb0FDS0dDYkNFeEEwVjIzVGw0Y0pZSnhvNGRpNFVMRjBJQlpOMjZ0Vmk3ZGcyMTJpTEoxbHJhWG9FRkN4WkFMSU1IRDNicUU1TW5UOGJzMmJQeDBVY2ZZZGV1SGRpelp6ZDI3N1pXc2luYkgzNzRJV2JObW9YeDQ4ZmZ4c3N0U2hQNHNoL0V5M1dSSkxzRUR3YnIxeTBQSG80RW9BbzFoenBHUVlsdjUwT1Yrd3N2dklCMjdkb2hJU0ZCYkg5THVsYjMwQU9HN3FsN0c1SnN5bmJWUDAvc0RoNkJjaEpsQXg5WXJnQ0NvSEhiRVB6bWx3alo4QnRDdGx5MFZ1dC9sVzBFUGJGVkxBZ2MvSTdEa1g4RkVDYXhvcmpDN3lnemNwa0NDTXBNMzRyNFpWOGladk52aU41MjBWSVYydlNyYktQczFDMWlRZWxoYnh0NXcxbVpSSkgzcG5oanR0OUFFVDMxNzdlSGloMENZclpjTS9JR21uMWl3SUFCQ2lCNlF0TVROR2JNbUtFSzBWTEpwbXh6dTFPeG9GKy9mazU5Z2hXekFnZzRFSXVsUzVkaStmTGw0RExobG1yWnNtV3lqZW5UcDRzRm8wZVBkdW9UQ3NwdnZmV21iWUxIMjIrL0NlNkVaL1lKeXhPQTl0VDd5Q2R4MmpJRDlCNjFoTUd1SnJDYlNhMVJQVlJJeXF0TXgzU096dFUxY0pMZWw2Mi9SK2tPSGdGODNmNkVzdjZ0SjZuQ3RwWDhtbzZHMk5oM3ZCZEFxTVErN1JOMGJDUjFtYWdLMjFaS2FEZnFObDYrVkJUaDRBMS80elFxSFZlcnl2V0JJNXdNVmNTeThLQ1JOOERzRTgyYk4xZUZiU3MxYXRUSXFVOXdrVHBWMkxaU3g0NGR4UXN5aWpmc3dJRUQ0ZUpWMlRQUFBJTVZLNWJib2ZVaEJnYS81Wmd3WVlMSkoxeGFQM2xSMWFoaDFDcnFHL3o5cEd0MWp4RlVkZDM3bjlHNWc0Yy9senlZcDZ4blJIRUVQYkxXUHNIajBRL2dGUmtQc1hIcTNQTUFnaVhtNTZ2TVA2bzR5ajJ4eGphQm85ellkZkNQaWN1UFY3OHZ2RXZYUXNTdWJHUWV0OEdZRWhraWR1ZkFwMXg5OFlKTFdVeVhMNWg5Z2dPSEdESmtpRzBDeC8zMzN3K3VodXZVSnpoYkJ1d3F0RTNnbURScEVyZ3N1cEUzaEFyaTd6MVhaYW1wcVZpMGFKR3R4cFM0SjRmWkoreFdaMFZTTmFndTFGRHFHZW9WYW9Ha3ZNcDBUT2ZvWEYxejkwbmN3Y00zTVRHeENmdGd2OU5YNzlTYUdtZHdlZUJRRjVwM1NuV0lTV3hwYVdrTkFRUkkvSU5yNnVBTksxRlQ0d3d1RHh6cVFndkx5SmMzTUNNam96N0xmdFF4djg2akVMYmpGbXFjQU9xZUJHcnpzNVpGa2kzWnJLRVd4N1liOE9zd0RBNWVicUZaVGI2UW4wL3d6V0IxQjdnOGNLZ0xqVXR0L0tGUGxDcFZTdU1NTGc4YzZrSnpWTVJpNHd0bmplUVA0alg2UkpNbVRld3dwcVR1S3JYcTh2R0ovSk03dVlPSEQvOGdxL1BwYUFpYi9SZFU1QmtTQTkvYS9SRFE1U1VFOUpoanJUcS9BTm4yREF4MzlMdGU0ajdOQS9qSFZoV0FuOFJLbzRhUjF6Y3NCa1d6K2lLdC80dklHRHpiVXFYMmZSNnk3UlBzbkxkMjdkcXA1SDJReDY3cEhLK2tjZ2ljdkE3QkszOUE4TG9mcmRXSzd5RGJYc1ZTYitPdFU2ZE9nbnpCbVUrd0pZSWFOV3FnUTRjTzZOeTVzNlhTSUtkc2MxWFlQK3NUZXNxSEtrSUZ2UWNmZk5CU0RSdzRVTGIxbStYSDYwLzVabVptcGhoOWdzdXRLMEJxTUZkOTlaWks0ME95elVVVW5mckVYVTZlbEJmbFN3VlFRVlNvU1NyVE1aMmpjM1dOTzlrcEFhekxtT2k4aldKall6dXpuM09uaXUwZ0RpcWU0R1kzZmNUR3lpRU9nTGRVd0hoOU9QUEhuOXVFMXRVZkpNODViemRlemtLcHczNTRYL21DMnlmdUhXK1pNbVhpNVE4RjBTZnVVc0R3b1lLb0NDcUo2a1NOcFpaUXk2aFBKZVZWcG1NNlIrZnFHbDJyZTlnbmtMaURoeWVicTc1Y3Jya21uYVloSGJveDg0L3pxV2t4Qi9XMnlyR3RGRzF1cHUwRlloQ0xtTVMyZWZObUh6bXlWTUI0Slc4dWNSREJZMW1zNDVxd3ozNkVYWGk1U212OVpzMmFoWW1SOG5UN2hDVzhuZ1hKSis1Q0M4T2ZpcUFxVTlPb3c3U1p4eTY5bTFsWldkZTdkdTE2dlUrZnZ0YzV0bmFOcmJiclhicDB2ZHFxVmF2TGJKMWRZUkM3eHNrYnVicUcwclc2aCs3bGI0TVdpVHQ0U1B5UERPV2JudlU0NE5oUXpxNG5KVG1TSE5zb1B1M2RWWm52TDV1eUxRYXhpSWxQYkNFT3pnTEtLM25wRDVMblZiY0xMeXVKekU2ZE9vVTRLalRKN1JQM25OZXJ3UG5FMzB1T29CRkY5YVEyTVVEbXRHblQ5c2JreVZOeVgzdjk5YnpGaTVkZzNyeDVuTkw4SENjV1BJa25uM3dTbzBhTnhzaVJvNkVaWC8vNXhGaU1HemNCR3IvcTNyM0hsVXFWSzEvZ25pYTNkQy9kVS9jMkJCRlhKbmNBb1NOcmxrMTVicVNmeFZrMkRlVDREc214N3FXTXRtUmJESFNVS2t4QkRyNkN6dXRvaFpRc1dUS2FBOUxKY1hGeDVWVnhTT3h1cVhFdjViQkRtK1ZrbThzeFJJckhXU1hoOWduSjdSTi9zN1hoUzRWUlBhbk5uQ2lRUFc3YytKdnZ2NzhNZWdGeDhwU3BIR041QkowNmQwR0RCbzFRdDI0OVpGYXJnWExsSzZGU3BjcFVGVlN1a29sNjllcWpjZU1tYU5teWpZSUhKMHdNUXIvK0EvS3lzaHBjWkNEU2UwaGJxRjZ5Slp2dVZvZ05nZ2ovWThMNXRKUkk1eTlMNTgvazRLTWxraTNhTENQYlluRHcvTXQ0SGZJeXlOc0tHVzBhV2R3K1lUM3Z2M2l0dkFBcWpucU40ems1YkVIY1dyNThCV2JPbklXaFE0ZWhaYXZXcUZDaE1wSlQwbENzZUR3aW93cWpTTkZZQ1ZIUlJWRzBXSnlrdk1xVVIrRWlzVWpQS0ltcW1kV1JsZFVJYmR1MjU4U05Uc2pNclBZemwwbS9KbHV5S2R2dVZvZzd1Wk03dVZQQlN0NVVFTldkczdWWXdiZTlzV0xGQ25aTHpXY3I0MUc5YklxVTFBd1VLbHdNbkhXRzZKaWlpQ2xVREp3T3pMTGlWQ3pLbGkyclFDRXByeklkMHprNlYxSzVBZ21xMTZpTjFxMWJzOVZTUDd0d2tTTGFYQnhVRHpHSWhYSW5WN1UrcEsxYnQ1Ymg0bkpWclJSdGxqUXkvQlhlYytmT2xhR3FXcXkvd1dzZi9WV2ZlQnF2cGorRnBWV3RsR3lhbWY5dHZIYlMzd3djb2RRNHRyeHl1VFRJcmJmZmZnZmp4azlFaXhhdGtGR2lOQU5DY2JVaVVEdzJBWVVZSE9MaWt4R2ZrSXdpeGVLUmtKaENwZko0Z2o1TitSU2RvM04xamE1RmJGeWl5aG1FU3FGYTlWcFVUWmJGLzdkV3ZoV0RXRndUUU54Qnc0dXpRb1p6OTZ3Zk4yM2FpRTJiTmxncTJaUnRNZ3d4OWIwNjVUMXo1c3h3NnNmVHAwL2gxS21UbGtvMlpadjZzN3ptcmlvZmkrV3c2N1J2Mjh3OE8yOWw4TVM4eFM5T3lGdDBZVXoyTEl5NCtiS2xrazNaSnNNMHNaaVk3OGc3TVhzK3h0K2NhNmxrMDh4YllIM2l6d2VPeWV5bXkzM2xsUm0zRmkxYXpQZGRIa0tWS3BtczhCUFZQYVVXQkN2NEpBVUJSMkJBWXBLNnJoTDFLVEd3SkNJcE9WMVNYbVhHY3h4QlJmZlF2ZGl0Rllma2xIU09sVlJrNjZRY2loWXRmb0VCNUNwWnByZ0RpRVhKT0hESFN2dTlEUnMrMVhJRkxsbHZSemFYTFhzZkd6WjhCckVZbk5velAxNVcydThkUDM0VTI3ZHZ4ZnIxbitHeno2eVZiTzdZc1IwblRoeURXTzdFYTZnWWZDay9pZkszV0E2N3ZtSXg4K2JIUEM1M3dTZTlMNDVGOUZmL0FjL3psZUZ4dnBLbGtzMFkydTV6YVJ6STh1SEd2QU4rWm1Zejc4aUxMNkRObHcraHdibit5TEpZc2luYm84amc0QzM0UHVGMGpDT1lHczlwdmptelpzM08xbHZxM2JyMVFNbFNaY0ZKQUFvYXF1UlJ2bng1QlFFR2hTUlVybHhabFQrVkRFNG0wT2VmelA5K3JlNmhlK21lRENieEtnZW45U3FRSUNRay9EZU9tMThWazlpc0d3TnhCNDYrR3pkK3BtV1piYkUwdEZqRVpIUm1VK0RvcTBwYmV5aW9JbmVoeE9BSUlFWmU4MU9sTCtWUEJUUnUzRGlaZmI5MXJCYVg4YWpkc21YTEJER0lSVXhHWHJOUGpNOVo4TUNnU3hQaGZ6NFRIdWNxdVZSaUVJdVlqTXhtM3RHWFhrTGpjNE53MzluK0xwVVl4cERGT1cvQjhZbDhrc29EcUg1ODh6LzN1ZWVlejJhcmc0dEFka0ZHeWRJb0hwZUF3Z3dhOFluSmJEV2s4bnN5a2xpNUo2ZG1JRFkrUlovL0tLOTc2WjY2ZDBKU0NzdVRrRjZpSkdKcE56ZzRWRHV5M1JTYkdOMnpzTzVSTWppeEg3dUxqbXFGVDdzc0Q3MXk1UXFRYWFmWXhHaVMzNmxUcDQ1cTN3UlYzbmJRN3QwN1FTWWpyN0dDVUZrQU42QnB5NWVlOXVxbjE1T1RsdDJ3VWhwd2xHMHliT2Y4L2laaU12SWFmTUpINWFOdnpUNWU2dHMyOERoYnlSYXE4RjFIakxrMVo0L1pKNHk4M2I0ZGdmdk85TE9GZW40MzZvNjhacCtJcXhLSGpLWWxMSlZzM3RrbjhrMitWQ0s3aWZSdXh2VVpNMmFxeFlHMGRGYmdzUW1JaTFmclFOMVFEQmdwR2Z5ZWdwVFVFaEx6cVhjcG42Sjd5NFphSS94TVJWcGFDVVJGRjBGUWNJaldEUU9WSkZiS25lNTJjbFRFVk9Bbm4zeVNyVlUyN2JPM3dGdmFVT2U2bk5uVXJQWVg3N0ZqeDdJM2J0eGdtK0N4ZWZNbWJUTGo0SFd3NnRPZkxhZ1FicUc2VUQrNTlodlFEbk11R2xPU2JjZUdTbHAvNldVRHI3ZlJKOFE4OU9yTHVRSG4yT280VTlFV2l2eThEaDY3OEVLK1B1SGdiWHgySU80NzNjOFdhbkgrZ1R2eXlpY0N3dnpSK2YxZWVPUzNLWGpveWhRTXVmeVVwWkpOMmU3NFZuZUl4ZXdUVHJxcndxblhtelp0ZWswdit2WHZQd2lsU3BkWFY1WEdKVlNabzJMRmlxcnNFWitRcHE0bmZkNlR2R3pJVm14Y0NyK25nQzlrTW9BVWhyZTN6emRpRkt1Nysrb2VyYXBMQmJEcE9YMzkrdlcyQ1J5U0F0bnExYXZCZWZQUEtGaFEvcEx5NGoxNThxUmRBb2VrN1VlMThZeVpONEFTN3d6OTNOcmxidjE2alNtOTYrSXhwVS9GQWpHSjExRlptSHhpeHVQWFg0TEg2WXEyVWNpNW1uamdmNmM2OHdueG92NnB2clpSazdPRG5mSTZmS0wvZ2NmUStaZWhIRk9xQjgvUE9hYjBlU1ZMSlpzeHROM2xsMkhvdC9kUmVQbDZtMzNDM0YzbFQvWGhRb3EzMkZXVk4yellDTDNrcDRGc3RqWVMyQUpJVTR1QTMxT1JtbFpTUWtKaTJyM015NVpzVXVrYVdOZXNMZ2FRUXRua3ZDaFdNYnU3cis1KzhQQmp2MmNtc3ptcUFPMFZQRjdIbWpWcklEWStaWlFERUNocHFXaVZuVGh4d2xiQlErTWUrL2J0TS9JR1VFSHNLcXFsNW4zdjNyMWhzekVsTVJsNS9SdytvVlZxbFgzazJ2UHdPRlhSTmdvK1d3TkRmbndHWnAvZzBpUTFIYnoxVC9hMWpScWZHVWpleVU1NUd6emRHRDEvSFFuL3p6TTFPY0NWRWdOWlJvbko3QlBtMlZWUjFEYnVyWEw5cWFlZVFhUEdUWkdZckJhR3hoNlNrYXh1SlZYdVNlbElUUzhsV1pLWFRkbU9JNGU2c29vVWkwVkFZTkQzWWhXenUvVnhkNU9YOU8yMzN3NldVd0N3SDZBWEVjbDIrdlRwaC9WVitXKysrV1l3SzJOYjhuS2h1Zi9IKzhVWFh6eXV3aFl0V25oY3VIREpJemMzeitXY1lyaDQ4YklIbHc3L25aZXR1SWNNVDJieWlhSEs1T1RscXVmWVZzcmxQL052TEY3NmhDMTU4enlkOHlaM3ErU3g3L0pwajV0NU9TN25GTVBocStjOEV0dVhOZnVFTWZsUXJSSVQvNCs5czRDT0cwbTM4RmVTMnBqWXpzVEpRakl2VHBhSGw1bVptWmtaRHoxbVptWllabWJlWVR6N2hwWWhNVE4wdTFsU1ZUMzk1ejA1ZWg1M3A2Mk8yL0pzM3puM3FEcXRsSzQ5bmJxcS8xYTFqajN3MkxHeHZsUGpwMWhkV2NLdkJ4aHJPWFJ3R0syTk1Hb1BFWVphMkpGMmZOM1JjNFlRTFFxSFE2TUhqeWlsemdPZTJzMCt6cjU1S04vM0h3OWdyU1dycU5WcWp3QmN3S25YNjQvYlEzcFZHSVlQQnhnZUhxWlNxV1pKSTlFU1N3UkJFRHc2Y1dlbW90Y1BTMlVlTXo1TTFrK3paQnFmSys4bkdkcVdyaEZpYnZPWjhIMy9vYkZlYTIzTHJNNFVxVXl1YnpBcytRM1BsZmVUTktGcDZScWh2YTNlSUFnZURxQU85alBoTDRDMW1lQk1mUWwzZEhDcno0UkFBZjNBcXgvK2lFY0d4V0tSOFZQakxDeXQwdHZUZzNDdFVJbU9PWHB5SGl0ckpUbDJ0QzNYRmcwNXo2T3Z0NWVhcjRsbUh4cDRqV2cveTZXcnJua1lZNDVtZERDT05jbnhqb0FTUnUwOW96ZGF1cHN6eGh5T1oxRmFhN0tDNUF3bzBuaUh1SDNWVlZkSm9DdXYwU2JjMXVEenJyRlg4RnVqYjl6Z0pXdGpXNStiRCtYOTB6ejZaa1p5KzgvWXY0MG9tcEsvNCtnTzJRTVNlbW1aTHhwN09xODY5S3dObnJ0MmNHdkR5dGVUNS9HYW84OWxmMjZ3cFd0c3BUZHFId2JRQ3VvNnlNd3NLVEFhcld6eU01R0VDOXc5ZWp6dFE2S3ZTaCtZbloxallXRVJhOEZ4WGZsOG81VEtETDFjanB6ck1UaTQ3eER3QU9ENDJkMDQyRFVQZ1p2eHdWamd4ZWF4aC9RNkgvLzR4d2ZrbUUyOWRxdmZMOUV6dFFjQk44M01JOTlmNXJmdjk4NE4vdFdGdndyNTIvYnhxTm9seWZONDFDODlpSHhZYk9rYW9pbXBPZm9PcFUxNmJjdXM5UWU4K1g0djMrQzdMM290WWI1Mm0vUE9xeDhqZWQ0RGpsMUNLU3kzZEEyOXRWNEhRR2VzekdhMzBNdHA5QURQanpMSGl0R2htcDZlb1ZTdWNHQjRFR1BsNzFrT0h0aEhxQTNDYzBZR2Q2TXRHa1JMUk1PQkEvdFJ5bEdlNTYwQUx3WjZPS3ZvbWdmYkdkeVdsNWVKZ21GdXZQRkdWbGRYYVJWUjdaK3JyNzZhbi8zc1oya0dZNFVnaGQ1U3FZUmNjM3g4bkVxbFFxdFlYRndrK3U0cUZoWVcydEhySU1pNDJTWFIwOU1UYXljd0lSaGE1bnRYUHM5NGJaWVlqN3J6QTNsVWNBa2t6NnNhZnV0ZWJ5T0pkOC8vZVl2WHNJU2lLZkU3OWp3dnFSZHJhSmxmV2JtQ3Vkb1NNZTUvNTRzNUx6aEI4aHhkMWJ6K25pOG1pYitmKzBoTC9Sc2ptblREejRTMkdjeVVyRzYwS2JBSGVPeXhzYkZjdnJCT3ZwREhjUlRGc2s5T3lrYzlMdm4xYXRSMmhidmFGaTJlNTFLcUJQVDI5dERmUHpBQVBBN28yYVhTVmRjOFpFQ2RtNXNqZW1nTVVzT1B3bXZrejg2RUtDeWtXcTBTVFhlcDErdE1UMCtuR3R5MnExZnFzbXRyYTBUZnU4UEF3QUNpVmY3c1RKaWRuVVYwUnNzUnBmWXJmYVRSSzJibDdqWHowRnFydUIybUNISmZQZjJiSlBIT3FKUkZ6V3k4UDdaeUNER1ZHTzlkK2h3M1ZYN2NjditpS1lrd0REZnB0ZHZpSDAvOU8wbTg2UGhUTWJYVC9SeFk2ZVArUnk0bXhsZVdMdWRubFlrVyt6ZWlxZUZuSWpRbWU1bVNNWTNNWXlReTZvdlBPZWRnLzhycUd1VlNHU1dsS3FGeWdJaEtBVXE0eTIzUjVFZzVMYUpIYjEvZkNIQWhNTkkxajEweUR4bUF4VGlpelUxRW00bUl2ck5mQnRxbUJoTHR1c1oxWFRsWDdtcGxRQmJqNlloNTlQYjJpbkhJZFVXelhGZG1TMDBOWkdabUJxbmZqb3lNeUYydC9CMzV1VHVpTndQbUlTYnZJa2hSQmhKZVdyeUJTd3MzRU9OWnh4OGZHY2FvdkNjZDhsdkgzMHdTdjdQNHp5MzNiWTJWd2EzeFlKeWlESFJUOFlmY1dQZ0JNUjV6L0tFY1dPMEhDemEwdlBiRTgwbml2UXVmM1ZiL29xa1J0Tkh0WlVxckxXWktSMXJMbElSbWEvTndnUWVNam82V3cxQ3JXcVZFdFY3SEdzWEkvajYwdHNKTXRyRUtjRnpIY1VyQUE3dTV4eTZaUjJ3WVNpbkVFR1JRanA1R0pnYXlaWGtuMm90QkxwZERCbkQ1T3pJb1I0RWJ3dlJvWFc5c0dQRzFSWXVZZ2hqSSt2bzZtekUxTllYOFhORW1xWTNnTGRyTUpmeUZNUTlCT3pNUDRidG4vNHdrZnV2RVc2Qm1HRm5xNDFYM2ZCNHgzcnY4T2NicnM5c2NqTU9tZXEyMTIrYmZ6MzZZSkY1Ny9Qbm9Xa2h1eWZETWV6NlJHRjladnB5NStsTHJmUnVMYnFBM2RhWjAzM2ZHYkpZcEpjNXJQVk95amMzT0JjNGJIaDdSZ2UrenNsWkVvWkF5VWFrY0lDdWRjcDdMZXNtWFl5YmFvcWtvN2Vnb040RmlIc0I1WGZQWUFmTXd4bkFtS0tXUUFUaDY1akhKQVZsZXo4L1BJNHdSclNxUlFWZVdnMjZZamR6Qnk4eWpSWWltVk84bHo1RVBUcXdoMWlHdnBSUlZLQlNJSWFVMG1hbkV4aVkvbTd3Vzg1RiswdXZOZXFiVUdFRks4NUF5MUhzWFAwY01NWXl4eFZIZU9mcFNZdVNESXUrZS9yTnQ5aDFuSG1kWDcwL0xFM3g1OFhKaVBQTmVUMlJrc1kvbkhUcHRITVdnek45TmZXaWJBVFFFdHJGZXZWT1owajAzWlVvTHJXWktpS1pHNWpFVy9YczJ0WG9kMzYrakhBVktTZGtxVVRGUzJXcUx0djhkcHlLNkFNZTY1ckdMZ2Judis0aGhTUG5LY1J4a01KYlgwUmU4c2JTMGhNeENKT01RNDRpZTU0eFNTZ2J3dU9RVjMvRjM3RTVlc2d2Um1Kejl4QVlpV3ZMNXZHaVdXWlFZUjJ3d0d5VXZDZG5UWSs5bVNvSlFwOSs4OWpzTC80d1lSSXkvdXZCWGVOZEZyeWJHWHk5OE1MNGJUanZ6YUtEWHB1Sjc1eitER0VTTTkwUXJyMTUyMFhPSThZbUZyOFlyckxiRlVPdkdlbE1FNXErZTJaUXBIZHVVS1MxdnlwU1d0NU1wV2RIVWFLellCNFIxK2Zmdnlxa0s0ZjdCSE1ZZ3pHUWJGQllsWTlRQllIOTNwL251bVVkY1o1YVNrQXh5WWd4Q01ZdllRT1E5bVdIRXhpTGxMbmxQQm1vWnZEdHBIbkVkZjZOOEpwcmlrcHU4bHRtSHZDZURkV3dzb2wvZUs1ZkxjcDMwZXJPVEthVkF2TnJLcHVKNGRZYS9udjhBTVo1MTRnbU05QTRoeUFmci9FMWtIdHZ0MDBZTWpHNnFWODVKdzducUlwK1kvK3JwN09QRVE5bmZ1eStlZGNoN0tmbzFCR2NxVzJHM3hVdExEVElsTE9ndE1xV2xmOTVXLzdyeDczY2ZLTStFSVpWYWdPYzZDTXRWbmVtMjZ6Z1JGY2JZQWpESTdxSnJIdkZLSnJrN1Q4NUF4RUR1ZHJlN3laOXRETkl5Q01ycmxaV1ZwSEYwUEVNUUk0Z05SSFFJUmIrVTNKSi9GaHVIL0h4eWpmYjBaaUJUNm56bUVUTXlpQThsWngrSldjZUgwc3c2aEtKcHAvVEs3Q0k1KzlnMDY2aWs2ZlBNbVlkaDIzejMzS1pNNmZoYm9Hb1lXZHdpVTZyTmJxdnYwQmdhUWV2UUJLSEdXRkNPK2o4NjJXOHJBS3ZJQnJybUlaQ3lqd3h5TXF1UW96RGVhU3BIdVpPV3dWQm1JN0Z4N0paNXhIcytSRWZDTEdLOXlZeERaaVBTZndmMGRqcFRTcEY1dElHOEx2THVxVDhsaWZIS0RMOHo4MCtreEk1a0hqRkxRWVcvbS9nZ1NjeVZGL212cVUrbjNIUkg4NWxITzVuU1VndVowc3lmYlZ0dmFCdnFMZGRxOVNBSUEvcHlDbXNqb2hqb1ZSZ3J6R2JiQXNZb0hOY1pCc3AwSHQzQXZKbUJDT0k3NXVRcXBXaHBuNVJjVWhwSFN3RjBLZ01SeUtxclRadmpHQm9hU20wY2pUVmxQbE5xUHJnWjJ4WmxhV3NTN3gzL2RCdjltUjFaYlpYa2x4Y3ZJNGt2akgrcm5mNWFXS3FiTWxPYTM1UXBYUkJsU2hjbU1xWEZkSm1TM2xxdkFZcTFXdFVKZ3hCZmcrTW9YS1dvQmRIUkVXYXo3YUFBUXhDRWEwQVJNT3crdWpPUHBJRm9yV1dBazBGWTd0NWxZRXRwSERIc2ppMTlGUU14eHNoZGU1ekpTS21uVmVOSXBVbXVsN0ZNU1RTbEtGdWxZQkkyUGVPbHBCM1YyNlptMGJRVDVqeGVpektsaFJTWlVqcHoxc0JFcVZRMHNpRERWUzRxc2JwSjJpcWpiWXZCV29QUm9RTk1BSnJzb0dzZThZQXN3ZlRZMkpqc2s1QVNTM3JqNk1DK0NjbEFmTitYR1pNTXhqTHd0bTBjNmZWbUwxTVNCRHA3ZzdGb2FxN1h0czBFMnV6TEVPcjArenhTWjBxTGpUT2xsRE1QRFh5L1hDNTcxVm9OMTlGWTYyQng2UFVNbHV5MnRZRlFHNHd4ZzhBUE1tZ2VYZk1RaUhuSThsTFpxeUIzeXpFNmNDZWZXcStZbkJoSE9yU3VLZnVaVXZabkhrSnRkN1pzSmR3c3Q2MnlWVk85T2xPWmtxVmhZSzZCNjRNZ09GQXBsM1N0YmxISzRrUU10QmNkRVdhdTdZY3VWZ2NSUXhOaEFMZ3VvK2JSTlkrTzdZRGUrM296a0NtMVloNDZnMlVndldmMDJoYjB0cDBwTFo3TlRNazIwbXVCdkxYMjF1V2w1UlUvOERkK1RKUlFaWkxHYW9Jd3BGcXJGb0ZiZ1R4ZzZhSnJIbnRmYjNZekpVRm9kcUFNNUpLNkgydU5hT3JvVEVrNUtuMC90NStNeGdJKzhPMXl1VmdLL1RJS0Iyc1ZuZ29BUjBqT3lWWmJtVHFCSDFDclZtdkFOd0cvYXg1ZDg5ajdlak9lS1NWM1FMZkxTL00zYkhEQ1dXaHZjTFBtREhwdDI3d3gvNE1OTGpuNXR2clN0dmxxcTZ5VkJVMWpzL09CajlmcnRjT0JkcXd4QVFxRHRqMXl4RkVXVGE4Y005RzJKcVRxVzhMUXQyRVlEQU1mQVh5NjZKckgzdGViN1V4Sm9FM0kyY0NqYjM3MUJ0ODcvOWsyYzZXd3FWNXJhWnR2dmZGM052aWx1VXZiNk11S3BzeVYyVko4UFlsQUF6OEJ2cnVlWDUwMDJtQk5SSktybkxKRG8wUDhlbzF5dVZnQXJnVk9kZk9Pcm5sMDlaNFZkQzd6U004VW1VZUdZTStnU1Z1ZHVhWFEycHBtUDA0VitLOWlNYjgvMUJwdFFaa3FGamVpZzJOcm9GemhycmExc2RUOUFMOVdvbHFwS09BL1Jmc09scXk2NWlHT25SRzBwQ1ZEY21NdHR5dnowRWJqb0RKakhNb3EwWFFHdllDMW1hQ3lvSnViWFlZeXBhYUJlWXdRK0lMVyt2dUZ0WlY1SGZob2VzQ0VLQXk0QTNMYzFiWjErZ21ET3RWS2lXS3B2R0t0dlFYNEVoQ3dNK2lhUnhBRWVKNUxWdUM2RG1FWTBnaWkxM1d6cE5jVnZiY3Y4Nmo2N0hQNk1tTWVBMDRQT21qeU82NkZlSTZiR2IwOXJvY05tcHRkMWpJbDBkUUVCaWdELzVIUHIvYjdRVjJIWVlDMkJpdi9zZnNycjBJZFVxMldJMVpNdFZMdUU2Mml1VHZyMkVIektCYUxzbGt1RTdNUDBSQnYzR3V5QWtsV0htVkZyK3owRnIyM0svT3dDMFh1TW5pVUhPNnUzOFgzcWh3bkJvNWdaOVpwQkcraFR1OWdIeTd1YnNzbHB6ejYrdnZ3Wm1yTnkxWm5BWSsrNWRVeDQ2K0RTUTNUWEpNRkF1Q3oxdHJQejgvTlROWXJCVUp0TUJac1VFSTVyaERDY3NmYm9xRmFYSkVOd0JUeXE2dkFwMFVyRUhUTll3Zk5RNTRCa2M4WEdCN2VMd08zQkxKeU45MVJ4bC9ESWQ4eHRiWldrRWZDMGdqeTFMOWlzY1RBUUwrWVNMeUJycU9VYThvRDlrV0RhSm1jbk56OGZHMjcxOHpEOTMwYnQ3MmJGdmgrOFNRUEdEbWZ1L1NmeXdGdmlDRnZYMGQ1VG02WXV3NmN5LzFHenVQVzBrbmNXNVlhL282SGJ5eHplZW0vdWZQSVlZNzBIMlovYm9CQnI2K2pITW9OY25UZ0R0eHg1QkRmTG4rWGZiZFVHdXJWeG1RdVV4Sk5aNEFCS3NDditmWDY4WHhoZmNxdlZRbDlIN3grck5GZ0RVN1BQamwyckcxMGdEd2V0MXoxS1JieTYyRVlqb3BHMFFvWWRnNWQ4NmpYNjV3OGVaS2xwWlhJUEdRdndaQlF6S1JESEJMVG9MZlhreDNUb2tWV0Y5RUlzZDVDUVdZZ0hvT0RBeEVITzh3QmNqbFBURmVlNUNkNk56OURYVnRyOTFLbUpEK1gzamluNk5OejlTelg1Mi9sRHYzRGtZbWN4d09Ieis4bzd6ZDhUdzcxRG5QOXlzMzBYRG1OS3Zna0lNdVdOL1RtU29iUmE4cDh0dkFkYXYxMXpoMitJMk1qUnpqV0ljcTFqZ3dmcHRSWDRYT3IzK0hRVldWeTY3cWhYbTB6bGltMVBoc0tnU1hnNWZtMTFjUEY5WHkrWHE4UkJnRkdtNDIrVklmK3MwYkxYZzdXMXd1c0YvS2xTcVhjRDd4Q05BSWhPNEt1ZVZpbFZEbGVCbG9vRk9UaFFoRi94S2xUNDB4T1RrV2M3aENuR0I4Zmo2NzlZOUVnV2lUWFNLNHhONG1hcTB4TnBVd2t6N1RneHovK0tkUFRNL0lVdm81eWFtcGFyaTBhUksvY3RTZjEycWMvL2VrbHBaUzA1YjNNWlVxYmZyOFc0RG5QZWM2R1psdTFlRE1sQnI0OHpvM1hYY1czZjM0NWwwNWMyVkYrNTJlWGM5UDFWNGtHdk5reU5yQWtOVC9wU1U4cVNSdEFWelVETXlGSHYxTGkyaHN1NTZNblA4K0hKejdQUnpwRXVkYkhmLzRGYnJqaFNrVER3R3lJYWFMWHE5bU1aVXE5S1AvLzZ3V2FiUnI4RFBBSGl3dHpYckZZV0tzVVZ3bU53YUFJNjBXVTYwYjAwTDYwdlIxb3V4Z3NwY0l5VXNhT1RLeFNLaFp5d084Qm4rNXVDdHpac2tXZjUzbmZrK2IvdEc4V3NJMWpRUmdPdVhZY0xqZlVwSXhweXN6Y3c0WDJtSmxSc0NnNFptWSswVEl6TTNaMXpNeXd6THh6TXo1YmNwYlJjYVE4NlZkaW5LL1c3emR2M2t0N2Vucmd6anZ2VkpYYTI5dUIyQmlHV1EwQUZoSk9VWDJPblJ0Y2NjVVY4TWdqajZoS2d3Y1BGbmlSa1hpdC9mMzlOdUtsZlE4Ly9EQ01IejhPUHZqZ0Ezai8vZmZES21LWU1HRWNqQnc1VXY1OE9mTEVtREZqekpJblRGME0yRy9uVkNXK2xRbnh4TktsU3gyU0o1emRpWkIxaDA5VlNtNkxEK0g5NktPUDdCS3YrOE1nQk5kZUJNeUNBR2ptNTRWVjdNSWdsUFlQQU05YlJhR2VPSDdUb3l5b1IxQTdFNUtTMTZkbjVrQkJvQVJLSytxaHZLb2VLcW9ib0xLMmhUN1A0bmRVVFRNVWwxVkRkbDRoT04wK01GdXNOS2pjZzNwVVpEclhJN1ZvNWNHeTdETGFXTDU4dVRnU1ZVZWpYeTVoNTB0ZmFSMWtxVlI1Y0J5M0hBQTBzMmJORWtmNjZtajA3Qll0V2lSOFIwYUJ0N1MwZEQ4K1gvcXVlZSs5OTNBZFo0dXExcFJHang0dDhSSTRpTS82a09TSjNTc1BhRUE5bHREQUFld2QxaDBJOFFSMnhBY2xUNnhmc1JsSCtvZFV4QXVhVGYxYlEzaUR3ZUIrNUYxR3ZGdWYvRW56emZaZk5SVTJGYXdwV2ZOd2Zlc256ZGFYZnduMXhQSGJRWEZONFhIVVkrdi8rZHV5WWYwLy8rN1l2cDErS2tzL21jVnBMRHdGZ0theHpwcm9ubnQzNzlMZ1B5dHF0bXphcU5tODhaOHRPN1p2bzRyalllSWdKcEh0SExabzVjR2twcVoyNHVMdmI3VHA5L3ZoNXB0dkRudkZjY01OTjREUDV3TmlJcmFNakl3MkFPQkk2ZW5wWFJKdmJtNHVqQmd4SXV3Vng5Q2hReUU3T3hzazNzek16SFlBTUJKdlZsWldFKzc3bDQ1MWRuYkNXMis5QlpNbVRZQ3BVNmZBbENtVFVaTVVFc1dhZ3JISHd4dHZ2Q0ZWZFFKdlhsNWVCWGxCOUVTTXgrTTVYMkptZkRxdzNSaitpc04ySFl0bTFSM05FMGIweWdVU3I5blBROFpOM3JCWEhPblhlOENVYWp3cXI5d1RpWmU2Z1p0WEJEWHIrcURqbyt1aC9hUHJGRmRWZngvd2M0c2dzZGQxVkUrY1JOT2plTlNWS0t5ODJWOVRVcHlRa1owUEJjRnlDQVFDV0NrMENaVUREcWlncXE2VmRJcmZXNkM0dUJpQ1pUV1FrMThFVHFjVFl1TVREK2dOaG8xaWtydUtHS0lWaDNMSnc0QXZYbVY4ZlB3dFdFWnZvVjI0WUFwVlZWVXdhTkFnNk92clUxUURCZ3dRWXVNb0RjVDFtRzJKaVlrMzRNdFdScDBhQ1YvQ0tqa3ZqcUtwSXhTUzN1MjMzNjZvYnJ6eFJvcE56K3hvdkN5S0tTOHZUMFBlMi9FWWpZYkk5RUtDZlBycHArRzU1NTVUVkU4KythUVFPeUVoSVlTM3JxN09TMTZRZTBMT3JETnBnYXMwZ0hsQURGaDZsWlg1NGhnaHR0YW9QYjRuWkx3R2t4N2lLeDNnR1pnTTNqNm5vdklNU0JaaTY0MzZZL0xXMXRhbXkzbjVOQk00SDhtR3VMR0Y0Smlvck9MSEZBcXhXU2QzVkUrYzRrd0doM0tqUHFDZlcxaHR0dlVlcjE5SUlua0ZRUWlXVmtKNWRZTXduVlZaMHdqVjlhMzBlWnp2cU5wbUtDMnZnVUN3RExMekF1Qko5VU44UWhMMUVadXBPS1pZWWt4T1pJZzJoWktIem9jTk83UjJsOHZWeHpETWN0cXRCdUUweStkSlNVblhFQnQyRG00QTBKTWlnVGMvUDk5REx4NXB4b3daTEk3azYrbUZ4SE8rVXh1djErdXR3K2xCaHJ3Z2VrS2ZrNU1qUEdPSldlV2VNRVFTYnlSNjRoU2FGc1dnckdJbHNBaVQwV2F6MWZxMzArMDk1UFdsUTFaT0llUmlJaW5FWkZCY1ZvT3FoaEpNRG1WVkRjSW43U3VwcUlPaTRnb29DSlJpbFJFRVgxb21wTGc4bURTU0QzRkc0emE4NXc2Nk44VVFZekZpYkFWYk5IbG9jUXFEaVkyTnJVYlR0S0doTy9EN3ZUaVNmZ2Zua2hlVHNaVVV4bHlJc2Q4a0JtSWhKbUpidUhDaGdZeE1pakJlTFVyZjFOUmt4Mk10bVBjNkhRN0hnMnJoVFU1T2J1cnU3cllTSTdIS1BZR2N0ZlQzU014cTkwUWs4VWFVSjA1L1BaVkZ4WXBUV1F0UXV4Z201aStzUnZZbHBiZ1B1ancrcXNJeE1XUkJXa1l1NFBRNXBHZm1najhqRzNCZ0NDNlBIL0E4UUM3Z1RaYXRoditucC9hSzk3cFN2RGNieG1vam1qeElPRjl2c2R2dERYRnhjVzFrZGhvcGtaSEkySExoNk9tczZ2RDdVMHlLVFF6RVFrdzRpamRMbkJIR3E1TXg2K2lGeFBNcTFjS0xuVVI1YjIrdldjNHA5d1JlYjhXL3Awbjlub2dzM29qenhPazNyU3lKMkZFbDRzTDZSNmo5dUs2eUdkY3IvbUU1YmdObjVEZnl2SGtEYWpQTEdUZkZzT3g2UExhSnB0REUvOVA0U0x5VzdtR1hrb1pLcW8xb0FrRWpzemdDQ1pqTjVoYWJ6ZFpLeHBlRXhqcW5rc2VpMk1UQTgzd3BObDdpaTNSZWxFNmNFb3JEVVpiZjdYWUhxT01nNFVpcjZseEtpb014Q3lsMllXR2hnM2hJb2J5aHpOVHA0WnBTdVlxZnNRSzhVVStjaGFaRkdWQTh5bzd5b1hwUncxSHZvY2FoNXBERTcrK0p4M3JGYyszaXRRWVZKNHhvRXNFUzJvYWpwVlEwZndHYXZ4eGZSa1ZFc1RCbVBzVW1Cb2tuOG5rajN4UFlHVG9peVJPUnhpdEtKNU5lSWNsamFoWHlzRlNSTUNnT3hhTXNoNGtYanpIcXJEQ2k3VC9TQWpDVC9ySzNod0FBQUFCSlJVNUVya0pnZ2c9PQ"},{ name : "__ASSET__:bitmap_flixel_addons_transition__FlxTransitionSprite_RawGraphicTransTileDiamond", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWlBQUFBQWdBUU1BQUFBUjJGRjJBQUFBQmxCTVZFWC8vLy8vLy85VmZQVnNBQUFBQW5SU1RsUC9BT1czTUVvQUFBQ1RTVVJCVkhqYXRkYXhEWVF3RUFYUlFRU0VsRUFwbEFhbFVRb2xFQklnL2tWb3cwTWFQQVZZejdMbE5YblROU2ZIbUd4OUFybGdQbURjb0FjZy83cVg1SnlTZlVqV0xqY3NKMHc3REN0MEFDakZrMUk4Q1VVbEZKVlFWRUpSQ1VVbEZKVlFWRUpSQ1VVbEZKVlFWRUloRm1tNkhhSDUrSWlGcHNHMUY1b1Bud0toYWZBOENzMkhJOE5vR294Um8vRmZDL2dCY3NkYjNjL01iQ1FBQUFBQVNVVk9SSzVDWUlJPQ"},{ name : "__ASSET__:bitmap_flixel_system__FlxPreloader_GraphicLogoCorners", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFDQVFBQUFBQVlMbFZBQUFFT1VsRVFWUjQybHlOaFJFRFFSRERGR2JxdjVzVTlNenNjVGluMFI2dlo5elprSk1SbTBpcmxKSktOTFIwOUdZd0krSTlnM3hYbUNIRkhHbVdMT1NLdFRLMkhNV0ZHMWQ1MW5yTG5ucXA1WXFlaGlVNHBIblR5dDZNY25pRnY4SDFQWjd4UE9NWHIvZlA4Nlc3RFY1dEZIMlFSK281T1NrSk1aRUlST2hWVENweUNsSEs2a245cHJILzFMaUs4a2xCVGtaSy9Nd0l2VXJKM0xtY1V6a21JeUdXa1d2NmZGQlJ5cWs0TStCdEdvYUNjSG1VdHF3dytQLy9jMXFsTm9oMy9YU2NMSVZLRzR2eHlZNmJacm52bloxVTBtS1liS3hiOXlqZkJPZ2lDR04wbC9TWnUxMUxGeWlGRmdoOWtaRGdINHh2V0Q3UW9qRVFUa1BaZ1pEaVZKb0J1djZXQUd6dnIxRnFIYTBXWmxIT0l6SnhEaXEwWlFleXZSWmtzQTFmeFRxR3RyTitXZFlBZzVLRUVkb3RHWlREdVkrdk5uZkZObkpubExURFI2MmNEd3hKWEx3cEJjSVNBeUM5c05zeHg1WXh0MlpFek5hMURzRmlnQ0QxVVFCKzBPQng0QktXYU1YeWIyMThTK1FlTnlrcCtCRXZieEFIMzNwb2Fac0hvbzE1TEJyWkUzYVVQUURZVS8yQ09YcGc5cWl0LzdWenVBNElGd0hrT1Y5YytYQzc5N1lSd3hETDhHQUMwSks5NngvSi83WDVIaXdvQU5lOG9NclB1K3k1MlAzalduTHdRb0FnQVVEOVh2MnRXaks0a1lJRWdPTjNBdHZZcTZuSUFhRTBUZjFiSmdBRUdZQWdsVjg5Vzhmdm93Q01JQlVIb3RsOEVad0FBRXNBbG0wVEdDR01nQ28vclBCTkFURENUUUMzSU15eEgzL2NLK1pveXgyd3RnaVYzM3BmTUNPRGFDV0J6ZDhEeUFBY0J1c1pDSXNSS2dzd0J5SUpnRkEyanYwc0NFb3ZEWFBOY1RSRXpZN2ZSKys3OG9tTTI5bXZMVVQyZ05rbXRDUXVnTW5OMXA0cGdmL1hQaldBaHZtMk9aWW5ibk9CU0NDYTFYRFRzUXd3ZVFHd2w1S0FUMjFySFpjeUFCTkVtNGRRQWtCekYwRXFSdHRiOCt5bHo3dlNFSWpOSDBJdkFQYnFPa2dnVExRSHdRQWxUZHFHU0w1N0FMNzBSTk5QMFZiVnAzN0tsbk5oejRwc1oyL3pJQ1NCUFJsTWVoZ2R2eVRuTDdVNzZERHNCR21qN2VjTmlMbThCWERVQnhZaUs3WFJHN0JjdnhHcTdROFNBTWkwSHhXNlo1THJUd0pIU2RPa0VPSkI0MTVlRjIzdFRMbisvQjlKcXQxcDk3VzdQZ0F3N2dXampMdDR0Y1Y2L2IxdmV5cDM4dFgyVDkyQk9CZ0IrWS9mcmZLWTJsMTlkNVYrRklBUmtnTVl5Y0tqdTJlZXh5eld5TWEyZHZRblNVY1NPTGVlV2lBY3ZCaCtSVEdtZSthNXI3QnlEZmV3ZFV2V2xQeEU0WVY5NnhzbjcyUUhiMHJFYmQ2a3ZZVzVLOGVhY2dWQ0FnYVFqT0RuSWhnY0h5dVc3dDV3eEk3NTJRamVBekwvVG0rZCtjTExnVUI1Z3c2T2ZLamNaWDRIZ1FST1F1QzBCSUtUR0NDWUlRd3NtNDdDbWpVWFFGeVVnczRkZVJQS2p2b053QVZHUUVaWVU2N0lYTmJzZG05emwrakZQZ0Z3dnA5OGJ2M2MvYmpyZVZnTVFJekM2Tm1hK01aVlo0dkw0MGQ3ZEc4OU80Zjk3cVgzN09YUGY3YUxoNlkvK2YvZVM2djBhZVdmR2ZwKy9PUmU0ODh1NmptL05Fdjd2ZDdudDk4YlN4R0tIQlprUkFBQUFBQkpSVTVFcmtKZ2dnPT0"},{ name : "__ASSET__:bitmap_flixel_input_mouse__FlxMouse_GraphicCursor", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUJnQUFBQWdDQVlBQUFBSVhyZzRBQUFCcFVsRVFWUjQyclRSQTVLRFFSQUY0QnhnYmR1MjdUM0RvckMyelR1dGJkdTJiYU5qZFp4TVh0VXJ6WFIvUHlqYUpzYU5GQ1dHRGdCNUJBSGtFUVJvR1JzaGhEQ2dZV2lJRVNVQVJvemxDQ0VJcEJlVVFtQkVCRUVFQWNXMXpUQzlzQW8rSWNFRUVRVDBUU3pCNmZrNWVBVUdFa0lRMERvd0F5ZVh0M0J5ZWdydS9uNWtFQXdNejZ3QlBmc0hCK0RpNDQwUUFnQzlkdy9QREdSbmR4Y2NQVDBRUWdDWVdka0JkamEzdDhETzNVMStCQVBzdnJ4OUFEdHJHeHRnNCtLTUVjV0E1YTFENE0zaThoSllPanBnUkg2Z1kzZ092cjUvK0pDNWhRWFpFUXp3ZHZ2Z0RIQW1wcWZBMk1ZYUkvSUIzV01MOFB2M0J6aGpFeFBTSXhqQVBUcS9CbUVaR0I0Q1Ewc0xqTWdPREU2dmdLaDA5L1pLUUNRQXlSbDU0T1lmQkNFeHNSQ1ZtQ2kwN0orT0VZbEFhbVlCcU9ycU1hcHBhSWlXU0d5aldDQ3pxSkt4V0UxUEQ3U01qR1JiamhFTUZGUTFNSmFyNnh1d0wvYlI2aTFucVdORHNhQzBvUTA5U0xZRE1TZFY2Z05iVncrZ3dWTElsZjlHa0F1b1ZhTUJzUVJ5K0swR0dVN2xoaGVtNGJTd1lDa1FNOU9xNlRnZlpqZ3RMSmhKeThidlpBWWFBZ0JJUDV2ZHJxV1ZzQUFBQUFCSlJVNUVya0pnZ2c9PQ"},{ name : "__ASSET__:bitmap_flixel_system__FlxPreloader_GraphicLogoLight", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQUVBQUFBQkFDQVlBQUFDcWFYSGVBQUFGT1VsRVFWUjQycjJhQ1E3VE1CUkUyN0t2MStFY1hJUTdjVVQyblVKUXFoZmxFVDBVbVZnYTJXM2NaZWJQLzNiY25rNnZYdjlQbkFmaDlMOXc1L1RpNVdsd093TmZDL1RyeHJaeEFvejc4cnltQkI0bndIamlaOEc0OExwd2crZnhPY2NMME1ROU52bTRybXZ4UFk0Vm9DSnVzaDd2aUhvNFlaOFFsMzNrVFR5aWVkbUxFRWxDREhaQTI5dEVsNFQ5WElnaWdoNURNdVlOZDBDN3dZVHYwQWNhWitHSUdqREMzcERRT0MzZmhIbGN3b1FBSFdIMW01WTIyWGFDaGFBUHEwZHgzaWxBVjJFVHBsL2hMZ0FsaGdTTzZDYngvUUxRdC8waHZTSi9iOVV6SjkzUUtWQk9TQUdhUEdqaWtBYkx4NzRHZUsrb0NVbE84d1lKd0pleTVTRmprdmNuTUxZQUFQSnlna2xkUTRpc0FYdklROXJrSVF3ZWJEeG1MdVNWQ3JrYUlFU21jd2pnSmNWd1ZYZkVJUW9FQ2JHcUQ1VUcxeUI5N1hxQUFDYmZCYy81YnVJUEo2ekdqM2lNR0U0SE84QmtUSm8rVXFFRU1DQU9uT2VRZy9DeXR4Q2toK3VBOHorSVI1TVlFa0RSajJydmZEZkp4Mzk2OEhnRzgrd0Mxd0RhV2RGbVROL2lXSUIvTFh4cGU1Tjlzc0JqUk5sMmdlOEJIUFVBNUVPQWlMNWQ4SGNCSUE5RVhDTGdBdFVCV1g4bjhXc1dRUk1IVWZnZ2I5c3Z5VCs5allFRm1LSG95KzdnSjMxRjMwS2tBQnQzYzhwOWs1OEFlWTBoLzlnMUFQSWlBRmtERVl4T2dkN3hiVGlBM01mMml2Nk1aMHN4bUwrS3Z2SmV4SDhBa1pjUVVRdk9rd0RLZnhjKzUvNEV5TnNCRUljMFFBQ1JWOVVYZVVTUUVFNkoyaGhkZXJPQUtMMGZjRXJNd0FuZytlUUtRV2t5d1VzbGdubkR4TGk1eVFFbUNyUUV4dExuM0ljWXI1MEo4Umx6VTZTL0E3QzZiaGZRcmlBZFlQVktHSW1qZXdIdERCOXJvd1NZN3p2SXUzVjJrTDlVV1lCdXZVemFKYkZiaENRaU1VOEhLVDVtaTVQa0lDOEJpaXpOdVdZM1dBd0xzeHdEdlVhRWhTQ3UxZ0wwSFZYOVdoT25PZkViZ1FSdVZHc0IyaTVSVkRUV2tpUjRxWXZYTWgvNDJuZ0hNSTR2NHpXYjhSTGZKbFJsMS91QUl0K2NFTURSVmlRMWhtZ3NWOTlXK1BJYlgvLzA0UE9FMnpXQVNFdXhZZ2NvQjVZSWx4M0svVFJNSENJUW5mdVA4L2pUTko3eGFRSnp3RTJNY0VuZUVlNVlCU0t2SFhrVEo3cWZWb1EvTFBDUkhpQUlvaWgxdEIyMkNCS2k5Z0ZiQ3NwcTI1WW42cEQvc01MNzMzaTN3SHVBR0N0WGtCcHlnQUJ4OFpJRFBDbWl6bmpUOGxoOFJmcHRBRkZTQ0p3ZzRsa280WGZwQXdSWGVWdWZJaWNCSFBFbDRUZEw4RHh1VUgyQVBFNndJMDVaQVB0SWpER0lQei9nS2gxaFNUQ0pwUnBCand0d3c1WVRuQmFPZmd2UXY3M2ZFTC9nWGlObEpBQUFkZ0hrNVFaRXVBbzZYb3RUNFNEdDIyZWF5R3VsQUo4aHR5VHJxQk41Uk5DS0VJVXdmaG1pMzNLRWdBaXN0Ym9uMTJyaHpSQWtQem5xTTVqck9nRDQzTjRmK0xmQkZvS3hYK09WQTZoZ1NvUVZSSDdMOWhIOUxvSW1aL3ZIZFgvQTBnVVVxRzg0WUlKRjJINk05WHRIYU9oWHBSU2dDNkd2bTd5M3lpMkNpWU52MitSQjdBUnArZitBYUtxcWtFY0U3eHVvQS9UZklHblNRZDdSNzUxZ0M5QVJ0eEFBOG1EN2J0RkVJUThnN2pVZlJPRUxCMlNoTS9td0d1UWxnb1FnTlJocnh3ZjVKajd3WDJMZCtzNFJRRWhpUUJUaUNLZEtIOGZnNnZjSTRQRlZ6OGR4RmNBTkVLWFhXRERodUEwZWVTanE1L2hDa0lzemdvVHpIbFRPbHpQVEFmdWRZQmZFM1NTQUZHTmZkOVQ3SHlMai95NnZQcHVKNjFoTks0Y2pISWlEbkVFQ0JHbDlhTGtCT0s5WHlLVXRIRGxFZ053dGRoUnMyU0FjeFMxRnA0MFhvTVhaSm0xU29BWGNFZlhSQXZRL3Nxc2lCNEdJYkZ3N1FJRGNGc2NYMjduczlwempCV2czZERPUmN4TnY4a2NMME9UN1dwUHJhOGNMTUlEc2JqR09GMkM4TUNaNmNQc0ZMZ2kyUWU0OEVWTUFBQUFBU1VWT1JLNUNZSUk9"},{ name : "__ASSET__:bitmap_flixel_addons_transition__TransitionFade_RawGraphicDiagonalGradient", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQVQ0QUFBQ0FDQU1BQUFDbFVmV3pBQUFBdzFCTVZFWC8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy85WnhUMVdBQUFBUVhSU1RsUC8rL2Z6Nyt2bjQ5L2IxOVBQeThmRHY3dTNzNitycDZPZm01ZVRqNHVIZzM5N2QzTnZhMmRqWDF0WFUwOUxSME0vT3pjekx5c25JeDhiRnhNUEN3Y0RBSjhTaURzQUFBR0ZTVVJCVkhqYTdkQkJEY0JBRU1Td09TbjhNWmZENXRrWWd0bS9QWWYyNnJ0NjBtanZicU05c1RmYUUzdWpQYkUzMmhON296MnhOOW9UZTZNOXNUZmFFM3VqUGJFMzJoTjdvejJ4TjlvVGU2TTlzVGZhRTN1alBiRTMyaE43b3oyeE45b1RlNk05c1RmYUUzdWpQYkUzMmhON296MnhOOW9UZTZNOXNUZmFFM3VqUGJFMzJoTjdvejJ4TjlvVGU2TTlzVGZhRTN1alBiRTMyaE43b3oyeE45b1RlNk05c1RmYUUzdWpQYkUzMmhON296MnhOOW9UZTZNOXNUZmFFM3VqUGJFMzJoTjdvejJ4TjlvVGU2TTlzVGZhRTN1alBiRTMyaE43b3oyeE45b1RlNk05c1RmYUUzdWp2YmM3MnB0QWV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHYlJuMEo1QmV3YnRHUjlPdmlJQWJIVmpCd0FBQUFCSlJVNUVya0pnZ2c9PQ"},{ name : "__ASSET__:bitmap_flixel_addons_transition__FlxTransitionSprite_RawGraphicTransTileCircle", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWlBQUFBQWdBUU1BQUFBUjJGRjJBQUFBQmxCTVZFWC8vLy8vLy85VmZQVnNBQUFBQW5SU1RsUC9BT1czTUVvQUFBRFNTVVJCVkhqYXZkYkJEWVVnRUFUUU1SNDhXb0tsV0JxV1ppbVc0TkVEWVgvbUFBRk9BL2xaQ25oaDFtVlhtSExlM2V4YUxBSGhBNDRIMkc1Z3ZZQUZQS1BBQyt3MW9DQUZpTUJKZ0xmSWdJWjhSd1BrR09DUmtYczFBbjBkWklTM01NQUk5REYwNU5tTVVlb1lLbEp1d1lJeVNnL295TE9WS0hOSVBGblEwaGMxSUNGOWM3RWU0MGdLSlFyck1ZZDhCNk0wU0FZMEpBVkdJZEk4dERFa25ya2VrMGdLak1KNnVDTjZISWZDQ3A5WVFMUm04Mng3L1FGNmpBSjlLSG1NUjMxUWU2ME1mWG01clZGOW9mL2oxK0lIcHllK2JGUTNZbWdBQUFBQVNVVk9SSzVDWUlJPQ"},{ name : "__ASSET__:bitmap_flixel_addons_transition_RawGraphicTransTileSquare", data : "aVZCT1J3MEtHZ29BQUFBTlNVaEVVZ0FBQWlBQUFBQWdBUU1BQUFBUjJGRjJBQUFBQmxCTVZFWC8vLy8vLy85VmZQVnNBQUFBQW5SU1RsUC9BT1czTUVvQUFBQjRTVVJCVkhqYXhkYXhFUUFSRkVYUmF3UkNKU2hGYVpTbUZDVUlCY1p1RVRlZ2dET0Q3ejE4Y2dGZ2dBNUJJUU9pUWlZa2hTeklDdGxRRkhLZ0t1UkNjd2hJcEFlSmpDaVJtU1N5c2tSMmtjaXBFcm50QVdLMjR3L1dYN0VmTmovMjd4K2dqd0lmU2o0ZWZWRDd5dkRsNVd2VUY3ci9Xc0FQdWkyYVRIRGkxTGNBQUFBQVNVVk9SSzVDWUlJPQ"}];
 if(typeof window == "undefined") {
 	$global.onmessage = function(event) {
 		var job = event.data;
@@ -127967,48 +131864,123 @@ openfl_display_DisplayObject.__tempStack = new lime_utils_ObjectPool(function() 
 },function(stack) {
 	stack.set_length(0);
 });
-AssetPaths.section1__png = "assets/data/bopeebo/section1.png";
-AssetPaths.section10__png = "assets/data/bopeebo/section10.png";
-AssetPaths.section11__png = "assets/data/bopeebo/section11.png";
-AssetPaths.section12__png = "assets/data/bopeebo/section12.png";
-AssetPaths.section13__png = "assets/data/bopeebo/section13.png";
-AssetPaths.section14__png = "assets/data/bopeebo/section14.png";
-AssetPaths.section15__png = "assets/data/bopeebo/section15.png";
-AssetPaths.section2__png = "assets/data/bopeebo/section2.png";
-AssetPaths.section3__png = "assets/data/bopeebo/section3.png";
-AssetPaths.section4__png = "assets/data/bopeebo/section4.png";
-AssetPaths.section5__png = "assets/data/bopeebo/section5.png";
-AssetPaths.section6__png = "assets/data/bopeebo/section6.png";
-AssetPaths.section7__png = "assets/data/bopeebo/section7.png";
-AssetPaths.section8__png = "assets/data/bopeebo/section8.png";
-AssetPaths.section9__png = "assets/data/bopeebo/section9.png";
+AssetPaths.bopeebo_section1__png = "assets/data/bopeebo/bopeebo_section1.png";
+AssetPaths.bopeebo_section10__png = "assets/data/bopeebo/bopeebo_section10.png";
+AssetPaths.bopeebo_section11__png = "assets/data/bopeebo/bopeebo_section11.png";
+AssetPaths.bopeebo_section12__png = "assets/data/bopeebo/bopeebo_section12.png";
+AssetPaths.bopeebo_section13__png = "assets/data/bopeebo/bopeebo_section13.png";
+AssetPaths.bopeebo_section14__png = "assets/data/bopeebo/bopeebo_section14.png";
+AssetPaths.bopeebo_section15__png = "assets/data/bopeebo/bopeebo_section15.png";
+AssetPaths.bopeebo_section2__png = "assets/data/bopeebo/bopeebo_section2.png";
+AssetPaths.bopeebo_section3__png = "assets/data/bopeebo/bopeebo_section3.png";
+AssetPaths.bopeebo_section4__png = "assets/data/bopeebo/bopeebo_section4.png";
+AssetPaths.bopeebo_section5__png = "assets/data/bopeebo/bopeebo_section5.png";
+AssetPaths.bopeebo_section6__png = "assets/data/bopeebo/bopeebo_section6.png";
+AssetPaths.bopeebo_section7__png = "assets/data/bopeebo/bopeebo_section7.png";
+AssetPaths.bopeebo_section8__png = "assets/data/bopeebo/bopeebo_section8.png";
+AssetPaths.bopeebo_section9__png = "assets/data/bopeebo/bopeebo_section9.png";
+AssetPaths.bopeepo_section1__png = "assets/data/bopeebo/bopeepo_section1.png";
+AssetPaths.bopeepo_section10__png = "assets/data/bopeebo/bopeepo_section10.png";
+AssetPaths.bopeepo_section11__png = "assets/data/bopeebo/bopeepo_section11.png";
+AssetPaths.bopeepo_section12__png = "assets/data/bopeebo/bopeepo_section12.png";
+AssetPaths.bopeepo_section13__png = "assets/data/bopeebo/bopeepo_section13.png";
+AssetPaths.bopeepo_section14__png = "assets/data/bopeebo/bopeepo_section14.png";
+AssetPaths.bopeepo_section15__png = "assets/data/bopeebo/bopeepo_section15.png";
+AssetPaths.bopeepo_section2__png = "assets/data/bopeebo/bopeepo_section2.png";
+AssetPaths.bopeepo_section3__png = "assets/data/bopeebo/bopeepo_section3.png";
+AssetPaths.bopeepo_section4__png = "assets/data/bopeebo/bopeepo_section4.png";
+AssetPaths.bopeepo_section5__png = "assets/data/bopeebo/bopeepo_section5.png";
+AssetPaths.bopeepo_section6__png = "assets/data/bopeebo/bopeepo_section6.png";
+AssetPaths.bopeepo_section7__png = "assets/data/bopeebo/bopeepo_section7.png";
+AssetPaths.bopeepo_section8__png = "assets/data/bopeebo/bopeepo_section8.png";
+AssetPaths.bopeepo_section9__png = "assets/data/bopeebo/bopeepo_section9.png";
 AssetPaths.bopeebo__json = "assets/data/bopeebo.json";
 AssetPaths.data_goes_here__txt = "assets/data/data-goes-here.txt";
+AssetPaths.fresh__json = "assets/data/fresh/fresh.json";
+AssetPaths.fresh_section1__png = "assets/data/fresh/fresh_section1.png";
+AssetPaths.fresh_section10__png = "assets/data/fresh/fresh_section10.png";
+AssetPaths.fresh_section11__png = "assets/data/fresh/fresh_section11.png";
+AssetPaths.fresh_section12__png = "assets/data/fresh/fresh_section12.png";
+AssetPaths.fresh_section13__png = "assets/data/fresh/fresh_section13.png";
+AssetPaths.fresh_section14__png = "assets/data/fresh/fresh_section14.png";
+AssetPaths.fresh_section15__png = "assets/data/fresh/fresh_section15.png";
+AssetPaths.fresh_section16__png = "assets/data/fresh/fresh_section16.png";
+AssetPaths.fresh_section2__png = "assets/data/fresh/fresh_section2.png";
+AssetPaths.fresh_section3__png = "assets/data/fresh/fresh_section3.png";
+AssetPaths.fresh_section4__png = "assets/data/fresh/fresh_section4.png";
+AssetPaths.fresh_section5__png = "assets/data/fresh/fresh_section5.png";
+AssetPaths.fresh_section6__png = "assets/data/fresh/fresh_section6.png";
+AssetPaths.fresh_section7__png = "assets/data/fresh/fresh_section7.png";
+AssetPaths.fresh_section8__png = "assets/data/fresh/fresh_section8.png";
+AssetPaths.fresh_section9__png = "assets/data/fresh/fresh_section9.png";
 AssetPaths.section1__aseprite = "assets/data/section1.aseprite";
 AssetPaths.specialThanks__txt = "assets/data/specialThanks.txt";
+AssetPaths.bad__png = "assets/images/bad.png";
+AssetPaths.bg__png = "assets/images/bg.png";
 AssetPaths.BOYFRIEND__png = "assets/images/BOYFRIEND.png";
 AssetPaths.BOYFRIEND__xml = "assets/images/BOYFRIEND.xml";
+AssetPaths.combo__png = "assets/images/combo.png";
 AssetPaths.DADDY_DEAREST__png = "assets/images/DADDY_DEAREST.png";
 AssetPaths.DADDY_DEAREST__xml = "assets/images/DADDY_DEAREST.xml";
+AssetPaths.GF_assets__png = "assets/images/GF_assets.png";
+AssetPaths.GF_assets__xml = "assets/images/GF_assets.xml";
+AssetPaths.go__png = "assets/images/go.png";
+AssetPaths.good__png = "assets/images/good.png";
+AssetPaths.grafix__png = "assets/images/grafix.png";
+AssetPaths.healthBar__png = "assets/images/healthBar.png";
+AssetPaths.healthHeads__png = "assets/images/healthHeads.png";
+AssetPaths.healthHeads__xml = "assets/images/healthHeads.xml";
 AssetPaths.images_go_here__txt = "assets/images/images-go-here.txt";
+AssetPaths.logo__png = "assets/images/logo.png";
+AssetPaths.lose__png = "assets/images/lose.png";
+AssetPaths.lose__xml = "assets/images/lose.xml";
 AssetPaths.NOTE_assets__png = "assets/images/NOTE_assets.png";
 AssetPaths.NOTE_assets__xml = "assets/images/NOTE_assets.xml";
+AssetPaths.num0__png = "assets/images/num0.png";
+AssetPaths.num1__png = "assets/images/num1.png";
+AssetPaths.num2__png = "assets/images/num2.png";
+AssetPaths.num3__png = "assets/images/num3.png";
+AssetPaths.num4__png = "assets/images/num4.png";
+AssetPaths.num5__png = "assets/images/num5.png";
+AssetPaths.num6__png = "assets/images/num6.png";
+AssetPaths.num7__png = "assets/images/num7.png";
+AssetPaths.num8__png = "assets/images/num8.png";
+AssetPaths.num9__png = "assets/images/num9.png";
+AssetPaths.ready__png = "assets/images/ready.png";
+AssetPaths.restart__png = "assets/images/restart.png";
+AssetPaths.set__png = "assets/images/set.png";
+AssetPaths.shit__png = "assets/images/shit.png";
+AssetPaths.sick__png = "assets/images/sick.png";
+AssetPaths.stageback__png = "assets/images/stageback.png";
+AssetPaths.stagecurtains__png = "assets/images/stagecurtains.png";
+AssetPaths.stagefront__png = "assets/images/stagefront.png";
+AssetPaths.stage_light__png = "assets/images/stage_light.png";
 AssetPaths.Bopeebo__mp3 = "assets/music/Bopeebo.mp3";
 AssetPaths.Bopeebo_Inst__mp3 = "assets/music/Bopeebo_Inst.mp3";
 AssetPaths.Bopeebo_Voices__mp3 = "assets/music/Bopeebo_Voices.mp3";
+AssetPaths.Fresh__mp3 = "assets/music/Fresh.mp3";
+AssetPaths.Fresh_Inst__mp3 = "assets/music/Fresh_Inst.mp3";
+AssetPaths.Fresh_Voices__mp3 = "assets/music/Fresh_Voices.mp3";
+AssetPaths.HaxeFlixel_Tutorial_Game__mp3 = "assets/music/HaxeFlixel_Tutorial_Game.mp3";
+AssetPaths.HaxeFlixel_Tutorial_Game__ogg = "assets/music/HaxeFlixel_Tutorial_Game.ogg";
 AssetPaths.Jammer2__mp3 = "assets/music/Jammer2.mp3";
 AssetPaths.music_goes_here__txt = "assets/music/music-goes-here.txt";
+AssetPaths.title__mp3 = "assets/music/title.mp3";
+AssetPaths.titleShoot__mp3 = "assets/music/titleShoot.mp3";
+AssetPaths.badnoise1__mp3 = "assets/sounds/badnoise1.mp3";
+AssetPaths.badnoise2__mp3 = "assets/sounds/badnoise2.mp3";
+AssetPaths.badnoise3__mp3 = "assets/sounds/badnoise3.mp3";
+AssetPaths.freshIntro__mp3 = "assets/sounds/freshIntro.mp3";
+AssetPaths.intro1__mp3 = "assets/sounds/intro1.mp3";
+AssetPaths.intro2__mp3 = "assets/sounds/intro2.mp3";
+AssetPaths.intro3__mp3 = "assets/sounds/intro3.mp3";
+AssetPaths.introGo__mp3 = "assets/sounds/introGo.mp3";
+AssetPaths.missnote1__mp3 = "assets/sounds/missnote1.mp3";
+AssetPaths.missnote2__mp3 = "assets/sounds/missnote2.mp3";
+AssetPaths.missnote3__mp3 = "assets/sounds/missnote3.mp3";
 AssetPaths.sounds_go_here__txt = "assets/sounds/sounds-go-here.txt";
-AssetPaths.allFiles = ["assets/data/bopeebo.json","assets/data/bopeebo/section1.png","assets/data/bopeebo/section10.png","assets/data/bopeebo/section11.png","assets/data/bopeebo/section12.png","assets/data/bopeebo/section13.png","assets/data/bopeebo/section14.png","assets/data/bopeebo/section15.png","assets/data/bopeebo/section2.png","assets/data/bopeebo/section3.png","assets/data/bopeebo/section4.png","assets/data/bopeebo/section5.png","assets/data/bopeebo/section6.png","assets/data/bopeebo/section7.png","assets/data/bopeebo/section8.png","assets/data/bopeebo/section9.png","assets/data/bopeebo.json","assets/data/data-goes-here.txt","assets/data/section1.aseprite","assets/data/specialThanks.txt","assets/images/BOYFRIEND.png","assets/images/BOYFRIEND.xml","assets/images/DADDY_DEAREST.png","assets/images/DADDY_DEAREST.xml","assets/images/images-go-here.txt","assets/images/NOTE_assets.png","assets/images/NOTE_assets.xml","assets/music/Bopeebo.mp3","assets/music/Bopeebo_Inst.mp3","assets/music/Bopeebo_Voices.mp3","assets/music/Jammer2.mp3","assets/music/music-goes-here.txt","assets/sounds/sounds-go-here.txt"];
+AssetPaths.allFiles = ["assets/data/bopeebo.json","assets/data/bopeebo/bopeebo_section1.png","assets/data/bopeebo/bopeebo_section10.png","assets/data/bopeebo/bopeebo_section11.png","assets/data/bopeebo/bopeebo_section12.png","assets/data/bopeebo/bopeebo_section13.png","assets/data/bopeebo/bopeebo_section14.png","assets/data/bopeebo/bopeebo_section15.png","assets/data/bopeebo/bopeebo_section2.png","assets/data/bopeebo/bopeebo_section3.png","assets/data/bopeebo/bopeebo_section4.png","assets/data/bopeebo/bopeebo_section5.png","assets/data/bopeebo/bopeebo_section6.png","assets/data/bopeebo/bopeebo_section7.png","assets/data/bopeebo/bopeebo_section8.png","assets/data/bopeebo/bopeebo_section9.png","assets/data/bopeebo/bopeepo_section1.png","assets/data/bopeebo/bopeepo_section10.png","assets/data/bopeebo/bopeepo_section11.png","assets/data/bopeebo/bopeepo_section12.png","assets/data/bopeebo/bopeepo_section13.png","assets/data/bopeebo/bopeepo_section14.png","assets/data/bopeebo/bopeepo_section15.png","assets/data/bopeebo/bopeepo_section2.png","assets/data/bopeebo/bopeepo_section3.png","assets/data/bopeebo/bopeepo_section4.png","assets/data/bopeebo/bopeepo_section5.png","assets/data/bopeebo/bopeepo_section6.png","assets/data/bopeebo/bopeepo_section7.png","assets/data/bopeebo/bopeepo_section8.png","assets/data/bopeebo/bopeepo_section9.png","assets/data/bopeebo.json","assets/data/data-goes-here.txt","assets/data/fresh/fresh.json","assets/data/fresh/fresh_section1.png","assets/data/fresh/fresh_section10.png","assets/data/fresh/fresh_section11.png","assets/data/fresh/fresh_section12.png","assets/data/fresh/fresh_section13.png","assets/data/fresh/fresh_section14.png","assets/data/fresh/fresh_section15.png","assets/data/fresh/fresh_section16.png","assets/data/fresh/fresh_section2.png","assets/data/fresh/fresh_section3.png","assets/data/fresh/fresh_section4.png","assets/data/fresh/fresh_section5.png","assets/data/fresh/fresh_section6.png","assets/data/fresh/fresh_section7.png","assets/data/fresh/fresh_section8.png","assets/data/fresh/fresh_section9.png","assets/data/section1.aseprite","assets/data/specialThanks.txt","assets/images/bad.png","assets/images/bg.png","assets/images/BOYFRIEND.png","assets/images/BOYFRIEND.xml","assets/images/combo.png","assets/images/DADDY_DEAREST.png","assets/images/DADDY_DEAREST.xml","assets/images/GF_assets.png","assets/images/GF_assets.xml","assets/images/go.png","assets/images/good.png","assets/images/grafix.png","assets/images/healthBar.png","assets/images/healthHeads.png","assets/images/healthHeads.xml","assets/images/images-go-here.txt","assets/images/logo.png","assets/images/lose.png","assets/images/lose.xml","assets/images/NOTE_assets.png","assets/images/NOTE_assets.xml","assets/images/num0.png","assets/images/num1.png","assets/images/num2.png","assets/images/num3.png","assets/images/num4.png","assets/images/num5.png","assets/images/num6.png","assets/images/num7.png","assets/images/num8.png","assets/images/num9.png","assets/images/ready.png","assets/images/restart.png","assets/images/set.png","assets/images/shit.png","assets/images/sick.png","assets/images/stageback.png","assets/images/stagecurtains.png","assets/images/stagefront.png","assets/images/stage_light.png","assets/music/Bopeebo.mp3","assets/music/Bopeebo_Inst.mp3","assets/music/Bopeebo_Voices.mp3","assets/music/Fresh.mp3","assets/music/Fresh_Inst.mp3","assets/music/Fresh_Voices.mp3","assets/music/HaxeFlixel_Tutorial_Game.mp3","assets/music/HaxeFlixel_Tutorial_Game.ogg","assets/music/Jammer2.mp3","assets/music/music-goes-here.txt","assets/music/title.mp3","assets/music/titleShoot.mp3","assets/sounds/badnoise1.mp3","assets/sounds/badnoise2.mp3","assets/sounds/badnoise3.mp3","assets/sounds/freshIntro.mp3","assets/sounds/intro1.mp3","assets/sounds/intro2.mp3","assets/sounds/intro3.mp3","assets/sounds/introGo.mp3","assets/sounds/missnote1.mp3","assets/sounds/missnote2.mp3","assets/sounds/missnote3.mp3","assets/sounds/sounds-go-here.txt"];
 flixel_FlxBasic.idEnumerator = 0;
-Conductor.bpm = 100;
-Conductor.crochet = 60 / Conductor.bpm * 1000;
-Conductor.stepCrochet = Conductor.crochet / 4;
-Conductor.offset = 0;
-Conductor.safeFrames = 5;
-Conductor.safeZoneOffset = Conductor.safeFrames / 60 * 1000;
-openfl_text_Font.__fontByName = new haxe_ds_StringMap();
-openfl_text_Font.__registeredFonts = [];
 flixel_FlxObject.defaultPixelPerfectPosition = false;
 flixel_FlxObject.SEPARATE_BIAS = 4;
 flixel_FlxObject.defaultMoves = true;
@@ -128022,6 +131994,20 @@ flixel_FlxObject.FLOOR = 4096;
 flixel_FlxObject.WALL = 17;
 flixel_FlxObject.ANY = 4369;
 flixel_FlxSprite.defaultAntialiasing = false;
+Conductor.bpm = 100;
+Conductor.crochet = 60 / Conductor.bpm * 1000;
+Conductor.stepCrochet = Conductor.crochet / 4;
+Conductor.offset = 0;
+Conductor.safeFrames = 5;
+Conductor.safeZoneOffset = Conductor.safeFrames / 60 * 1000;
+flixel_addons_transition_FlxTransitionableState.skipNextTransIn = false;
+flixel_addons_transition_FlxTransitionableState.skipNextTransOut = false;
+openfl_text_Font.__fontByName = new haxe_ds_StringMap();
+openfl_text_Font.__registeredFonts = [];
+Note.swagWidth = 112.;
+PlayState.curLevel = "Bopeebo";
+TitleState.initialized = false;
+TitleState.soundExt = ".mp3";
 Xml.Element = 0;
 Xml.PCData = 1;
 Xml.CData = 2;
@@ -128166,6 +132152,32 @@ flixel_FlxG.initialHeight = 0;
 flixel_FlxG.signals = new flixel_system_frontEnds_SignalFrontEnd();
 flixel_FlxG.assets = new flixel_system_frontEnds_AssetFrontEnd();
 flixel_system_FlxSplash.muted = true;
+openfl_geom_Rectangle.__pool = new lime_utils_ObjectPool(function() {
+	return new openfl_geom_Rectangle();
+},function(r) {
+	r.setTo(0,0,0,0);
+});
+openfl_display_BitmapData.__meta__ = { fields : { image : { SuppressWarnings : ["checkstyle:Dynamic"]}, __framebufferContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, __indexBufferContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, __surface : { SuppressWarnings : ["checkstyle:Dynamic"]}, __textureContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, __vertexBufferContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, compare : { SuppressWarnings : ["checkstyle:Dynamic"]}, getSurface : { SuppressWarnings : ["checkstyle:Dynamic"]}, __fromImage : { SuppressWarnings : ["checkstyle:Dynamic"]}}};
+openfl_display_BitmapData.VERTEX_BUFFER_STRIDE = 14;
+openfl_display_BitmapData.__tempVector = new lime_math_Vector2();
+openfl_display_BitmapData.__fillRectRectangle = new openfl_geom_Rectangle();
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.resourceType = "image/png";
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileCircle.resourceName = "__ASSET__:bitmap_flixel_addons_transition__FlxTransitionSprite_RawGraphicTransTileCircle";
+flixel_addons_transition_GraphicTransTileCircle.WIDTH = 544;
+flixel_addons_transition_GraphicTransTileCircle.HEIGHT = 32;
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.resourceType = "image/png";
+flixel_addons_transition__$FlxTransitionSprite_RawGraphicTransTileDiamond.resourceName = "__ASSET__:bitmap_flixel_addons_transition__FlxTransitionSprite_RawGraphicTransTileDiamond";
+flixel_addons_transition_GraphicTransTileDiamond.WIDTH = 544;
+flixel_addons_transition_GraphicTransTileDiamond.HEIGHT = 32;
+flixel_addons_transition_RawGraphicTransTileSquare.resourceType = "image/png";
+flixel_addons_transition_RawGraphicTransTileSquare.resourceName = "__ASSET__:bitmap_flixel_addons_transition_RawGraphicTransTileSquare";
+flixel_addons_transition_GraphicTransTileSquare.WIDTH = 544;
+flixel_addons_transition_GraphicTransTileSquare.HEIGHT = 32;
+flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.resourceType = "image/png";
+flixel_addons_transition__$TransitionFade_RawGraphicDiagonalGradient.resourceName = "__ASSET__:bitmap_flixel_addons_transition__TransitionFade_RawGraphicDiagonalGradient";
+flixel_addons_transition_GraphicDiagonalGradient.WIDTH = 319;
+flixel_addons_transition_GraphicDiagonalGradient.HEIGHT = 128;
+flixel_addons_transition_TransitionFade.GRADIENT_PATH = "flixel/images/transitions/diagonal_gradient.png";
 flixel_animation_FlxPrerotatedAnimation.PREROTATED = "prerotated_animation";
 flixel_effects_FlxFlicker._pool = new flixel_util_FlxPool(function() {
 	return new flixel_effects_FlxFlicker();
@@ -128245,11 +132257,6 @@ flixel_graphics_atlas_FlxAtlas.defaultMaxSize = (function($this) {
 	$r = point;
 	return $r;
 }(this));
-openfl_geom_Rectangle.__pool = new lime_utils_ObjectPool(function() {
-	return new openfl_geom_Rectangle();
-},function(r) {
-	r.setTo(0,0,0,0);
-});
 flixel_graphics_frames_FlxBitmapFont.SPACE_CODE = 32;
 flixel_graphics_frames_FlxBitmapFont.TAB_CODE = 9;
 flixel_graphics_frames_FlxBitmapFont.NEW_LINE_CODE = 10;
@@ -129131,10 +133138,6 @@ flixel_input_keyboard_FlxKey.NUMPADPLUS = 107;
 flixel_input_keyboard_FlxKey.NUMPADPERIOD = 110;
 flixel_input_keyboard_FlxKey.NUMPADMULTIPLY = 106;
 flixel_input_keyboard_FlxKey.NUMPADSLASH = 111;
-openfl_display_BitmapData.__meta__ = { fields : { image : { SuppressWarnings : ["checkstyle:Dynamic"]}, __framebufferContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, __indexBufferContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, __surface : { SuppressWarnings : ["checkstyle:Dynamic"]}, __textureContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, __vertexBufferContext : { SuppressWarnings : ["checkstyle:Dynamic"]}, compare : { SuppressWarnings : ["checkstyle:Dynamic"]}, getSurface : { SuppressWarnings : ["checkstyle:Dynamic"]}, __fromImage : { SuppressWarnings : ["checkstyle:Dynamic"]}}};
-openfl_display_BitmapData.VERTEX_BUFFER_STRIDE = 14;
-openfl_display_BitmapData.__tempVector = new lime_math_Vector2();
-openfl_display_BitmapData.__fillRectRectangle = new openfl_geom_Rectangle();
 flixel_input_mouse__$FlxMouse_GraphicCursor.resourceType = "image/png";
 flixel_input_mouse__$FlxMouse_GraphicCursor.resourceName = "__ASSET__:bitmap_flixel_input_mouse__FlxMouse_GraphicCursor";
 flixel_input_touch_FlxTouchManager.maxTouchPoints = 0;
@@ -129295,6 +133298,10 @@ flixel_tweens_FlxTween.LOOPING = 2;
 flixel_tweens_FlxTween.PINGPONG = 4;
 flixel_tweens_FlxTween.ONESHOT = 8;
 flixel_tweens_FlxTween.BACKWARD = 16;
+flixel_ui_FlxButton.NORMAL = 0;
+flixel_ui_FlxButton.HIGHLIGHT = 1;
+flixel_ui_FlxButton.PRESSED = 2;
+flixel_ui_FlxButton.DISABLED = 3;
 flixel_util_FlxAxes.X = 1;
 flixel_util_FlxAxes.Y = 16;
 flixel_util_FlxAxes.XY = 17;
