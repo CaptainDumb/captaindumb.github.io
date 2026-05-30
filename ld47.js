@@ -913,7 +913,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "34";
+	app.meta.h["build"] = "35";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "ld47";
 	app.meta.h["name"] = "fnf 0.2 (2/98)";
@@ -7721,7 +7721,7 @@ IncrementalState.__name__ = "IncrementalState";
 IncrementalState.__super__ = flixel_FlxState;
 IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	initUpgrades: function() {
-		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 1, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e7, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e10, costMult : 1.5, multiplier : 1.05, maxLevel : 10}];
+		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 1, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e7, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "ultraboost", name : "Ultra Boost", level : 0, baseCost : 1e9, costMult : 1.5, multiplier : 100.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e10, costMult : 1.5, multiplier : 1.05, maxLevel : 10},{ id : "extendedupgrade", name : "More Levels", level : 0, baseCost : 1e12, costMult : 1.5, multiplier : 1.1, maxLevel : 10}];
 	}
 	,buyUpgrade: function(id) {
 		var _g = 0;
@@ -7848,7 +7848,7 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		this.saveWarningText = new flixel_text_FlxText(4,flixel_FlxG.height - 36,0,"WARNING: SAVING NOT YET IMPLEMENTED");
 		this.saveWarningText.set_size(8);
 		this.add(this.saveWarningText);
-		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"PROTOTYPE 2 - endgame = 1e10 points");
+		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"PROTOTYPE 3 - endgame = 1e30 points");
 		this.versionText.set_size(8);
 		this.add(this.versionText);
 		new flixel_util_FlxTimer().start(1,function(_) {
@@ -7884,6 +7884,153 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		case 6:
 			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 1750) + 1) + 1) + 1),1);
 			break;
+		case 7:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 1500) + 1) + 1) + 1),1);
+			break;
+		case 8:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 1250) + 1) + 1) + 1),1);
+			break;
+		case 9:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 1000) + 1) + 1) + 1),1);
+			break;
+		case 10:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 750) + 1) + 1) + 1),1);
+			break;
+		case 11:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 500) + 1) + 1) + 1),1);
+			break;
+		case 12:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 250) + 1) + 1) + 1),1);
+			break;
+		case 13:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 100) + 1) + 1) + 1),1);
+			break;
+		case 14:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 50) + 1) + 1) + 1),1);
+			break;
+		case 15:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 25) + 1) + 1) + 1),1);
+			break;
+		case 16:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 10) + 1) + 1) + 1),1);
+			break;
+		case 17:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 5) + 1) + 1) + 1),1);
+			break;
+		case 18:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points / 2.5) + 1) + 1) + 1),1);
+			break;
+		case 19:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.log(this.points) + 1) + 1) + 1),1);
+			break;
+		case 20:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 1000000000) + 1) + 1) + 1),1);
+			break;
+		case 21:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 500000000) + 1) + 1) + 1),1);
+			break;
+		case 22:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 250000000) + 1) + 1) + 1),1);
+			break;
+		case 23:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 100000000) + 1) + 1) + 1),1);
+			break;
+		case 24:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 50000000) + 1) + 1) + 1),1);
+			break;
+		case 25:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 25000000) + 1) + 1) + 1),1);
+			break;
+		case 26:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 10000000) + 1) + 1) + 1),1);
+			break;
+		case 27:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 5000000) + 1) + 1) + 1),1);
+			break;
+		case 28:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 2500000) + 1) + 1) + 1),1);
+			break;
+		case 29:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 1000000) + 1) + 1) + 1),1);
+			break;
+		case 30:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 500000) + 1) + 1) + 1),1);
+			break;
+		case 31:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 250000) + 1) + 1) + 1),1);
+			break;
+		case 32:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 100000) + 1) + 1) + 1),1);
+			break;
+		case 33:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 50000) + 1) + 1) + 1),1);
+			break;
+		case 34:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 25000) + 1) + 1) + 1),1);
+			break;
+		case 35:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 10000) + 1) + 1) + 1),1);
+			break;
+		case 36:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 5000) + 1) + 1) + 1),1);
+			break;
+		case 37:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 2500) + 1) + 1) + 1),1);
+			break;
+		case 38:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 1000) + 1) + 1) + 1),1);
+			break;
+		case 39:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 500) + 1) + 1) + 1),1);
+			break;
+		case 40:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 250) + 1) + 1) + 1),1);
+			break;
+		case 41:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 100) + 1) + 1) + 1),1);
+			break;
+		case 42:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 50) + 1) + 1) + 1),1);
+			break;
+		case 43:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 25) + 1) + 1) + 1),1);
+			break;
+		case 44:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 10) + 1) + 1) + 1),1);
+			break;
+		case 45:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 5) + 1) + 1) + 1),1);
+			break;
+		case 46:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points / 2.5) + 1) + 1) + 1),1);
+			break;
+		case 47:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(Math.sqrt(this.points) + 1) + 1) + 1),1);
+			break;
+		case 48:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 1000000000) + 1) + 1),1);
+			break;
+		case 49:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 500000000) + 1) + 1),1);
+			break;
+		case 50:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 250000000) + 1) + 1),1);
+			break;
+		case 51:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 100000000) + 1) + 1),1);
+			break;
+		case 52:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 50000000) + 1) + 1),1);
+			break;
+		case 53:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 25000000) + 1) + 1),1);
+			break;
+		case 54:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 10000000) + 1) + 1),1);
+			break;
+		case 55:
+			this.FormulaBoost = Math.max(Math.sqrt(Math.log(Math.log(this.points / 5000000) + 1) + 1),1);
+			break;
 		}
 		var f = this.FormulaBoost;
 		if(isNaN(f)) {
@@ -7893,8 +8040,8 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		if(isNaN(f)) {
 			this.points = 0;
 		}
-		if(this.points > 1e10) {
-			this.points = 1e10;
+		if(this.points > 1e30) {
+			this.points = 1e30;
 		}
 		var _g = 0;
 		var _g1 = this.upgrades;
@@ -7903,6 +8050,25 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 			++_g;
 			if(u.level > 0) {
 				switch(u.id) {
+				case "extendedupgrade":
+					var _g2 = 0;
+					var _g3 = this.upgrades;
+					while(_g2 < _g3.length) {
+						var other = _g3[_g2];
+						++_g2;
+						switch(other.id) {
+						case "clickboost1":case "clickboost2":case "clickboost3":case "clickboost4":case "clickboost5":
+							other.maxLevel = 100 + 10 * u.level;
+							break;
+						case "formula":
+							other.maxLevel = 5 + 5 * u.level;
+							break;
+						case "megaboost":case "ultraboost":
+							other.maxLevel = 10 + 10 * u.level;
+							break;
+						}
+					}
+					break;
 				case "formula":
 					this.FormulaLevel = u.level;
 					break;
@@ -79509,7 +79675,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 68920;
+	this.version = 270817;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
