@@ -913,7 +913,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "35";
+	app.meta.h["build"] = "37";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "ld47";
 	app.meta.h["name"] = "fnf 0.2 (2/98)";
@@ -7704,11 +7704,32 @@ HxOverrides.remove = function(a,obj) {
 HxOverrides.now = function() {
 	return Date.now();
 };
+var SaveManager = function() { };
+$hxClasses["SaveManager"] = SaveManager;
+SaveManager.__name__ = "SaveManager";
+SaveManager.init = function() {
+	SaveManager.save = new flixel_util_FlxSave();
+	SaveManager.save.bind("incremental_save_v1");
+	if(SaveManager.save.data.data == null) {
+		SaveManager.data = { version : 1, points : 0, prestigePoints : 0, upgrades : { }};
+	} else {
+		SaveManager.data = SaveManager.save.data.data;
+	}
+};
+SaveManager.flush = function() {
+	SaveManager.save.data.data = SaveManager.data;
+	SaveManager.save.flush();
+};
 var IncrementalState = function() {
+	this.prestigeTexts = [];
+	this.prestigeButtons = [];
+	this.prestigeUpgrades = [];
 	this.upgradeTexts = [];
 	this.upgradeButtons = [];
 	this.upgrades = [];
 	this.passiveRate = 0;
+	this.prestigeLevel = 0;
+	this.prestigePoints = 0;
 	this.FormulaLevel = 0;
 	this.FormulaBoost = 1;
 	this.clickMulti = 1;
@@ -7721,7 +7742,8 @@ IncrementalState.__name__ = "IncrementalState";
 IncrementalState.__super__ = flixel_FlxState;
 IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	initUpgrades: function() {
-		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 1, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e7, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "ultraboost", name : "Ultra Boost", level : 0, baseCost : 1e9, costMult : 1.5, multiplier : 100.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e10, costMult : 1.5, multiplier : 1.05, maxLevel : 10},{ id : "extendedupgrade", name : "More Levels", level : 0, baseCost : 1e12, costMult : 1.5, multiplier : 1.1, maxLevel : 10}];
+		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 1, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e7, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "ultraboost", name : "Ultra Boost", level : 0, baseCost : 1e9, costMult : 1.5, multiplier : 100.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e10, costMult : 1.5, multiplier : 1.05, maxLevel : 10},{ id : "extendedupgrade", name : "More Levels", level : 0, baseCost : 1e12, costMult : 1.5, multiplier : 1.1, maxLevel : 10},{ id : "omegaboost", name : "Omega Boost", level : 0, baseCost : 5e13, costMult : 10, multiplier : 500, maxLevel : 10},{ id : "hyperboost", name : "Hyper Boost", level : 0, baseCost : 1e20, costMult : 10, multiplier : 1000, maxLevel : 10},{ id : "clickboost6", name : "Click Boost 1 Remastered", level : 0, baseCost : 1e25, costMult : 10, multiplier : 10000, maxLevel : 10},{ id : "unstucker100", name : "Unstucker 100", level : 0, baseCost : 0.0000001, costMult : 1.01, multiplier : 1.01, maxLevel : 2147483647}];
+		this.prestigeUpgrades = [{ id : "recovery1", name : "Recovery 1", level : 0, baseCost : 1, costMult : 2, multiplier : 5, maxLevel : 10}];
 	}
 	,buyUpgrade: function(id) {
 		var _g = 0;
@@ -7743,6 +7765,29 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 				}
 			}
 		}
+		this.saveGame();
+	}
+	,buyPrestigeUpgrade: function(id) {
+		var _g = 0;
+		var _g1 = this.prestigeUpgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			if(u.id == id) {
+				if(u.level >= u.maxLevel) {
+					return;
+				}
+				var cost = this.getCost(u);
+				if(this.points >= cost) {
+					this.points -= cost;
+					u.level++;
+					if(u.level > u.maxLevel) {
+						u.level = u.maxLevel;
+					}
+				}
+			}
+		}
+		this.saveGame();
 	}
 	,getCost: function(u) {
 		return u.baseCost * Math.pow(u.costMult,u.level);
@@ -7772,6 +7817,23 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 			this.add(btn);
 			this.upgradeTexts.push(label);
 			this.upgradeButtons.push(btn);
+		}
+		var _g = 0;
+		var _g1 = this.prestigeUpgrades.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var u1 = [this.prestigeUpgrades[i]];
+			var label = new flixel_text_FlxText(300,startY + i * 40,200,"");
+			label.set_size(12);
+			this.add(label);
+			var btn = new flixel_ui_FlxButton(510,startY + i * 40,"BUY",(function(u) {
+				return function() {
+					_gthis.buyPrestigeUpgrade(u[0].id);
+				};
+			})(u1));
+			this.add(btn);
+			this.prestigeTexts.push(label);
+			this.prestigeButtons.push(btn);
 		}
 	}
 	,floorTo: function(value,decimals) {
@@ -7820,8 +7882,12 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		return Std.string(this.floorTo(value,decimals));
 	}
 	,scientific: function(value) {
-		var exp = Math.floor(Math.log(value) / Math.log(10));
+		var exp = Math.floor(Math.log(value + 1e-12) / Math.log(10));
 		var mantissa = value / Math.pow(10,exp);
+		if(mantissa >= 10) {
+			mantissa /= 10;
+			++exp;
+		}
 		if(exp >= 9) {
 			return Std.string(this.floorTo(mantissa,6)) + "e" + exp;
 		} else if(exp <= 99) {
@@ -7831,11 +7897,69 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		}
 		return Std.string(this.floorTo(mantissa,2)) + "e" + exp;
 	}
+	,canPrestige: function() {
+		return this.points >= 1e30;
+	}
+	,getPrestigeGain: function() {
+		if(this.points < 1e30) {
+			return 0;
+		}
+		return Math.floor(Math.pow(this.points / 1e30,0.25));
+	}
+	,prestige: function() {
+		if(!this.canPrestige()) {
+			return;
+		}
+		var gain = this.getPrestigeGain();
+		this.prestigePoints += gain;
+		this.points = 0;
+		this.passiveRate = 0;
+		this.clickMulti = 1;
+		this.FormulaLevel = 0;
+		this.FormulaBoost = 1;
+		var _g = 0;
+		var _g1 = this.upgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			u.level = 0;
+		}
+	}
+	,saveGame: function() {
+		SaveManager.data.points = this.points;
+		SaveManager.data.prestigePoints = this.prestigePoints;
+		SaveManager.data.upgrades = { };
+		var _g = 0;
+		var _g1 = this.upgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			SaveManager.data.upgrades[u.id] = u.level;
+		}
+		SaveManager.flush();
+	}
+	,loadGame: function() {
+		this.points = SaveManager.data.points;
+		this.prestigePoints = SaveManager.data.prestigePoints;
+		var map = SaveManager.data.upgrades;
+		var _g = 0;
+		var _g1 = this.upgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			var lvl = Reflect.field(map,u.id);
+			if(lvl != null) {
+				u.level = lvl;
+			}
+		}
+	}
 	,create: function() {
 		var _gthis = this;
 		flixel_FlxState.prototype.create.call(this);
 		this.initUpgrades();
 		this.createUpgradeUI();
+		SaveManager.init();
+		this.loadGame();
 		flixel_FlxG.sound.playMusic("assets/music/HaxeFlixel_Tutorial_Game.mp3",0,false);
 		this.pointsText = new flixel_text_FlxText(10,10,0,"points: 0");
 		this.pointsText.set_size(16);
@@ -7845,23 +7969,25 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 			_gthis.updateUI();
 		});
 		this.add(this.clickButton);
+		this.prestigeButton = new flixel_ui_FlxButton(10,30,"prestige",$bind(this,this.prestige));
+		this.add(this.prestigeButton);
 		this.saveWarningText = new flixel_text_FlxText(4,flixel_FlxG.height - 36,0,"WARNING: SAVING NOT YET IMPLEMENTED");
 		this.saveWarningText.set_size(8);
 		this.add(this.saveWarningText);
-		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"PROTOTYPE 3 - endgame = 1e30 points");
+		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"Pre-Alpha 1 - endgame = 1e50 points");
 		this.versionText.set_size(8);
 		this.add(this.versionText);
-		new flixel_util_FlxTimer().start(1,function(_) {
-			_gthis.points += _gthis.passiveRate;
-			_gthis.updateUI();
+		new flixel_util_FlxTimer().start(15,function(_) {
+			_gthis.saveGame();
 		},0);
 	}
 	,updateUI: function() {
-		this.pointsText.set_text("points: " + this.checkRounding(this.points));
+		this.pointsText.set_text("points: " + this.checkRounding(this.points) + " | PP: " + this.checkRounding(this.prestigePoints));
 	}
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
 		this.clickMulti = 1;
+		this.updateUI();
 		switch(this.FormulaLevel) {
 		case 0:
 			this.FormulaBoost = 1.0;
@@ -8040,8 +8166,10 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		if(isNaN(f)) {
 			this.points = 0;
 		}
-		if(this.points > 1e30) {
+		if(this.points > 1e30 && this.prestigePoints == 0 && this.prestigeUpgrades[0].level == 0) {
 			this.points = 1e30;
+		} else if(this.points > 1e50) {
+			this.points = 1e50;
 		}
 		var _g = 0;
 		var _g1 = this.upgrades;
@@ -8080,6 +8208,17 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 				}
 			}
 		}
+		var _g = 0;
+		var _g1 = this.prestigeUpgrades;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			if(u.level > 0) {
+				if(u.id == "recovery1") {
+					this.clickMulti *= u.multiplier * u.level;
+				}
+			}
+		}
 		this.clickMulti *= this.FormulaBoost;
 		var _g = 0;
 		var _g1 = this.upgrades.length;
@@ -8091,7 +8230,19 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 				this.upgradeTexts[i].set_text(u.name + "\nMAX LEVEL REACHED");
 				continue;
 			}
-			this.upgradeTexts[i].set_text(u.name + "\nCost: " + this.checkRounding(cost) + " | Level: " + u.level + "/" + u.maxLevel);
+			this.upgradeTexts[i].set_text(u.name + "\nCost: " + this.checkRounding(cost) + " Points | Level: " + u.level + "/" + u.maxLevel);
+		}
+		var _g = 0;
+		var _g1 = this.prestigeUpgrades.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var u = this.prestigeUpgrades[i];
+			var cost = this.getCost(u);
+			if(u.level == u.maxLevel) {
+				this.prestigeTexts[i].set_text(u.name + "\nMAX LEVEL REACHED");
+				continue;
+			}
+			this.prestigeTexts[i].set_text(u.name + "\nCost: " + this.checkRounding(cost) + " Prestige Points | Level: " + u.level + "/" + u.maxLevel);
 		}
 	}
 	,__class__: IncrementalState
@@ -79675,7 +79826,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 270817;
+	this.version = 776316;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
@@ -132165,6 +132316,7 @@ AssetPaths.Bopeebo_Voices__mp3 = "assets/music/Bopeebo_Voices.mp3";
 AssetPaths.Fresh__mp3 = "assets/music/Fresh.mp3";
 AssetPaths.Fresh_Inst__mp3 = "assets/music/Fresh_Inst.mp3";
 AssetPaths.Fresh_Voices__mp3 = "assets/music/Fresh_Voices.mp3";
+AssetPaths.HaxeFlixel_Tutorial_Game___Copy__ogg = "assets/music/HaxeFlixel_Tutorial_Game - Copy.ogg";
 AssetPaths.HaxeFlixel_Tutorial_Game__mp3 = "assets/music/HaxeFlixel_Tutorial_Game.mp3";
 AssetPaths.HaxeFlixel_Tutorial_Game__ogg = "assets/music/HaxeFlixel_Tutorial_Game.ogg";
 AssetPaths.Jammer2__mp3 = "assets/music/Jammer2.mp3";
@@ -132183,7 +132335,7 @@ AssetPaths.missnote1__mp3 = "assets/sounds/missnote1.mp3";
 AssetPaths.missnote2__mp3 = "assets/sounds/missnote2.mp3";
 AssetPaths.missnote3__mp3 = "assets/sounds/missnote3.mp3";
 AssetPaths.sounds_go_here__txt = "assets/sounds/sounds-go-here.txt";
-AssetPaths.allFiles = ["assets/data/bopeebo.json","assets/data/bopeebo/bopeebo_section1.png","assets/data/bopeebo/bopeebo_section10.png","assets/data/bopeebo/bopeebo_section11.png","assets/data/bopeebo/bopeebo_section12.png","assets/data/bopeebo/bopeebo_section13.png","assets/data/bopeebo/bopeebo_section14.png","assets/data/bopeebo/bopeebo_section15.png","assets/data/bopeebo/bopeebo_section2.png","assets/data/bopeebo/bopeebo_section3.png","assets/data/bopeebo/bopeebo_section4.png","assets/data/bopeebo/bopeebo_section5.png","assets/data/bopeebo/bopeebo_section6.png","assets/data/bopeebo/bopeebo_section7.png","assets/data/bopeebo/bopeebo_section8.png","assets/data/bopeebo/bopeebo_section9.png","assets/data/bopeebo/bopeepo_section1.png","assets/data/bopeebo/bopeepo_section10.png","assets/data/bopeebo/bopeepo_section11.png","assets/data/bopeebo/bopeepo_section12.png","assets/data/bopeebo/bopeepo_section13.png","assets/data/bopeebo/bopeepo_section14.png","assets/data/bopeebo/bopeepo_section15.png","assets/data/bopeebo/bopeepo_section2.png","assets/data/bopeebo/bopeepo_section3.png","assets/data/bopeebo/bopeepo_section4.png","assets/data/bopeebo/bopeepo_section5.png","assets/data/bopeebo/bopeepo_section6.png","assets/data/bopeebo/bopeepo_section7.png","assets/data/bopeebo/bopeepo_section8.png","assets/data/bopeebo/bopeepo_section9.png","assets/data/bopeebo.json","assets/data/data-goes-here.txt","assets/data/fresh/fresh.json","assets/data/fresh/fresh_section1.png","assets/data/fresh/fresh_section10.png","assets/data/fresh/fresh_section11.png","assets/data/fresh/fresh_section12.png","assets/data/fresh/fresh_section13.png","assets/data/fresh/fresh_section14.png","assets/data/fresh/fresh_section15.png","assets/data/fresh/fresh_section16.png","assets/data/fresh/fresh_section2.png","assets/data/fresh/fresh_section3.png","assets/data/fresh/fresh_section4.png","assets/data/fresh/fresh_section5.png","assets/data/fresh/fresh_section6.png","assets/data/fresh/fresh_section7.png","assets/data/fresh/fresh_section8.png","assets/data/fresh/fresh_section9.png","assets/data/section1.aseprite","assets/data/specialThanks.txt","assets/images/bad.png","assets/images/bg.png","assets/images/BOYFRIEND.png","assets/images/BOYFRIEND.xml","assets/images/combo.png","assets/images/DADDY_DEAREST.png","assets/images/DADDY_DEAREST.xml","assets/images/GF_assets.png","assets/images/GF_assets.xml","assets/images/go.png","assets/images/good.png","assets/images/grafix.png","assets/images/healthBar.png","assets/images/healthHeads.png","assets/images/healthHeads.xml","assets/images/images-go-here.txt","assets/images/logo.png","assets/images/lose.png","assets/images/lose.xml","assets/images/NOTE_assets.png","assets/images/NOTE_assets.xml","assets/images/num0.png","assets/images/num1.png","assets/images/num2.png","assets/images/num3.png","assets/images/num4.png","assets/images/num5.png","assets/images/num6.png","assets/images/num7.png","assets/images/num8.png","assets/images/num9.png","assets/images/ready.png","assets/images/restart.png","assets/images/set.png","assets/images/shit.png","assets/images/sick.png","assets/images/stageback.png","assets/images/stagecurtains.png","assets/images/stagefront.png","assets/images/stage_light.png","assets/music/Bopeebo.mp3","assets/music/Bopeebo_Inst.mp3","assets/music/Bopeebo_Voices.mp3","assets/music/Fresh.mp3","assets/music/Fresh_Inst.mp3","assets/music/Fresh_Voices.mp3","assets/music/HaxeFlixel_Tutorial_Game.mp3","assets/music/HaxeFlixel_Tutorial_Game.ogg","assets/music/Jammer2.mp3","assets/music/music-goes-here.txt","assets/music/title.mp3","assets/music/titleShoot.mp3","assets/sounds/badnoise1.mp3","assets/sounds/badnoise2.mp3","assets/sounds/badnoise3.mp3","assets/sounds/freshIntro.mp3","assets/sounds/intro1.mp3","assets/sounds/intro2.mp3","assets/sounds/intro3.mp3","assets/sounds/introGo.mp3","assets/sounds/missnote1.mp3","assets/sounds/missnote2.mp3","assets/sounds/missnote3.mp3","assets/sounds/sounds-go-here.txt"];
+AssetPaths.allFiles = ["assets/data/bopeebo.json","assets/data/bopeebo/bopeebo_section1.png","assets/data/bopeebo/bopeebo_section10.png","assets/data/bopeebo/bopeebo_section11.png","assets/data/bopeebo/bopeebo_section12.png","assets/data/bopeebo/bopeebo_section13.png","assets/data/bopeebo/bopeebo_section14.png","assets/data/bopeebo/bopeebo_section15.png","assets/data/bopeebo/bopeebo_section2.png","assets/data/bopeebo/bopeebo_section3.png","assets/data/bopeebo/bopeebo_section4.png","assets/data/bopeebo/bopeebo_section5.png","assets/data/bopeebo/bopeebo_section6.png","assets/data/bopeebo/bopeebo_section7.png","assets/data/bopeebo/bopeebo_section8.png","assets/data/bopeebo/bopeebo_section9.png","assets/data/bopeebo/bopeepo_section1.png","assets/data/bopeebo/bopeepo_section10.png","assets/data/bopeebo/bopeepo_section11.png","assets/data/bopeebo/bopeepo_section12.png","assets/data/bopeebo/bopeepo_section13.png","assets/data/bopeebo/bopeepo_section14.png","assets/data/bopeebo/bopeepo_section15.png","assets/data/bopeebo/bopeepo_section2.png","assets/data/bopeebo/bopeepo_section3.png","assets/data/bopeebo/bopeepo_section4.png","assets/data/bopeebo/bopeepo_section5.png","assets/data/bopeebo/bopeepo_section6.png","assets/data/bopeebo/bopeepo_section7.png","assets/data/bopeebo/bopeepo_section8.png","assets/data/bopeebo/bopeepo_section9.png","assets/data/bopeebo.json","assets/data/data-goes-here.txt","assets/data/fresh/fresh.json","assets/data/fresh/fresh_section1.png","assets/data/fresh/fresh_section10.png","assets/data/fresh/fresh_section11.png","assets/data/fresh/fresh_section12.png","assets/data/fresh/fresh_section13.png","assets/data/fresh/fresh_section14.png","assets/data/fresh/fresh_section15.png","assets/data/fresh/fresh_section16.png","assets/data/fresh/fresh_section2.png","assets/data/fresh/fresh_section3.png","assets/data/fresh/fresh_section4.png","assets/data/fresh/fresh_section5.png","assets/data/fresh/fresh_section6.png","assets/data/fresh/fresh_section7.png","assets/data/fresh/fresh_section8.png","assets/data/fresh/fresh_section9.png","assets/data/section1.aseprite","assets/data/specialThanks.txt","assets/images/bad.png","assets/images/bg.png","assets/images/BOYFRIEND.png","assets/images/BOYFRIEND.xml","assets/images/combo.png","assets/images/DADDY_DEAREST.png","assets/images/DADDY_DEAREST.xml","assets/images/GF_assets.png","assets/images/GF_assets.xml","assets/images/go.png","assets/images/good.png","assets/images/grafix.png","assets/images/healthBar.png","assets/images/healthHeads.png","assets/images/healthHeads.xml","assets/images/images-go-here.txt","assets/images/logo.png","assets/images/lose.png","assets/images/lose.xml","assets/images/NOTE_assets.png","assets/images/NOTE_assets.xml","assets/images/num0.png","assets/images/num1.png","assets/images/num2.png","assets/images/num3.png","assets/images/num4.png","assets/images/num5.png","assets/images/num6.png","assets/images/num7.png","assets/images/num8.png","assets/images/num9.png","assets/images/ready.png","assets/images/restart.png","assets/images/set.png","assets/images/shit.png","assets/images/sick.png","assets/images/stageback.png","assets/images/stagecurtains.png","assets/images/stagefront.png","assets/images/stage_light.png","assets/music/Bopeebo.mp3","assets/music/Bopeebo_Inst.mp3","assets/music/Bopeebo_Voices.mp3","assets/music/Fresh.mp3","assets/music/Fresh_Inst.mp3","assets/music/Fresh_Voices.mp3","assets/music/HaxeFlixel_Tutorial_Game - Copy.ogg","assets/music/HaxeFlixel_Tutorial_Game.mp3","assets/music/HaxeFlixel_Tutorial_Game.ogg","assets/music/Jammer2.mp3","assets/music/music-goes-here.txt","assets/music/title.mp3","assets/music/titleShoot.mp3","assets/sounds/badnoise1.mp3","assets/sounds/badnoise2.mp3","assets/sounds/badnoise3.mp3","assets/sounds/freshIntro.mp3","assets/sounds/intro1.mp3","assets/sounds/intro2.mp3","assets/sounds/intro3.mp3","assets/sounds/introGo.mp3","assets/sounds/missnote1.mp3","assets/sounds/missnote2.mp3","assets/sounds/missnote3.mp3","assets/sounds/sounds-go-here.txt"];
 flixel_FlxBasic.idEnumerator = 0;
 flixel_FlxObject.defaultPixelPerfectPosition = false;
 flixel_FlxObject.SEPARATE_BIAS = 4;
