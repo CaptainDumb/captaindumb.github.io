@@ -913,7 +913,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "37";
+	app.meta.h["build"] = "38";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "ld47";
 	app.meta.h["name"] = "fnf 0.2 (2/98)";
@@ -7720,6 +7720,36 @@ SaveManager.flush = function() {
 	SaveManager.save.data.data = SaveManager.data;
 	SaveManager.save.flush();
 };
+SaveManager.clear = function() {
+	SaveManager.save.erase();
+	if(flixel_FlxG.game._state == null || flixel_FlxG.game._state._constructor == null) {
+		flixel_FlxG.log.advanced("FlxG.resetState was called while switching states",flixel_system_debug_log_LogStyle.ERROR,true);
+	} else if(!((flixel_FlxG.game._state._constructor) instanceof flixel_FlxState)) {
+		var nextState = flixel_FlxG.game._state._constructor;
+		var stateOnCall = flixel_FlxG.game._state;
+		if(!((nextState) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState)) {
+			flixel_FlxG.game._state.startOutro(function() {
+				if(flixel_FlxG.game._state == stateOnCall) {
+					flixel_FlxG.game._nextState = nextState;
+				} else {
+					flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+				}
+			});
+		}
+	} else {
+		var nextState1 = flixel_util_typeLimit_NextState.fromState(Type.createInstance(js_Boot.getClass(flixel_FlxG.game._state),[]));
+		var stateOnCall1 = flixel_FlxG.game._state;
+		if(!((nextState1) instanceof flixel_FlxState) || flixel_FlxG.canSwitchTo(nextState1)) {
+			flixel_FlxG.game._state.startOutro(function() {
+				if(flixel_FlxG.game._state == stateOnCall1) {
+					flixel_FlxG.game._nextState = nextState1;
+				} else {
+					flixel_FlxG.log.advanced("`onOutroComplete` was called after the state was switched. This will be ignored",flixel_system_debug_log_LogStyle.WARNING,true);
+				}
+			});
+		}
+	}
+};
 var IncrementalState = function() {
 	this.prestigeTexts = [];
 	this.prestigeButtons = [];
@@ -7733,7 +7763,7 @@ var IncrementalState = function() {
 	this.FormulaLevel = 0;
 	this.FormulaBoost = 1;
 	this.clickMulti = 1;
-	this.baseMulti = 0.0000001;
+	this.baseMulti = 0.001;
 	this.points = 0;
 	flixel_FlxState.call(this);
 };
@@ -7742,7 +7772,7 @@ IncrementalState.__name__ = "IncrementalState";
 IncrementalState.__super__ = flixel_FlxState;
 IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	initUpgrades: function() {
-		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.0000002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.0000005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.000001, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.000002, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.000005, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 1, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e7, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "ultraboost", name : "Ultra Boost", level : 0, baseCost : 1e9, costMult : 1.5, multiplier : 100.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e10, costMult : 1.5, multiplier : 1.05, maxLevel : 10},{ id : "extendedupgrade", name : "More Levels", level : 0, baseCost : 1e12, costMult : 1.5, multiplier : 1.1, maxLevel : 10},{ id : "omegaboost", name : "Omega Boost", level : 0, baseCost : 5e13, costMult : 10, multiplier : 500, maxLevel : 10},{ id : "hyperboost", name : "Hyper Boost", level : 0, baseCost : 1e20, costMult : 10, multiplier : 1000, maxLevel : 10},{ id : "clickboost6", name : "Click Boost 1 Remastered", level : 0, baseCost : 1e25, costMult : 10, multiplier : 10000, maxLevel : 10},{ id : "unstucker100", name : "Unstucker 100", level : 0, baseCost : 0.0000001, costMult : 1.01, multiplier : 1.01, maxLevel : 2147483647}];
+		this.upgrades = [{ id : "clickboost1", name : "Click Boost 1", level : 0, baseCost : 0.002, costMult : 1.15, multiplier : 1.5, maxLevel : 100},{ id : "clickboost2", name : "Click Boost 2", level : 0, baseCost : 0.005, costMult : 1.2, multiplier : 1.3, maxLevel : 100},{ id : "clickboost3", name : "Click Boost 3", level : 0, baseCost : 0.01, costMult : 1.25, multiplier : 1.4, maxLevel : 100},{ id : "clickboost4", name : "Click Boost 4", level : 0, baseCost : 0.02, costMult : 1.3, multiplier : 1.5, maxLevel : 100},{ id : "clickboost5", name : "Click Boost 5", level : 0, baseCost : 0.05, costMult : 1.35, multiplier : 1.6, maxLevel : 100},{ id : "formula", name : "Point SelfBoost", level : 0, baseCost : 10000, costMult : 100, multiplier : 1.0, maxLevel : 5},{ id : "megaboost", name : "Mega Boost", level : 0, baseCost : 1e11, costMult : 1.5, multiplier : 15.0, maxLevel : 10},{ id : "ultraboost", name : "Ultra Boost", level : 0, baseCost : 1e13, costMult : 1.5, multiplier : 100.0, maxLevel : 10},{ id : "powers1", name : "Power Boost 1", level : 0, baseCost : 1e14, costMult : 1.5, multiplier : 1.05, maxLevel : 10},{ id : "extendedupgrade", name : "More Levels", level : 0, baseCost : 1e16, costMult : 1.5, multiplier : 1.1, maxLevel : 10},{ id : "omegaboost", name : "Omega Boost", level : 0, baseCost : 5e17, costMult : 10, multiplier : 500, maxLevel : 10},{ id : "hyperboost", name : "Hyper Boost", level : 0, baseCost : 1e24, costMult : 10, multiplier : 1000, maxLevel : 10},{ id : "clickboost6", name : "Click Boost 1 Remastered", level : 0, baseCost : 1e29, costMult : 10, multiplier : 10000, maxLevel : 10},{ id : "unstucker100", name : "Point Stealer with minor boost", level : 0, baseCost : 0.001, costMult : 1.01, multiplier : 1.01, maxLevel : 100}];
 		this.prestigeUpgrades = [{ id : "recovery1", name : "Recovery 1", level : 0, baseCost : 1, costMult : 2, multiplier : 5, maxLevel : 10}];
 	}
 	,buyUpgrade: function(id) {
@@ -7778,8 +7808,8 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 					return;
 				}
 				var cost = this.getCost(u);
-				if(this.points >= cost) {
-					this.points -= cost;
+				if(this.prestigePoints >= cost) {
+					this.prestigePoints -= cost;
 					u.level++;
 					if(u.level > u.maxLevel) {
 						u.level = u.maxLevel;
@@ -7971,11 +8001,12 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		this.add(this.clickButton);
 		this.prestigeButton = new flixel_ui_FlxButton(10,30,"prestige",$bind(this,this.prestige));
 		this.add(this.prestigeButton);
-		this.saveWarningText = new flixel_text_FlxText(4,flixel_FlxG.height - 36,0,"WARNING: SAVING NOT YET IMPLEMENTED");
-		this.saveWarningText.set_size(8);
+		this.saveWarningText = new flixel_text_FlxText(4,flixel_FlxG.height - 50,0,"CURRENTLY DOING BALANCING, GRAPHICAL REVAMP AFTER - PRESS DELETE TO RESET PROGRESS");
+		this.saveWarningText.set_size(16);
+		this.saveWarningText.set_color(-65536);
 		this.add(this.saveWarningText);
-		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 18,0,"Pre-Alpha 1 - endgame = 1e50 points");
-		this.versionText.set_size(8);
+		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 32,0,"Pre-Alpha 2 - endgame = 1e50 points");
+		this.versionText.set_size(24);
 		this.add(this.versionText);
 		new flixel_util_FlxTimer().start(15,function(_) {
 			_gthis.saveGame();
@@ -7986,6 +8017,10 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 	}
 	,update: function(elapsed) {
 		flixel_FlxState.prototype.update.call(this,elapsed);
+		var _this = flixel_FlxG.keys.justPressed;
+		if(_this.keyManager.checkStatusUnsafe(46,_this.status)) {
+			SaveManager.clear();
+		}
 		this.clickMulti = 1;
 		this.updateUI();
 		switch(this.FormulaLevel) {
@@ -79826,7 +79861,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 776316;
+	this.version = 888017;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
