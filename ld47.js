@@ -913,7 +913,7 @@ ApplicationMain.main = function() {
 ApplicationMain.create = function(config) {
 	var app = new openfl_display_Application();
 	ManifestResources.init(config);
-	app.meta.h["build"] = "38";
+	app.meta.h["build"] = "39";
 	app.meta.h["company"] = "HaxeFlixel";
 	app.meta.h["file"] = "ld47";
 	app.meta.h["name"] = "fnf 0.2 (2/98)";
@@ -8005,7 +8005,11 @@ IncrementalState.prototype = $extend(flixel_FlxState.prototype,{
 		this.saveWarningText.set_size(16);
 		this.saveWarningText.set_color(-65536);
 		this.add(this.saveWarningText);
-		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 32,0,"Pre-Alpha 2 - endgame = 1e50 points");
+		this.randomText = new flixel_text_FlxText(600,20,0,"can i request you to talk about the game balance which is what\n i am focusing on\n instead of treating me like a 7 year old who's \ntrowing a tantrum about tristan being mean, thanks in advance");
+		this.randomText.set_size(16);
+		this.randomText.set_color(-65536);
+		this.add(this.randomText);
+		this.versionText = new flixel_text_FlxText(4,flixel_FlxG.height - 32,0,"Pre-Alpha 2_01 - endgame = 1e50 points");
 		this.versionText.set_size(24);
 		this.add(this.versionText);
 		new flixel_util_FlxTimer().start(15,function(_) {
@@ -79861,7 +79865,7 @@ var lime_utils_AssetCache = function() {
 	this.audio = new haxe_ds_StringMap();
 	this.font = new haxe_ds_StringMap();
 	this.image = new haxe_ds_StringMap();
-	this.version = 888017;
+	this.version = 143331;
 };
 $hxClasses["lime.utils.AssetCache"] = lime_utils_AssetCache;
 lime_utils_AssetCache.__name__ = "lime.utils.AssetCache";
